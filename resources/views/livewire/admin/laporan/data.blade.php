@@ -50,7 +50,7 @@
                 <tr>
                     <th scope="row">{{ $index + 1 }}</th>
                     <td>{{ $item->nomor_tiket }}</td>
-                    <td>{{ $item->nama_lengkap }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
                     <td>{{ $item->nik }}</td>
                     <td>{{ $item->nomor_pengadu }}</td>
                     <td>{{ $item->jenis_kelamin }}</td>
