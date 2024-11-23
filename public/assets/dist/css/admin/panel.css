@@ -1,0 +1,227 @@
+.wrapper {
+    min-height: 90vh;
+    height: auto;
+    background-color: rgb(240, 240, 240);
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 50px;
+    z-index: 5;
+    padding-top: .1rem !important;
+}
+
+.navbar .navbar-brand {
+    font-family: 'Pacifico', cursive;
+}
+
+.navbar .nav-item .dropdown-menu {
+    width: 300px;
+}
+
+.navbar .nav-item .img-user {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.navbar .nav-item .dropdown-menu .img-user {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.navbar .nav-item .badge {
+    width: 24px;
+    height: 24px;
+    padding: 0px;
+    font-size: 16px;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 24px;
+    text-align: center;
+    padding-top: .2rem;
+    padding-bottom: .1rem;
+}
+
+.navbar .nav-item .dropdown-menu .dropdown-icons {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    text-align: center;
+    padding: auto;
+}
+
+.slider {
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    background: #36D1DC;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to top, #5B86E5, #36D1DC);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to top, #5B86E5, #36D1DC); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+    transition: all 0.3s;
+    z-index: 9;
+    padding-bottom: 24px;
+    overflow-y: scroll;
+    /* background-color: #ece7dd; */
+}
+
+.slider-head {
+    padding-top: 24px;
+    padding-bottom: 14px;
+}
+
+.slider-head .slider-img-user {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+.slider-body .nav .nav-link {
+    color: #fff;
+    border-radius: 4px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+.slider-body .nav .nav-link.nav-link-child{
+    padding-right: 1rem!important;
+    padding-left: 1.5rem!important;
+}
+
+.slider-body .nav .nav-link:hover {
+    padding-left: 24px !important;
+    color: #f3f3f3;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.slider-body .nav .nav-link .indications{
+    transition: all 0.3s;
+    margin-left: auto;
+}
+.slider-body .nav .nav-link.collapsed .indications{
+    -webkit-transform: rotate(-180deg);    
+    -moz-transform: rotate(-180deg);        
+    -o-transform: rotate(-180deg);          
+    -ms-transform: rotate(-180deg);         
+    transform: rotate(-180deg);
+}
+
+.slider-body .nav .nav-link .box-icon {
+    width: 20px;
+    margin-right: 8px;
+}
+
+.slider::-webkit-scrollbar {
+    width: 8px;
+}
+
+.slider::-webkit-scrollbar-track {
+    border-radius: 0px;
+    -webkit-box-shadow: transparent;
+}
+
+.slider::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.slider-background {
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    z-index: 8;
+    display: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: all 0.2s;
+}
+
+
+.main-pages {
+    display: block;
+    margin-top: 50px;
+    margin-left: 260px;
+    height: auto;
+    padding: 14px 8px 14px 8px;
+    /* background-color: rgb(255, 255, 255); */
+    transition: all 0.3s;
+    z-index: 1;
+}
+
+.text-color{
+    color: #716D66;
+}
+
+.btn-custom-1{
+    color: #716D66;
+    background-color: #ece7dd;
+}
+.btn-custom-1:hover{
+    border-color: transparent;
+    color: #4d4537;
+    background-color: #dad1be;
+}
+
+.bg-custom{
+    background-color: #fcfaf7;
+}
+.bg-custom-2{
+    background-color: #dfdad2;
+}
+
+@media(max-width: 768px) {
+    .slider {
+        margin-left: -280px;
+    }
+
+    .slider.active {
+        margin-left: 0px;
+    }
+
+    .slider-background.active {
+        display: block;
+    }
+
+    .main-pages {
+        margin-left: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+}
+
+@media(max-width: 576px) {
+    .navbar .nav .nav-item .dropdown-menu {
+        position: fixed;
+        top: 52px;
+        left: 0px;
+        right: 0px;
+        width: 90% !important;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0px !important;
+    }
+}
+
+@media(max-width: 360px) {
+    .slider {
+        margin-left: -100%;
+        width: 75%;
+    }
+}

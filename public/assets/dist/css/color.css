@@ -1,0 +1,192 @@
+.text-custom-1{
+    color: #fe7467!important;
+}
+.text-custom-2{
+    color: #fe7062!important
+}
+.text-custom-3{
+    color: #fed5d1!important;
+}
+.text-blue-1{
+    color: #4042e2!important;
+}
+.text-blue-2{
+    color: #5760ed!important;
+}
+.text-blue-3{
+    color: #7d97f4!important;
+}
+.text-blue-4{
+    color: #91b3fa!important;
+}
+.text-blue-5{
+    color: #bdd0fb!important;
+}
+
+
+
+.bg-custom-1{
+    background-color: #fe7467!important;
+}
+.bg-custom-2{
+    background-color: #f89e96!important
+}
+.bg-custom-3{
+    background-color: #fec7c2!important;
+}
+.bg-custom-4{
+    background-color: #f8e5e4!important;
+}
+.bg-blue-1{
+    background-color: #4042e2!important;
+}
+.bg-blue-2{
+    background-color: #5760ed!important;
+}
+.bg-blue-3{
+    background-color: #7d97f4!important;
+}
+.bg-blue-4{
+    background-color: #91b3fa!important;
+}
+.bg-blue-5{
+    background-color: #bdd0fb!important;
+}
+
+
+
+/*-- color-1 --*/
+.color1{
+	background: #0052cc !important;
+}
+
+/*-- color-2 --*/
+.color2{
+	background: #892fe2 !important;
+}
+
+/*-- color-3 --*/
+.color3{
+	background:#ff5370 !important;
+}
+
+/*-- color-4 --*/
+.color4{
+	background:#17bd81 !important;
+}
+
+/*-- color-5 --*/
+.color5{
+	background:#aa1a7a!important;
+}
+
+/*-- color-6 --*/
+.color6{
+	background: #ad0c0e !important;
+}
+
+/*-- color-7 --*/
+.color7{
+	background: #0969d6 !important;
+}
+
+/*-- color-8 --*/
+.color8{
+	background:#5231bc !important;
+}
+
+/*-- color-9 --*/
+.color9{
+	background: #5e2572!important;
+}
+
+/*-- color-10 --*/
+.color10{
+	background: #6504eb !important;
+}
+
+/*-- color-11 --*/
+.color11{
+	background: linear-gradient(to right, #0052cc, #021b79)!important;
+}
+
+/*-- color-12 --*/
+.color12{
+	background: linear-gradient(to right, #00c6fb, #005bea) !important;
+}
+
+/*-- color-13 --*/
+.color13{
+	background: linear-gradient( 135deg, #8e2ae4 10%, #4c00e6 100%) !important;
+}
+
+/*-- color-14 --*/
+.color14{
+	background: linear-gradient( 135deg, #9956a7 10%, #6a2c77  100%) !important;
+}
+
+/*-- color-15 --*/
+.color15{
+	background:linear-gradient( 135deg, #159957 10%, #155799 100%)  !important;
+}
+
+/*-- color-16 --*/
+.color16{
+	background:linear-gradient(to right, #4c1f86, #815eae) !important;
+}
+
+/*-- color-17 --*/
+.color17{
+	background: linear-gradient(to right, #3838af, #0c86ce)  !important;
+}
+
+/*-- color-18 --*/
+.color18{
+	background: linear-gradient(to right, #4c4177 ,#2a5470 ) !important;
+}
+
+/*-- color-19 --*/
+.color19{
+	background: linear-gradient(to right, #4f055f, #980fb5) !important;
+}
+
+/*-- color-20 --*/
+.color20{
+	background: linear-gradient(to right, #3d2a90, #770467) !important;
+}
+
+
+
+
+/* blue theme */
+.slider-theme{
+    background: #36D1DC;
+    /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #5B86E5, #36D1DC);
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+.btn-theme {
+    background: #36D1DC;
+    background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);
+    background: linear-gradient(to right, #5B86E5, #36D1DC);
+    color: #fff;
+}
+
+.btn-theme:hover {
+    transition: linear all 0.3s;
+    color: #fff;
+    background: #51e0eb;
+    background: -webkit-linear-gradient(to top, #7da2f2, #51e0eb);
+    background: linear-gradient(to top, #7da2f2, #51e0eb);
+}
+
+
+/* gradien */
+.gradient-scooter{
+    background: #36D1DC;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to top, #5B86E5, #36D1DC);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to top, #5B86E5, #36D1DC); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}

@@ -1,0 +1,112 @@
+.elementor {
+    position: relative;
+    margin-top: 3rem;
+}
+
+.link-boxs{
+    display: block;
+    position: relative;
+    border-radius: 4px;
+    text-decoration: none;
+    background-color: #fff;
+    padding: 1rem;
+    color: #505050;
+    transition: all 0.3s;
+}
+.link-boxs:hover{
+    color: #505050;
+    box-shadow: 0px 0px 12px #0004;
+}
+
+.link-actived{
+    display: flex;
+    position: relative;
+    background-color: #ffffff;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: right;
+}
+.link-actived:hover{
+    transition: 0.8s;
+    background-size: 160%;
+}
+
+.background-left {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    left: -50px;
+    top: -200px;
+    background: #007bff50;
+    filter: blur(140px);
+    z-index: 0;
+    border-radius: 50%;
+}
+.background-right {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    right: -200px;
+    top: 100px;
+    background: #007bff50;
+    filter: blur(140px);
+    z-index: 0;
+    border-radius: 50%;
+}
+
+.boxMembers{
+    display: flex;
+    position: relative;
+    background-color: transparent;
+    justify-content: center;
+    height: 100%;
+    padding-bottom: 3rem;
+    /* padding-left: 1rem;
+    padding-right: 1rem; */
+}
+.BoxMembersImg{
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    position: absolute;
+}
+.imgMembers{
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.boxMemberContent{
+    display: block;
+    margin-top: 3rem;
+    padding-top: 4.5rem;
+    background-color: white;
+    text-align: center;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    width: 100%;
+    height: 100%;
+    border-radius: 1rem;
+}
+
+@media(max-width: 992px) {
+    .elementor {
+        padding-top: 0rem;
+        padding-bottom: 2rem;
+    }
+    .background-right{
+        top: auto;
+        bottom: 50px;
+        z-index: -1;
+    }
+}
+
+@media(min-width: 992px){
+    .text-wellcome{
+        font-size: 14px;
+    }
+}

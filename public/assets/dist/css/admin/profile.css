@@ -1,0 +1,22 @@
+.img-profile{
+    width: 64px;
+    height: 64px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.img-profile .img-profile-content{
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+@media(max-width: 768px){
+    .img-profile{
+        width: 84px;
+        height: 84px;
+        margin-bottom: 1rem;
+    }
+}

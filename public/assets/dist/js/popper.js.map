@@ -1,0 +1,3189 @@
+{
+    version: 3,
+    file: "popper.js.map",
+    sources: [
+    "../../src/dom-utils/getWindow.js",
+    "../../src/dom-utils/instanceOf.js",
+    "../../src/utils/math.js",
+    "../../src/dom-utils/getBoundingClientRect.js",
+    "../../src/dom-utils/getWindowScroll.js",
+    "../../src/dom-utils/getNodeName.js",
+    "../../src/dom-utils/getDocumentElement.js",
+    "../../src/dom-utils/getWindowScrollBarX.js",
+    "../../src/dom-utils/getComputedStyle.js",
+    "../../src/dom-utils/isScrollParent.js",
+    "../../src/dom-utils/getCompositeRect.js",
+    "../../src/dom-utils/getNodeScroll.js",
+    "../../src/dom-utils/getHTMLElementScroll.js",
+    "../../src/dom-utils/getLayoutRect.js",
+    "../../src/dom-utils/getParentNode.js",
+    "../../src/dom-utils/getScrollParent.js",
+    "../../src/dom-utils/listScrollParents.js",
+    "../../src/dom-utils/isTableElement.js",
+    "../../src/dom-utils/getOffsetParent.js",
+    "../../src/enums.js",
+    "../../src/utils/orderModifiers.js",
+    "../../src/utils/getBasePlacement.js",
+    "../../src/dom-utils/contains.js",
+    "../../src/utils/rectToClientRect.js",
+    "../../src/dom-utils/getClippingRect.js",
+    "../../src/dom-utils/getViewportRect.js",
+    "../../src/dom-utils/getDocumentRect.js",
+    "../../src/utils/getVariation.js",
+    "../../src/utils/getMainAxisFromPlacement.js",
+    "../../src/utils/computeOffsets.js",
+    "../../src/utils/mergePaddingObject.js",
+    "../../src/utils/getFreshSideObject.js",
+    "../../src/utils/expandToHashMap.js",
+    "../../src/utils/detectOverflow.js",
+    "../../src/createPopper.js",
+    "../../src/utils/debounce.js",
+    "../../src/utils/mergeByName.js",
+    "../../src/modifiers/eventListeners.js",
+    "../../src/modifiers/popperOffsets.js",
+    "../../src/modifiers/computeStyles.js",
+    "../../src/modifiers/applyStyles.js",
+    "../../src/modifiers/offset.js",
+    "../../src/utils/getOppositePlacement.js",
+    "../../src/utils/getOppositeVariationPlacement.js",
+    "../../src/utils/computeAutoPlacement.js",
+    "../../src/modifiers/flip.js",
+    "../../src/utils/within.js",
+    "../../src/modifiers/preventOverflow.js",
+    "../../src/utils/getAltAxis.js",
+    "../../src/modifiers/arrow.js",
+    "../../src/modifiers/hide.js",
+    "../../src/popper-lite.js",
+    "../../src/popper.js"
+    ],
+    sourcesContent: [
+    "// @flow
+    import type { Window } from '../types';
+    declare function getWindow(node: Node | Window): Window;
+    
+    export default function getWindow(node) {
+      if (node == null) {
+        return window;
+      }
+    
+      if (node.toString() !== '[object Window]') {
+        const ownerDocument = node.ownerDocument;
+        return ownerDocument ? ownerDocument.defaultView || window : window;
+      }
+    
+      return node;
+    }
+    ",
+    "// @flow
+    import getWindow from './getWindow';
+    
+    declare function isElement(node: mixed): boolean %checks(node instanceof
+      Element);
+    function isElement(node) {
+      const OwnElement = getWindow(node).Element;
+      return node instanceof OwnElement || node instanceof Element;
+    }
+    
+    declare function isHTMLElement(node: mixed): boolean %checks(node instanceof
+      HTMLElement);
+    function isHTMLElement(node) {
+      const OwnElement = getWindow(node).HTMLElement;
+      return node instanceof OwnElement || node instanceof HTMLElement;
+    }
+    
+    declare function isShadowRoot(node: mixed): boolean %checks(node instanceof
+      ShadowRoot);
+    function isShadowRoot(node) {
+      // IE 11 has no ShadowRoot
+      if (typeof ShadowRoot === 'undefined') {
+        return false;
+      }
+      const OwnElement = getWindow(node).ShadowRoot;
+      return node instanceof OwnElement || node instanceof ShadowRoot;
+    }
+    
+    export { isElement, isHTMLElement, isShadowRoot };
+    ",
+    "// @flow
+    export const max = Math.max;
+    export const min = Math.min;
+    export const round = Math.round;
+    ",
+    "// @flow
+    import type { ClientRectObject, VirtualElement } from '../types';
+    import { isHTMLElement } from './instanceOf';
+    import { round } from '../utils/math';
+    
+    export default function getBoundingClientRect(
+      element: Element | VirtualElement,
+      includeScale: boolean = false
+    ): ClientRectObject {
+      const rect = element.getBoundingClientRect();
+      let scaleX = 1;
+      let scaleY = 1;
+    
+      if (isHTMLElement(element) && includeScale) {
+        const offsetHeight = element.offsetHeight;
+        const offsetWidth = element.offsetWidth;
+    
+        // Do not attempt to divide by 0, otherwise we get `Infinity` as scale
+        // Fallback to 1 in case both values are `0`
+        if (offsetWidth > 0) {
+          scaleX = round(rect.width) / offsetWidth || 1;
+        }
+        if (offsetHeight > 0) {
+          scaleY = round(rect.height) / offsetHeight || 1;
+        }
+      }
+    
+      return {
+        width: rect.width / scaleX,
+        height: rect.height / scaleY,
+        top: rect.top / scaleY,
+        right: rect.right / scaleX,
+        bottom: rect.bottom / scaleY,
+        left: rect.left / scaleX,
+        x: rect.left / scaleX,
+        y: rect.top / scaleY,
+      };
+    }
+    ",
+    "// @flow
+    import getWindow from './getWindow';
+    import type { Window } from '../types';
+    
+    export default function getWindowScroll(node: Node | Window) {
+      const win = getWindow(node);
+      const scrollLeft = win.pageXOffset;
+      const scrollTop = win.pageYOffset;
+    
+      return {
+        scrollLeft,
+        scrollTop,
+      };
+    }
+    ",
+    "// @flow
+    import type { Window } from '../types';
+    
+    export default function getNodeName(element: ?Node | Window): ?string {
+      return element ? (element.nodeName || '').toLowerCase() : null;
+    }
+    ",
+    "// @flow
+    import { isElement } from './instanceOf';
+    import type { Window } from '../types';
+    
+    export default function getDocumentElement(
+      element: Element | Window
+    ): HTMLElement {
+      // $FlowFixMe[incompatible-return]: assume body is always available
+      return (
+        (isElement(element)
+          ? element.ownerDocument
+          : // $FlowFixMe[prop-missing]
+            element.document) || window.document
+      ).documentElement;
+    }
+    ",
+    "// @flow
+    import getBoundingClientRect from './getBoundingClientRect';
+    import getDocumentElement from './getDocumentElement';
+    import getWindowScroll from './getWindowScroll';
+    
+    export default function getWindowScrollBarX(element: Element): number {
+      // If <html> has a CSS width greater than the viewport, then this will be
+      // incorrect for RTL.
+      // Popper 1 is broken in this case and never had a bug report so let's assume
+      // it's not an issue. I don't think anyone ever specifies width on <html>
+      // anyway.
+      // Browsers where the left scrollbar doesn't cause an issue report `0` for
+      // this (e.g. Edge 2019, IE11, Safari)
+      return (
+        getBoundingClientRect(getDocumentElement(element)).left +
+        getWindowScroll(element).scrollLeft
+      );
+    }
+    ",
+    "// @flow
+    import getWindow from './getWindow';
+    
+    export default function getComputedStyle(
+      element: Element
+    ): CSSStyleDeclaration {
+      return getWindow(element).getComputedStyle(element);
+    }
+    ",
+    "// @flow
+    import getComputedStyle from './getComputedStyle';
+    
+    export default function isScrollParent(element: HTMLElement): boolean {
+      // Firefox wants us to check `-x` and `-y` variations as well
+      const { overflow, overflowX, overflowY } = getComputedStyle(element);
+      return /auto|scroll|overlay|hidden/.test(overflow + overflowY + overflowX);
+    }
+    ",
+    "// @flow
+    import type { Rect, VirtualElement, Window } from '../types';
+    import getBoundingClientRect from './getBoundingClientRect';
+    import getNodeScroll from './getNodeScroll';
+    import getNodeName from './getNodeName';
+    import { isHTMLElement } from './instanceOf';
+    import getWindowScrollBarX from './getWindowScrollBarX';
+    import getDocumentElement from './getDocumentElement';
+    import isScrollParent from './isScrollParent';
+    import { round } from '../utils/math';
+    
+    function isElementScaled(element: HTMLElement) {
+      const rect = element.getBoundingClientRect();
+      const scaleX = round(rect.width) / element.offsetWidth || 1;
+      const scaleY = round(rect.height) / element.offsetHeight || 1;
+    
+      return scaleX !== 1 || scaleY !== 1;
+    }
+    
+    // Returns the composite rect of an element relative to its offsetParent.
+    // Composite means it takes into account transforms as well as layout.
+    export default function getCompositeRect(
+      elementOrVirtualElement: Element | VirtualElement,
+      offsetParent: Element | Window,
+      isFixed: boolean = false
+    ): Rect {
+      const isOffsetParentAnElement = isHTMLElement(offsetParent);
+      const offsetParentIsScaled =
+        isHTMLElement(offsetParent) && isElementScaled(offsetParent);
+      const documentElement = getDocumentElement(offsetParent);
+      const rect = getBoundingClientRect(
+        elementOrVirtualElement,
+        offsetParentIsScaled
+      );
+    
+      let scroll = { scrollLeft: 0, scrollTop: 0 };
+      let offsets = { x: 0, y: 0 };
+    
+      if (isOffsetParentAnElement || (!isOffsetParentAnElement && !isFixed)) {
+        if (
+          getNodeName(offsetParent) !== 'body' ||
+          // https://github.com/popperjs/popper-core/issues/1078
+          isScrollParent(documentElement)
+        ) {
+          scroll = getNodeScroll(offsetParent);
+        }
+    
+        if (isHTMLElement(offsetParent)) {
+          offsets = getBoundingClientRect(offsetParent, true);
+          offsets.x += offsetParent.clientLeft;
+          offsets.y += offsetParent.clientTop;
+        } else if (documentElement) {
+          offsets.x = getWindowScrollBarX(documentElement);
+        }
+      }
+    
+      return {
+        x: rect.left + scroll.scrollLeft - offsets.x,
+        y: rect.top + scroll.scrollTop - offsets.y,
+        width: rect.width,
+        height: rect.height,
+      };
+    }
+    ",
+    "// @flow
+    import getWindowScroll from './getWindowScroll';
+    import getWindow from './getWindow';
+    import { isHTMLElement } from './instanceOf';
+    import getHTMLElementScroll from './getHTMLElementScroll';
+    import type { Window } from '../types';
+    
+    export default function getNodeScroll(node: Node | Window) {
+      if (node === getWindow(node) || !isHTMLElement(node)) {
+        return getWindowScroll(node);
+      } else {
+        return getHTMLElementScroll(node);
+      }
+    }
+    ",
+    "// @flow
+    
+    export default function getHTMLElementScroll(element: HTMLElement) {
+      return {
+        scrollLeft: element.scrollLeft,
+        scrollTop: element.scrollTop,
+      };
+    }
+    ",
+    "// @flow
+    import type { Rect } from '../types';
+    import getBoundingClientRect from './getBoundingClientRect';
+    
+    // Returns the layout rect of an element relative to its offsetParent. Layout
+    // means it doesn't take into account transforms.
+    export default function getLayoutRect(element: HTMLElement): Rect {
+      const clientRect = getBoundingClientRect(element);
+    
+      // Use the clientRect sizes if it's not been transformed.
+      // Fixes https://github.com/popperjs/popper-core/issues/1223
+      let width = element.offsetWidth;
+      let height = element.offsetHeight;
+    
+      if (Math.abs(clientRect.width - width) <= 1) {
+        width = clientRect.width;
+      }
+    
+      if (Math.abs(clientRect.height - height) <= 1) {
+        height = clientRect.height;
+      }
+    
+      return {
+        x: element.offsetLeft,
+        y: element.offsetTop,
+        width,
+        height,
+      };
+    }
+    ",
+    "// @flow
+    import getNodeName from './getNodeName';
+    import getDocumentElement from './getDocumentElement';
+    import { isShadowRoot } from './instanceOf';
+    
+    export default function getParentNode(element: Node | ShadowRoot): Node {
+      if (getNodeName(element) === 'html') {
+        return element;
+      }
+    
+      return (
+        // this is a quicker (but less type safe) way to save quite some bytes from the bundle
+        // $FlowFixMe[incompatible-return]
+        // $FlowFixMe[prop-missing]
+        element.assignedSlot || // step into the shadow DOM of the parent of a slotted node
+        element.parentNode || // DOM Element detected
+        (isShadowRoot(element) ? element.host : null) || // ShadowRoot detected
+        // $FlowFixMe[incompatible-call]: HTMLElement is a Node
+        getDocumentElement(element) // fallback
+      );
+    }
+    ",
+    "// @flow
+    import getParentNode from './getParentNode';
+    import isScrollParent from './isScrollParent';
+    import getNodeName from './getNodeName';
+    import { isHTMLElement } from './instanceOf';
+    
+    export default function getScrollParent(node: Node): HTMLElement {
+      if (['html', 'body', '#document'].indexOf(getNodeName(node)) >= 0) {
+        // $FlowFixMe[incompatible-return]: assume body is always available
+        return node.ownerDocument.body;
+      }
+    
+      if (isHTMLElement(node) && isScrollParent(node)) {
+        return node;
+      }
+    
+      return getScrollParent(getParentNode(node));
+    }
+    ",
+    "// @flow
+    import getScrollParent from './getScrollParent';
+    import getParentNode from './getParentNode';
+    import getWindow from './getWindow';
+    import type { Window, VisualViewport } from '../types';
+    import isScrollParent from './isScrollParent';
+    
+    /*
+    given a DOM element, return the list of all scroll parents, up the list of ancesors
+    until we get to the top window object. This list is what we attach scroll listeners
+    to, because if any of these parent elements scroll, we'll need to re-calculate the
+    reference element's position.
+    */
+    export default function listScrollParents(
+      element: Node,
+      list: Array<Element | Window> = []
+    ): Array<Element | Window | VisualViewport> {
+      const scrollParent = getScrollParent(element);
+      const isBody = scrollParent === element.ownerDocument?.body;
+      const win = getWindow(scrollParent);
+      const target = isBody
+        ? [win].concat(
+            win.visualViewport || [],
+            isScrollParent(scrollParent) ? scrollParent : []
+          )
+        : scrollParent;
+      const updatedList = list.concat(target);
+    
+      return isBody
+        ? updatedList
+        : // $FlowFixMe[incompatible-call]: isBody tells us target will be an HTMLElement here
+          updatedList.concat(listScrollParents(getParentNode(target)));
+    }
+    ",
+    "// @flow
+    import getNodeName from './getNodeName';
+    
+    export default function isTableElement(element: Element): boolean {
+      return ['table', 'td', 'th'].indexOf(getNodeName(element)) >= 0;
+    }
+    ",
+    "// @flow
+    import getWindow from './getWindow';
+    import getNodeName from './getNodeName';
+    import getComputedStyle from './getComputedStyle';
+    import { isHTMLElement, isShadowRoot } from './instanceOf';
+    import isTableElement from './isTableElement';
+    import getParentNode from './getParentNode';
+    
+    function getTrueOffsetParent(element: Element): ?Element {
+      if (
+        !isHTMLElement(element) ||
+        // https://github.com/popperjs/popper-core/issues/837
+        getComputedStyle(element).position === 'fixed'
+      ) {
+        return null;
+      }
+    
+      return element.offsetParent;
+    }
+    
+    // `.offsetParent` reports `null` for fixed elements, while absolute elements
+    // return the containing block
+    function getContainingBlock(element: Element) {
+      const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
+      const isIE = navigator.userAgent.indexOf('Trident') !== -1;
+    
+      if (isIE && isHTMLElement(element)) {
+        // In IE 9, 10 and 11 fixed elements containing block is always established by the viewport
+        const elementCss = getComputedStyle(element);
+        if (elementCss.position === 'fixed') {
+          return null;
+        }
+      }
+    
+      let currentNode = getParentNode(element);
+    
+      if (isShadowRoot(currentNode)) {
+        currentNode = currentNode.host;
+      }
+    
+      while (
+        isHTMLElement(currentNode) &&
+        ['html', 'body'].indexOf(getNodeName(currentNode)) < 0
+      ) {
+        const css = getComputedStyle(currentNode);
+    
+        // This is non-exhaustive but covers the most common CSS properties that
+        // create a containing block.
+        // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
+        if (
+          css.transform !== 'none' ||
+          css.perspective !== 'none' ||
+          css.contain === 'paint' ||
+          ['transform', 'perspective'].indexOf(css.willChange) !== -1 ||
+          (isFirefox && css.willChange === 'filter') ||
+          (isFirefox && css.filter && css.filter !== 'none')
+        ) {
+          return currentNode;
+        } else {
+          currentNode = currentNode.parentNode;
+        }
+      }
+    
+      return null;
+    }
+    
+    // Gets the closest ancestor positioned element. Handles some edge cases,
+    // such as table ancestors and cross browser bugs.
+    export default function getOffsetParent(element: Element) {
+      const window = getWindow(element);
+    
+      let offsetParent = getTrueOffsetParent(element);
+    
+      while (
+        offsetParent &&
+        isTableElement(offsetParent) &&
+        getComputedStyle(offsetParent).position === 'static'
+      ) {
+        offsetParent = getTrueOffsetParent(offsetParent);
+      }
+    
+      if (
+        offsetParent &&
+        (getNodeName(offsetParent) === 'html' ||
+          (getNodeName(offsetParent) === 'body' &&
+            getComputedStyle(offsetParent).position === 'static'))
+      ) {
+        return window;
+      }
+    
+      return offsetParent || getContainingBlock(element) || window;
+    }
+    ",
+    "// @flow
+    export const top: 'top' = 'top';
+    export const bottom: 'bottom' = 'bottom';
+    export const right: 'right' = 'right';
+    export const left: 'left' = 'left';
+    export const auto: 'auto' = 'auto';
+    export type BasePlacement =
+      | typeof top
+      | typeof bottom
+      | typeof right
+      | typeof left;
+    export const basePlacements: Array<BasePlacement> = [top, bottom, right, left];
+    
+    export const start: 'start' = 'start';
+    export const end: 'end' = 'end';
+    export type Variation = typeof start | typeof end;
+    
+    export const clippingParents: 'clippingParents' = 'clippingParents';
+    export const viewport: 'viewport' = 'viewport';
+    export type Boundary = Element | Array<Element> | typeof clippingParents;
+    export type RootBoundary = typeof viewport | 'document';
+    
+    export const popper: 'popper' = 'popper';
+    export const reference: 'reference' = 'reference';
+    export type Context = typeof popper | typeof reference;
+    
+    export type VariationPlacement =
+      | 'top-start'
+      | 'top-end'
+      | 'bottom-start'
+      | 'bottom-end'
+      | 'right-start'
+      | 'right-end'
+      | 'left-start'
+      | 'left-end';
+    export type AutoPlacement = 'auto' | 'auto-start' | 'auto-end';
+    export type ComputedPlacement = VariationPlacement | BasePlacement;
+    export type Placement = AutoPlacement | BasePlacement | VariationPlacement;
+    
+    export const variationPlacements: Array<VariationPlacement> = basePlacements.reduce(
+      (acc: Array<VariationPlacement>, placement: BasePlacement) =>
+        acc.concat([(`${placement}-${start}`: any), (`${placement}-${end}`: any)]),
+      []
+    );
+    export const placements: Array<Placement> = [...basePlacements, auto].reduce(
+      (
+        acc: Array<Placement>,
+        placement: BasePlacement | typeof auto
+      ): Array<Placement> =>
+        acc.concat([
+          placement,
+          (`${placement}-${start}`: any),
+          (`${placement}-${end}`: any),
+        ]),
+      []
+    );
+    
+    // modifiers that need to read the DOM
+    export const beforeRead: 'beforeRead' = 'beforeRead';
+    export const read: 'read' = 'read';
+    export const afterRead: 'afterRead' = 'afterRead';
+    // pure-logic modifiers
+    export const beforeMain: 'beforeMain' = 'beforeMain';
+    export const main: 'main' = 'main';
+    export const afterMain: 'afterMain' = 'afterMain';
+    // modifier with the purpose to write to the DOM (or write into a framework state)
+    export const beforeWrite: 'beforeWrite' = 'beforeWrite';
+    export const write: 'write' = 'write';
+    export const afterWrite: 'afterWrite' = 'afterWrite';
+    export const modifierPhases: Array<ModifierPhases> = [
+      beforeRead,
+      read,
+      afterRead,
+      beforeMain,
+      main,
+      afterMain,
+      beforeWrite,
+      write,
+      afterWrite,
+    ];
+    
+    export type ModifierPhases =
+      | typeof beforeRead
+      | typeof read
+      | typeof afterRead
+      | typeof beforeMain
+      | typeof main
+      | typeof afterMain
+      | typeof beforeWrite
+      | typeof write
+      | typeof afterWrite;
+    ",
+    "// @flow
+    import type { Modifier } from '../types';
+    import { modifierPhases } from '../enums';
+    
+    // source: https://stackoverflow.com/questions/49875255
+    function order(modifiers) {
+      const map = new Map();
+      const visited = new Set();
+      const result = [];
+    
+      modifiers.forEach(modifier => {
+        map.set(modifier.name, modifier);
+      });
+    
+      // On visiting object, check for its dependencies and visit them recursively
+      function sort(modifier: Modifier<any, any>) {
+        visited.add(modifier.name);
+    
+        const requires = [
+          ...(modifier.requires || []),
+          ...(modifier.requiresIfExists || []),
+        ];
+    
+        requires.forEach(dep => {
+          if (!visited.has(dep)) {
+            const depModifier = map.get(dep);
+    
+            if (depModifier) {
+              sort(depModifier);
+            }
+          }
+        });
+    
+        result.push(modifier);
+      }
+    
+      modifiers.forEach(modifier => {
+        if (!visited.has(modifier.name)) {
+          // check for visited object
+          sort(modifier);
+        }
+      });
+    
+      return result;
+    }
+    
+    export default function orderModifiers(
+      modifiers: Array<Modifier<any, any>>
+    ): Array<Modifier<any, any>> {
+      // order based on dependencies
+      const orderedModifiers = order(modifiers);
+    
+      // order based on phase
+      return modifierPhases.reduce((acc, phase) => {
+        return acc.concat(
+          orderedModifiers.filter(modifier => modifier.phase === phase)
+        );
+      }, []);
+    }
+    ",
+    "// @flow
+    import { type BasePlacement, type Placement, auto } from '../enums';
+    
+    export default function getBasePlacement(
+      placement: Placement | typeof auto
+    ): BasePlacement {
+      return (placement.split('-')[0]: any);
+    }
+    ",
+    "// @flow
+    import { isShadowRoot } from './instanceOf';
+    
+    export default function contains(parent: Element, child: Element) {
+      const rootNode = child.getRootNode && child.getRootNode();
+    
+      // First, attempt with faster native method
+      if (parent.contains(child)) {
+        return true;
+      }
+      // then fallback to custom implementation with Shadow DOM support
+      else if (rootNode && isShadowRoot(rootNode)) {
+        let next = child;
+        do {
+          if (next && parent.isSameNode(next)) {
+            return true;
+          }
+          // $FlowFixMe[prop-missing]: need a better way to handle this...
+          next = next.parentNode || next.host;
+        } while (next);
+      }
+    
+      // Give up, the result is false
+      return false;
+    }
+    ",
+    "// @flow
+    import type { Rect, ClientRectObject } from '../types';
+    
+    export default function rectToClientRect(rect: Rect): ClientRectObject {
+      return {
+        ...rect,
+        left: rect.x,
+        top: rect.y,
+        right: rect.x + rect.width,
+        bottom: rect.y + rect.height,
+      };
+    }
+    ",
+    "// @flow
+    import type { ClientRectObject } from '../types';
+    import type { Boundary, RootBoundary } from '../enums';
+    import { viewport } from '../enums';
+    import getViewportRect from './getViewportRect';
+    import getDocumentRect from './getDocumentRect';
+    import listScrollParents from './listScrollParents';
+    import getOffsetParent from './getOffsetParent';
+    import getDocumentElement from './getDocumentElement';
+    import getComputedStyle from './getComputedStyle';
+    import { isElement, isHTMLElement } from './instanceOf';
+    import getBoundingClientRect from './getBoundingClientRect';
+    import getParentNode from './getParentNode';
+    import contains from './contains';
+    import getNodeName from './getNodeName';
+    import rectToClientRect from '../utils/rectToClientRect';
+    import { max, min } from '../utils/math';
+    
+    function getInnerBoundingClientRect(element: Element) {
+      const rect = getBoundingClientRect(element);
+    
+      rect.top = rect.top + element.clientTop;
+      rect.left = rect.left + element.clientLeft;
+      rect.bottom = rect.top + element.clientHeight;
+      rect.right = rect.left + element.clientWidth;
+      rect.width = element.clientWidth;
+      rect.height = element.clientHeight;
+      rect.x = rect.left;
+      rect.y = rect.top;
+    
+      return rect;
+    }
+    
+    function getClientRectFromMixedType(
+      element: Element,
+      clippingParent: Element | RootBoundary
+    ): ClientRectObject {
+      return clippingParent === viewport
+        ? rectToClientRect(getViewportRect(element))
+        : isElement(clippingParent)
+        ? getInnerBoundingClientRect(clippingParent)
+        : rectToClientRect(getDocumentRect(getDocumentElement(element)));
+    }
+    
+    // A "clipping parent" is an overflowable container with the characteristic of
+    // clipping (or hiding) overflowing elements with a position different from
+    // `initial`
+    function getClippingParents(element: Element): Array<Element> {
+      const clippingParents = listScrollParents(getParentNode(element));
+      const canEscapeClipping =
+        ['absolute', 'fixed'].indexOf(getComputedStyle(element).position) >= 0;
+      const clipperElement =
+        canEscapeClipping && isHTMLElement(element)
+          ? getOffsetParent(element)
+          : element;
+    
+      if (!isElement(clipperElement)) {
+        return [];
+      }
+    
+      // $FlowFixMe[incompatible-return]: https://github.com/facebook/flow/issues/1414
+      return clippingParents.filter(
+        (clippingParent) =>
+          isElement(clippingParent) &&
+          contains(clippingParent, clipperElement) &&
+          getNodeName(clippingParent) !== 'body'
+      );
+    }
+    
+    // Gets the maximum area that the element is visible in due to any number of
+    // clipping parents
+    export default function getClippingRect(
+      element: Element,
+      boundary: Boundary,
+      rootBoundary: RootBoundary
+    ): ClientRectObject {
+      const mainClippingParents =
+        boundary === 'clippingParents'
+          ? getClippingParents(element)
+          : [].concat(boundary);
+      const clippingParents = [...mainClippingParents, rootBoundary];
+      const firstClippingParent = clippingParents[0];
+    
+      const clippingRect = clippingParents.reduce((accRect, clippingParent) => {
+        const rect = getClientRectFromMixedType(element, clippingParent);
+    
+        accRect.top = max(rect.top, accRect.top);
+        accRect.right = min(rect.right, accRect.right);
+        accRect.bottom = min(rect.bottom, accRect.bottom);
+        accRect.left = max(rect.left, accRect.left);
+    
+        return accRect;
+      }, getClientRectFromMixedType(element, firstClippingParent));
+    
+      clippingRect.width = clippingRect.right - clippingRect.left;
+      clippingRect.height = clippingRect.bottom - clippingRect.top;
+      clippingRect.x = clippingRect.left;
+      clippingRect.y = clippingRect.top;
+    
+      return clippingRect;
+    }
+    ",
+    "// @flow
+    import getWindow from './getWindow';
+    import getDocumentElement from './getDocumentElement';
+    import getWindowScrollBarX from './getWindowScrollBarX';
+    
+    export default function getViewportRect(element: Element) {
+      const win = getWindow(element);
+      const html = getDocumentElement(element);
+      const visualViewport = win.visualViewport;
+    
+      let width = html.clientWidth;
+      let height = html.clientHeight;
+      let x = 0;
+      let y = 0;
+    
+      // NB: This isn't supported on iOS <= 12. If the keyboard is open, the popper
+      // can be obscured underneath it.
+      // Also, `html.clientHeight` adds the bottom bar height in Safari iOS, even
+      // if it isn't open, so if this isn't available, the popper will be detected
+      // to overflow the bottom of the screen too early.
+      if (visualViewport) {
+        width = visualViewport.width;
+        height = visualViewport.height;
+    
+        // Uses Layout Viewport (like Chrome; Safari does not currently)
+        // In Chrome, it returns a value very close to 0 (+/-) but contains rounding
+        // errors due to floating point numbers, so we need to check precision.
+        // Safari returns a number <= 0, usually < -1 when pinch-zoomed
+    
+        // Feature detection fails in mobile emulation mode in Chrome.
+        // Math.abs(win.innerWidth / visualViewport.scale - visualViewport.width) <
+        // 0.001
+        // Fallback here: "Not Safari" userAgent
+        if (!/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+          x = visualViewport.offsetLeft;
+          y = visualViewport.offsetTop;
+        }
+      }
+    
+      return {
+        width,
+        height,
+        x: x + getWindowScrollBarX(element),
+        y,
+      };
+    }
+    ",
+    "// @flow
+    import type { Rect } from '../types';
+    import getDocumentElement from './getDocumentElement';
+    import getComputedStyle from './getComputedStyle';
+    import getWindowScrollBarX from './getWindowScrollBarX';
+    import getWindowScroll from './getWindowScroll';
+    import { max } from '../utils/math';
+    
+    // Gets the entire size of the scrollable document area, even extending outside
+    // of the `<html>` and `<body>` rect bounds if horizontally scrollable
+    export default function getDocumentRect(element: HTMLElement): Rect {
+      const html = getDocumentElement(element);
+      const winScroll = getWindowScroll(element);
+      const body = element.ownerDocument?.body;
+    
+      const width = max(
+        html.scrollWidth,
+        html.clientWidth,
+        body ? body.scrollWidth : 0,
+        body ? body.clientWidth : 0
+      );
+      const height = max(
+        html.scrollHeight,
+        html.clientHeight,
+        body ? body.scrollHeight : 0,
+        body ? body.clientHeight : 0
+      );
+    
+      let x = -winScroll.scrollLeft + getWindowScrollBarX(element);
+      const y = -winScroll.scrollTop;
+    
+      if (getComputedStyle(body || html).direction === 'rtl') {
+        x += max(html.clientWidth, body ? body.clientWidth : 0) - width;
+      }
+    
+      return { width, height, x, y };
+    }
+    ",
+    "// @flow
+    import { type Variation, type Placement } from '../enums';
+    
+    export default function getVariation(placement: Placement): ?Variation {
+      return (placement.split('-')[1]: any);
+    }
+    ",
+    "// @flow
+    import type { Placement } from '../enums';
+    
+    export default function getMainAxisFromPlacement(
+      placement: Placement
+    ): 'x' | 'y' {
+      return ['top', 'bottom'].indexOf(placement) >= 0 ? 'x' : 'y';
+    }
+    ",
+    "// @flow
+    import getBasePlacement from './getBasePlacement';
+    import getVariation from './getVariation';
+    import getMainAxisFromPlacement from './getMainAxisFromPlacement';
+    import type {
+      Rect,
+      PositioningStrategy,
+      Offsets,
+      ClientRectObject,
+    } from '../types';
+    import { top, right, bottom, left, start, end, type Placement } from '../enums';
+    
+    export default function computeOffsets({
+      reference,
+      element,
+      placement,
+    }: {
+      reference: Rect | ClientRectObject,
+      element: Rect | ClientRectObject,
+      strategy: PositioningStrategy,
+      placement?: Placement,
+    }): Offsets {
+      const basePlacement = placement ? getBasePlacement(placement) : null;
+      const variation = placement ? getVariation(placement) : null;
+      const commonX = reference.x + reference.width / 2 - element.width / 2;
+      const commonY = reference.y + reference.height / 2 - element.height / 2;
+    
+      let offsets;
+      switch (basePlacement) {
+        case top:
+          offsets = {
+            x: commonX,
+            y: reference.y - element.height,
+          };
+          break;
+        case bottom:
+          offsets = {
+            x: commonX,
+            y: reference.y + reference.height,
+          };
+          break;
+        case right:
+          offsets = {
+            x: reference.x + reference.width,
+            y: commonY,
+          };
+          break;
+        case left:
+          offsets = {
+            x: reference.x - element.width,
+            y: commonY,
+          };
+          break;
+        default:
+          offsets = {
+            x: reference.x,
+            y: reference.y,
+          };
+      }
+    
+      const mainAxis = basePlacement
+        ? getMainAxisFromPlacement(basePlacement)
+        : null;
+    
+      if (mainAxis != null) {
+        const len = mainAxis === 'y' ? 'height' : 'width';
+    
+        switch (variation) {
+          case start:
+            offsets[mainAxis] =
+              offsets[mainAxis] - (reference[len] / 2 - element[len] / 2);
+            break;
+          case end:
+            offsets[mainAxis] =
+              offsets[mainAxis] + (reference[len] / 2 - element[len] / 2);
+            break;
+          default:
+        }
+      }
+    
+      return offsets;
+    }
+    ",
+    "// @flow
+    import type { SideObject } from '../types';
+    import getFreshSideObject from './getFreshSideObject';
+    
+    export default function mergePaddingObject(
+      paddingObject: $Shape<SideObject>
+    ): SideObject {
+      return {
+        ...getFreshSideObject(),
+        ...paddingObject,
+      };
+    }
+    ",
+    "// @flow
+    import type { SideObject } from '../types';
+    
+    export default function getFreshSideObject(): SideObject {
+      return {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0,
+      };
+    }
+    ",
+    "// @flow
+    
+    export default function expandToHashMap<
+      T: number | string | boolean,
+      K: string
+    >(value: T, keys: Array<K>): { [key: string]: T } {
+      return keys.reduce((hashMap, key) => {
+        hashMap[key] = value;
+        return hashMap;
+      }, {});
+    }
+    ",
+    "// @flow
+    import type { State, SideObject, Padding } from '../types';
+    import type { Placement, Boundary, RootBoundary, Context } from '../enums';
+    import getClippingRect from '../dom-utils/getClippingRect';
+    import getDocumentElement from '../dom-utils/getDocumentElement';
+    import getBoundingClientRect from '../dom-utils/getBoundingClientRect';
+    import computeOffsets from './computeOffsets';
+    import rectToClientRect from './rectToClientRect';
+    import {
+      clippingParents,
+      reference,
+      popper,
+      bottom,
+      top,
+      right,
+      basePlacements,
+      viewport,
+    } from '../enums';
+    import { isElement } from '../dom-utils/instanceOf';
+    import mergePaddingObject from './mergePaddingObject';
+    import expandToHashMap from './expandToHashMap';
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      placement: Placement,
+      boundary: Boundary,
+      rootBoundary: RootBoundary,
+      elementContext: Context,
+      altBoundary: boolean,
+      padding: Padding,
+    };
+    
+    export default function detectOverflow(
+      state: State,
+      options: $Shape<Options> = {}
+    ): SideObject {
+      const {
+        placement = state.placement,
+        boundary = clippingParents,
+        rootBoundary = viewport,
+        elementContext = popper,
+        altBoundary = false,
+        padding = 0,
+      } = options;
+    
+      const paddingObject = mergePaddingObject(
+        typeof padding !== 'number'
+          ? padding
+          : expandToHashMap(padding, basePlacements)
+      );
+    
+      const altContext = elementContext === popper ? reference : popper;
+    
+      const popperRect = state.rects.popper;
+      const element = state.elements[altBoundary ? altContext : elementContext];
+    
+      const clippingClientRect = getClippingRect(
+        isElement(element)
+          ? element
+          : element.contextElement || getDocumentElement(state.elements.popper),
+        boundary,
+        rootBoundary
+      );
+    
+      const referenceClientRect = getBoundingClientRect(state.elements.reference);
+    
+      const popperOffsets = computeOffsets({
+        reference: referenceClientRect,
+        element: popperRect,
+        strategy: 'absolute',
+        placement,
+      });
+    
+      const popperClientRect = rectToClientRect({
+        ...popperRect,
+        ...popperOffsets,
+      });
+    
+      const elementClientRect =
+        elementContext === popper ? popperClientRect : referenceClientRect;
+    
+      // positive = overflowing the clipping rect
+      // 0 or negative = within the clipping rect
+      const overflowOffsets = {
+        top: clippingClientRect.top - elementClientRect.top + paddingObject.top,
+        bottom:
+          elementClientRect.bottom -
+          clippingClientRect.bottom +
+          paddingObject.bottom,
+        left: clippingClientRect.left - elementClientRect.left + paddingObject.left,
+        right:
+          elementClientRect.right - clippingClientRect.right + paddingObject.right,
+      };
+    
+      const offsetData = state.modifiersData.offset;
+    
+      // Offsets can be applied only to the popper element
+      if (elementContext === popper && offsetData) {
+        const offset = offsetData[placement];
+    
+        Object.keys(overflowOffsets).forEach((key) => {
+          const multiply = [right, bottom].indexOf(key) >= 0 ? 1 : -1;
+          const axis = [top, bottom].indexOf(key) >= 0 ? 'y' : 'x';
+          overflowOffsets[key] += offset[axis] * multiply;
+        });
+      }
+    
+      return overflowOffsets;
+    }
+    ",
+    "// @flow
+    import type {
+      State,
+      OptionsGeneric,
+      Modifier,
+      Instance,
+      VirtualElement,
+    } from './types';
+    import getCompositeRect from './dom-utils/getCompositeRect';
+    import getLayoutRect from './dom-utils/getLayoutRect';
+    import listScrollParents from './dom-utils/listScrollParents';
+    import getOffsetParent from './dom-utils/getOffsetParent';
+    import getComputedStyle from './dom-utils/getComputedStyle';
+    import orderModifiers from './utils/orderModifiers';
+    import debounce from './utils/debounce';
+    import validateModifiers from './utils/validateModifiers';
+    import uniqueBy from './utils/uniqueBy';
+    import getBasePlacement from './utils/getBasePlacement';
+    import mergeByName from './utils/mergeByName';
+    import detectOverflow from './utils/detectOverflow';
+    import { isElement } from './dom-utils/instanceOf';
+    import { auto } from './enums';
+    
+    const INVALID_ELEMENT_ERROR =
+      'Popper: Invalid reference or popper argument provided. They must be either a DOM element or virtual element.';
+    const INFINITE_LOOP_ERROR =
+      'Popper: An infinite loop in the modifiers cycle has been detected! The cycle has been interrupted to prevent a browser crash.';
+    
+    const DEFAULT_OPTIONS: OptionsGeneric<any> = {
+      placement: 'bottom',
+      modifiers: [],
+      strategy: 'absolute',
+    };
+    
+    type PopperGeneratorArgs = {
+      defaultModifiers?: Array<Modifier<any, any>>,
+      defaultOptions?: $Shape<OptionsGeneric<any>>,
+    };
+    
+    function areValidElements(...args: Array<any>): boolean {
+      return !args.some(
+        (element) =>
+          !(element && typeof element.getBoundingClientRect === 'function')
+      );
+    }
+    
+    export function popperGenerator(generatorOptions: PopperGeneratorArgs = {}) {
+      const {
+        defaultModifiers = [],
+        defaultOptions = DEFAULT_OPTIONS,
+      } = generatorOptions;
+    
+      return function createPopper<TModifier: $Shape<Modifier<any, any>>>(
+        reference: Element | VirtualElement,
+        popper: HTMLElement,
+        options: $Shape<OptionsGeneric<TModifier>> = defaultOptions
+      ): Instance {
+        let state: $Shape<State> = {
+          placement: 'bottom',
+          orderedModifiers: [],
+          options: { ...DEFAULT_OPTIONS, ...defaultOptions },
+          modifiersData: {},
+          elements: {
+            reference,
+            popper,
+          },
+          attributes: {},
+          styles: {},
+        };
+    
+        let effectCleanupFns: Array<() => void> = [];
+        let isDestroyed = false;
+    
+        const instance = {
+          state,
+          setOptions(setOptionsAction) {
+            const options =
+              typeof setOptionsAction === 'function'
+                ? setOptionsAction(state.options)
+                : setOptionsAction;
+    
+            cleanupModifierEffects();
+    
+            state.options = {
+              // $FlowFixMe[exponential-spread]
+              ...defaultOptions,
+              ...state.options,
+              ...options,
+            };
+    
+            state.scrollParents = {
+              reference: isElement(reference)
+                ? listScrollParents(reference)
+                : reference.contextElement
+                ? listScrollParents(reference.contextElement)
+                : [],
+              popper: listScrollParents(popper),
+            };
+    
+            // Orders the modifiers based on their dependencies and `phase`
+            // properties
+            const orderedModifiers = orderModifiers(
+              mergeByName([...defaultModifiers, ...state.options.modifiers])
+            );
+    
+            // Strip out disabled modifiers
+            state.orderedModifiers = orderedModifiers.filter((m) => m.enabled);
+    
+            // Validate the provided modifiers so that the consumer will get warned
+            // if one of the modifiers is invalid for any reason
+            if (__DEV__) {
+              const modifiers = uniqueBy(
+                [...orderedModifiers, ...state.options.modifiers],
+                ({ name }) => name
+              );
+    
+              validateModifiers(modifiers);
+    
+              if (getBasePlacement(state.options.placement) === auto) {
+                const flipModifier = state.orderedModifiers.find(
+                  ({ name }) => name === 'flip'
+                );
+    
+                if (!flipModifier) {
+                  console.error(
+                    [
+                      'Popper: "auto" placements require the "flip" modifier be',
+                      'present and enabled to work.',
+                    ].join(' ')
+                  );
+                }
+              }
+    
+              const {
+                marginTop,
+                marginRight,
+                marginBottom,
+                marginLeft,
+              } = getComputedStyle(popper);
+    
+              // We no longer take into account `margins` on the popper, and it can
+              // cause bugs with positioning, so we'll warn the consumer
+              if (
+                [marginTop, marginRight, marginBottom, marginLeft].some((margin) =>
+                  parseFloat(margin)
+                )
+              ) {
+                console.warn(
+                  [
+                    'Popper: CSS "margin" styles cannot be used to apply padding',
+                    'between the popper and its reference element or boundary.',
+                    'To replicate margin, use the `offset` modifier, as well as',
+                    'the `padding` option in the `preventOverflow` and `flip`',
+                    'modifiers.',
+                  ].join(' ')
+                );
+              }
+            }
+    
+            runModifierEffects();
+    
+            return instance.update();
+          },
+    
+          // Sync update – it will always be executed, even if not necessary. This
+          // is useful for low frequency updates where sync behavior simplifies the
+          // logic.
+          // For high frequency updates (e.g. `resize` and `scroll` events), always
+          // prefer the async Popper#update method
+          forceUpdate() {
+            if (isDestroyed) {
+              return;
+            }
+    
+            const { reference, popper } = state.elements;
+    
+            // Don't proceed if `reference` or `popper` are not valid elements
+            // anymore
+            if (!areValidElements(reference, popper)) {
+              if (__DEV__) {
+                console.error(INVALID_ELEMENT_ERROR);
+              }
+              return;
+            }
+    
+            // Store the reference and popper rects to be read by modifiers
+            state.rects = {
+              reference: getCompositeRect(
+                reference,
+                getOffsetParent(popper),
+                state.options.strategy === 'fixed'
+              ),
+              popper: getLayoutRect(popper),
+            };
+    
+            // Modifiers have the ability to reset the current update cycle. The
+            // most common use case for this is the `flip` modifier changing the
+            // placement, which then needs to re-run all the modifiers, because the
+            // logic was previously ran for the previous placement and is therefore
+            // stale/incorrect
+            state.reset = false;
+    
+            state.placement = state.options.placement;
+    
+            // On each update cycle, the `modifiersData` property for each modifier
+            // is filled with the initial data specified by the modifier. This means
+            // it doesn't persist and is fresh on each update.
+            // To ensure persistent data, use `${name}#persistent`
+            state.orderedModifiers.forEach(
+              (modifier) =>
+                (state.modifiersData[modifier.name] = {
+                  ...modifier.data,
+                })
+            );
+    
+            let __debug_loops__ = 0;
+            for (let index = 0; index < state.orderedModifiers.length; index++) {
+              if (__DEV__) {
+                __debug_loops__ += 1;
+                if (__debug_loops__ > 100) {
+                  console.error(INFINITE_LOOP_ERROR);
+                  break;
+                }
+              }
+    
+              if (state.reset === true) {
+                state.reset = false;
+                index = -1;
+                continue;
+              }
+    
+              const { fn, options = {}, name } = state.orderedModifiers[index];
+    
+              if (typeof fn === 'function') {
+                state = fn({ state, options, name, instance }) || state;
+              }
+            }
+          },
+    
+          // Async and optimistically optimized update – it will not be executed if
+          // not necessary (debounced to run at most once-per-tick)
+          update: debounce<$Shape<State>>(
+            () =>
+              new Promise<$Shape<State>>((resolve) => {
+                instance.forceUpdate();
+                resolve(state);
+              })
+          ),
+    
+          destroy() {
+            cleanupModifierEffects();
+            isDestroyed = true;
+          },
+        };
+    
+        if (!areValidElements(reference, popper)) {
+          if (__DEV__) {
+            console.error(INVALID_ELEMENT_ERROR);
+          }
+          return instance;
+        }
+    
+        instance.setOptions(options).then((state) => {
+          if (!isDestroyed && options.onFirstUpdate) {
+            options.onFirstUpdate(state);
+          }
+        });
+    
+        // Modifiers have the ability to execute arbitrary code before the first
+        // update cycle runs. They will be executed in the same order as the update
+        // cycle. This is useful when a modifier adds some persistent data that
+        // other modifiers need to use, but the modifier is run after the dependent
+        // one.
+        function runModifierEffects() {
+          state.orderedModifiers.forEach(({ name, options = {}, effect }) => {
+            if (typeof effect === 'function') {
+              const cleanupFn = effect({ state, name, instance, options });
+              const noopFn = () => {};
+              effectCleanupFns.push(cleanupFn || noopFn);
+            }
+          });
+        }
+    
+        function cleanupModifierEffects() {
+          effectCleanupFns.forEach((fn) => fn());
+          effectCleanupFns = [];
+        }
+    
+        return instance;
+      };
+    }
+    
+    export const createPopper = popperGenerator();
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export { detectOverflow };
+    ",
+    "// @flow
+    
+    export default function debounce<T>(fn: Function): () => Promise<T> {
+      let pending;
+      return () => {
+        if (!pending) {
+          pending = new Promise<T>(resolve => {
+            Promise.resolve().then(() => {
+              pending = undefined;
+              resolve(fn());
+            });
+          });
+        }
+    
+        return pending;
+      };
+    }
+    ",
+    "// @flow
+    import type { Modifier } from '../types';
+    
+    export default function mergeByName(
+      modifiers: Array<$Shape<Modifier<any, any>>>
+    ): Array<$Shape<Modifier<any, any>>> {
+      const merged = modifiers.reduce((merged, current) => {
+        const existing = merged[current.name];
+        merged[current.name] = existing
+          ? {
+              ...existing,
+              ...current,
+              options: { ...existing.options, ...current.options },
+              data: { ...existing.data, ...current.data },
+            }
+          : current;
+        return merged;
+      }, {});
+    
+      // IE11 does not support Object.values
+      return Object.keys(merged).map(key => merged[key]);
+    }
+    ",
+    "// @flow
+    import type { ModifierArguments, Modifier } from '../types';
+    import getWindow from '../dom-utils/getWindow';
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      scroll: boolean,
+      resize: boolean,
+    };
+    
+    const passive = { passive: true };
+    
+    function effect({ state, instance, options }: ModifierArguments<Options>) {
+      const { scroll = true, resize = true } = options;
+    
+      const window = getWindow(state.elements.popper);
+      const scrollParents = [
+        ...state.scrollParents.reference,
+        ...state.scrollParents.popper,
+      ];
+    
+      if (scroll) {
+        scrollParents.forEach(scrollParent => {
+          scrollParent.addEventListener('scroll', instance.update, passive);
+        });
+      }
+    
+      if (resize) {
+        window.addEventListener('resize', instance.update, passive);
+      }
+    
+      return () => {
+        if (scroll) {
+          scrollParents.forEach(scrollParent => {
+            scrollParent.removeEventListener('scroll', instance.update, passive);
+          });
+        }
+    
+        if (resize) {
+          window.removeEventListener('resize', instance.update, passive);
+        }
+      };
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type EventListenersModifier = Modifier<'eventListeners', Options>;
+    export default ({
+      name: 'eventListeners',
+      enabled: true,
+      phase: 'write',
+      fn: () => {},
+      effect,
+      data: {},
+    }: EventListenersModifier);
+    ",
+    "// @flow
+    import type { ModifierArguments, Modifier } from '../types';
+    import computeOffsets from '../utils/computeOffsets';
+    
+    function popperOffsets({ state, name }: ModifierArguments<{||}>) {
+      // Offsets are the actual position the popper needs to have to be
+      // properly positioned near its reference element
+      // This is the most basic placement, and will be adjusted by
+      // the modifiers in the next step
+      state.modifiersData[name] = computeOffsets({
+        reference: state.rects.reference,
+        element: state.rects.popper,
+        strategy: 'absolute',
+        placement: state.placement,
+      });
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type PopperOffsetsModifier = Modifier<'popperOffsets', {||}>;
+    export default ({
+      name: 'popperOffsets',
+      enabled: true,
+      phase: 'read',
+      fn: popperOffsets,
+      data: {},
+    }: PopperOffsetsModifier);
+    ",
+    "// @flow
+    import type {
+      PositioningStrategy,
+      Offsets,
+      Modifier,
+      ModifierArguments,
+      Rect,
+      Window,
+    } from '../types';
+    import {
+      type BasePlacement,
+      type Variation,
+      top,
+      left,
+      right,
+      bottom,
+      end,
+    } from '../enums';
+    import getOffsetParent from '../dom-utils/getOffsetParent';
+    import getWindow from '../dom-utils/getWindow';
+    import getDocumentElement from '../dom-utils/getDocumentElement';
+    import getComputedStyle from '../dom-utils/getComputedStyle';
+    import getBasePlacement from '../utils/getBasePlacement';
+    import getVariation from '../utils/getVariation';
+    import { round } from '../utils/math';
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type RoundOffsets = (
+      offsets: $Shape<{ x: number, y: number, centerOffset: number }>
+    ) => Offsets;
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      gpuAcceleration: boolean,
+      adaptive: boolean,
+      roundOffsets?: boolean | RoundOffsets,
+    };
+    
+    const unsetSides = {
+      top: 'auto',
+      right: 'auto',
+      bottom: 'auto',
+      left: 'auto',
+    };
+    
+    // Round the offsets to the nearest suitable subpixel based on the DPR.
+    // Zooming can change the DPR, but it seems to report a value that will
+    // cleanly divide the values into the appropriate subpixels.
+    function roundOffsetsByDPR({ x, y }): Offsets {
+      const win: Window = window;
+      const dpr = win.devicePixelRatio || 1;
+    
+      return {
+        x: round(x * dpr) / dpr || 0,
+        y: round(y * dpr) / dpr || 0,
+      };
+    }
+    
+    export function mapToStyles({
+      popper,
+      popperRect,
+      placement,
+      variation,
+      offsets,
+      position,
+      gpuAcceleration,
+      adaptive,
+      roundOffsets,
+      isFixed,
+    }: {
+      popper: HTMLElement,
+      popperRect: Rect,
+      placement: BasePlacement,
+      variation: ?Variation,
+      offsets: $Shape<{ x: number, y: number, centerOffset: number }>,
+      position: PositioningStrategy,
+      gpuAcceleration: boolean,
+      adaptive: boolean,
+      roundOffsets: boolean | RoundOffsets,
+      isFixed: boolean,
+    }) {
+      let { x = 0, y = 0 } = offsets;
+    
+      ({ x, y } =
+        typeof roundOffsets === 'function'
+          ? roundOffsets({ x, y })
+          : { x, y });
+    
+      const hasX = offsets.hasOwnProperty('x');
+      const hasY = offsets.hasOwnProperty('y');
+    
+      let sideX: string = left;
+      let sideY: string = top;
+    
+      const win: Window = window;
+    
+      if (adaptive) {
+        let offsetParent = getOffsetParent(popper);
+        let heightProp = 'clientHeight';
+        let widthProp = 'clientWidth';
+    
+        if (offsetParent === getWindow(popper)) {
+          offsetParent = getDocumentElement(popper);
+    
+          if (
+            getComputedStyle(offsetParent).position !== 'static' &&
+            position === 'absolute'
+          ) {
+            heightProp = 'scrollHeight';
+            widthProp = 'scrollWidth';
+          }
+        }
+    
+        // $FlowFixMe[incompatible-cast]: force type refinement, we compare offsetParent with window above, but Flow doesn't detect it
+        offsetParent = (offsetParent: Element);
+    
+        if (
+          placement === top ||
+          ((placement === left || placement === right) && variation === end)
+        ) {
+          sideY = bottom;
+          const offsetY =
+            isFixed && offsetParent === win && win.visualViewport
+              ? win.visualViewport.height
+              : // $FlowFixMe[prop-missing]
+                offsetParent[heightProp];
+          y -= offsetY - popperRect.height;
+          y *= gpuAcceleration ? 1 : -1;
+        }
+    
+        if (
+          placement === left ||
+          ((placement === top || placement === bottom) && variation === end)
+        ) {
+          sideX = right;
+          const offsetX =
+            isFixed && offsetParent === win && win.visualViewport
+              ? win.visualViewport.width
+              : // $FlowFixMe[prop-missing]
+                offsetParent[widthProp];
+          x -= offsetX - popperRect.width;
+          x *= gpuAcceleration ? 1 : -1;
+        }
+      }
+    
+      const commonStyles = {
+        position,
+        ...(adaptive && unsetSides),
+      };
+    
+      ({ x, y } =
+        roundOffsets === true
+          ? roundOffsetsByDPR({ x, y })
+          : { x, y });
+    
+      if (gpuAcceleration) {
+        return {
+          ...commonStyles,
+          [sideY]: hasY ? '0' : '',
+          [sideX]: hasX ? '0' : '',
+          // Layer acceleration can disable subpixel rendering which causes slightly
+          // blurry text on low PPI displays, so we want to use 2D transforms
+          // instead
+          transform:
+            (win.devicePixelRatio || 1) <= 1
+              ? `translate(${x}px, ${y}px)`
+              : `translate3d(${x}px, ${y}px, 0)`,
+        };
+      }
+    
+      return {
+        ...commonStyles,
+        [sideY]: hasY ? `${y}px` : '',
+        [sideX]: hasX ? `${x}px` : '',
+        transform: '',
+      };
+    }
+    
+    function computeStyles({ state, options }: ModifierArguments<Options>) {
+      const {
+        gpuAcceleration = true,
+        adaptive = true,
+        // defaults to use builtin `roundOffsetsByDPR`
+        roundOffsets = true,
+      } = options;
+    
+      if (__DEV__) {
+        const transitionProperty =
+          getComputedStyle(state.elements.popper).transitionProperty || '';
+    
+        if (
+          adaptive &&
+          ['transform', 'top', 'right', 'bottom', 'left'].some(
+            (property) => transitionProperty.indexOf(property) >= 0
+          )
+        ) {
+          console.warn(
+            [
+              'Popper: Detected CSS transitions on at least one of the following',
+              'CSS properties: "transform", "top", "right", "bottom", "left".',
+              '\n\n',
+              'Disable the "computeStyles" modifier\'s `adaptive` option to allow',
+              'for smooth transitions, or remove these properties from the CSS',
+              'transition declaration on the popper element if only transitioning',
+              'opacity or background-color for example.',
+              '\n\n',
+              'We recommend using the popper element as a wrapper around an inner',
+              'element that can have any CSS property transitioned for animations.',
+            ].join(' ')
+          );
+        }
+      }
+    
+      const commonStyles = {
+        placement: getBasePlacement(state.placement),
+        variation: getVariation(state.placement),
+        popper: state.elements.popper,
+        popperRect: state.rects.popper,
+        gpuAcceleration,
+        isFixed: state.options.strategy === 'fixed',
+      };
+    
+      if (state.modifiersData.popperOffsets != null) {
+        state.styles.popper = {
+          ...state.styles.popper,
+          ...mapToStyles({
+            ...commonStyles,
+            offsets: state.modifiersData.popperOffsets,
+            position: state.options.strategy,
+            adaptive,
+            roundOffsets,
+          }),
+        };
+      }
+    
+      if (state.modifiersData.arrow != null) {
+        state.styles.arrow = {
+          ...state.styles.arrow,
+          ...mapToStyles({
+            ...commonStyles,
+            offsets: state.modifiersData.arrow,
+            position: 'absolute',
+            adaptive: false,
+            roundOffsets,
+          }),
+        };
+      }
+    
+      state.attributes.popper = {
+        ...state.attributes.popper,
+        'data-popper-placement': state.placement,
+      };
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type ComputeStylesModifier = Modifier<'computeStyles', Options>;
+    export default ({
+      name: 'computeStyles',
+      enabled: true,
+      phase: 'beforeWrite',
+      fn: computeStyles,
+      data: {},
+    }: ComputeStylesModifier);
+    ",
+    "// @flow
+    import type { Modifier, ModifierArguments } from '../types';
+    import getNodeName from '../dom-utils/getNodeName';
+    import { isHTMLElement } from '../dom-utils/instanceOf';
+    
+    // This modifier takes the styles prepared by the `computeStyles` modifier
+    // and applies them to the HTMLElements such as popper and arrow
+    
+    function applyStyles({ state }: ModifierArguments<{||}>) {
+      Object.keys(state.elements).forEach((name) => {
+        const style = state.styles[name] || {};
+    
+        const attributes = state.attributes[name] || {};
+        const element = state.elements[name];
+    
+        // arrow is optional + virtual elements
+        if (!isHTMLElement(element) || !getNodeName(element)) {
+          return;
+        }
+    
+        // Flow doesn't support to extend this property, but it's the most
+        // effective way to apply styles to an HTMLElement
+        // $FlowFixMe[cannot-write]
+        Object.assign(element.style, style);
+    
+        Object.keys(attributes).forEach((name) => {
+          const value = attributes[name];
+          if (value === false) {
+            element.removeAttribute(name);
+          } else {
+            element.setAttribute(name, value === true ? '' : value);
+          }
+        });
+      });
+    }
+    
+    function effect({ state }: ModifierArguments<{||}>) {
+      const initialStyles = {
+        popper: {
+          position: state.options.strategy,
+          left: '0',
+          top: '0',
+          margin: '0',
+        },
+        arrow: {
+          position: 'absolute',
+        },
+        reference: {},
+      };
+    
+      Object.assign(state.elements.popper.style, initialStyles.popper);
+      state.styles = initialStyles;
+    
+      if (state.elements.arrow) {
+        Object.assign(state.elements.arrow.style, initialStyles.arrow);
+      }
+    
+      return () => {
+        Object.keys(state.elements).forEach((name) => {
+          const element = state.elements[name];
+          const attributes = state.attributes[name] || {};
+    
+          const styleProperties = Object.keys(
+            state.styles.hasOwnProperty(name)
+              ? state.styles[name]
+              : initialStyles[name]
+          );
+    
+          // Set all values to an empty string to unset them
+          const style = styleProperties.reduce((style, property) => {
+            style[property] = '';
+            return style;
+          }, {});
+    
+          // arrow is optional + virtual elements
+          if (!isHTMLElement(element) || !getNodeName(element)) {
+            return;
+          }
+    
+          Object.assign(element.style, style);
+    
+          Object.keys(attributes).forEach((attribute) => {
+            element.removeAttribute(attribute);
+          });
+        });
+      };
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type ApplyStylesModifier = Modifier<'applyStyles', {||}>;
+    export default ({
+      name: 'applyStyles',
+      enabled: true,
+      phase: 'write',
+      fn: applyStyles,
+      effect,
+      requires: ['computeStyles'],
+    }: ApplyStylesModifier);
+    ",
+    "// @flow
+    import type { Placement } from '../enums';
+    import type { ModifierArguments, Modifier, Rect, Offsets } from '../types';
+    import getBasePlacement from '../utils/getBasePlacement';
+    import { top, left, right, placements } from '../enums';
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type OffsetsFunction = ({
+      popper: Rect,
+      reference: Rect,
+      placement: Placement,
+    }) => [?number, ?number];
+    
+    type Offset = OffsetsFunction | [?number, ?number];
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      offset: Offset,
+    };
+    
+    export function distanceAndSkiddingToXY(
+      placement: Placement,
+      rects: { popper: Rect, reference: Rect },
+      offset: Offset
+    ): Offsets {
+      const basePlacement = getBasePlacement(placement);
+      const invertDistance = [left, top].indexOf(basePlacement) >= 0 ? -1 : 1;
+    
+      let [skidding, distance] =
+        typeof offset === 'function'
+          ? offset({
+              ...rects,
+              placement,
+            })
+          : offset;
+    
+      skidding = skidding || 0;
+      distance = (distance || 0) * invertDistance;
+    
+      return [left, right].indexOf(basePlacement) >= 0
+        ? { x: distance, y: skidding }
+        : { x: skidding, y: distance };
+    }
+    
+    function offset({ state, options, name }: ModifierArguments<Options>) {
+      const { offset = [0, 0] } = options;
+    
+      const data = placements.reduce((acc, placement) => {
+        acc[placement] = distanceAndSkiddingToXY(placement, state.rects, offset);
+        return acc;
+      }, {});
+    
+      const { x, y } = data[state.placement];
+    
+      if (state.modifiersData.popperOffsets != null) {
+        state.modifiersData.popperOffsets.x += x;
+        state.modifiersData.popperOffsets.y += y;
+      }
+    
+      state.modifiersData[name] = data;
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type OffsetModifier = Modifier<'offset', Options>;
+    export default ({
+      name: 'offset',
+      enabled: true,
+      phase: 'main',
+      requires: ['popperOffsets'],
+      fn: offset,
+    }: OffsetModifier);
+    ",
+    "// @flow
+    import type { Placement } from '../enums';
+    
+    const hash = { left: 'right', right: 'left', bottom: 'top', top: 'bottom' };
+    
+    export default function getOppositePlacement(placement: Placement): Placement {
+      return (placement.replace(
+        /left|right|bottom|top/g,
+        matched => hash[matched]
+      ): any);
+    }
+    ",
+    "// @flow
+    import type { Placement } from '../enums';
+    
+    const hash = { start: 'end', end: 'start' };
+    
+    export default function getOppositeVariationPlacement(
+      placement: Placement
+    ): Placement {
+      return (placement.replace(/start|end/g, matched => hash[matched]): any);
+    }
+    ",
+    "// @flow
+    import type { State, Padding } from '../types';
+    import type {
+      Placement,
+      ComputedPlacement,
+      Boundary,
+      RootBoundary,
+    } from '../enums';
+    import getVariation from './getVariation';
+    import {
+      variationPlacements,
+      basePlacements,
+      placements as allPlacements,
+    } from '../enums';
+    import detectOverflow from './detectOverflow';
+    import getBasePlacement from './getBasePlacement';
+    
+    type Options = {
+      placement: Placement,
+      padding: Padding,
+      boundary: Boundary,
+      rootBoundary: RootBoundary,
+      flipVariations: boolean,
+      allowedAutoPlacements?: Array<Placement>,
+    };
+    
+    type OverflowsMap = { [ComputedPlacement]: number };
+    
+    export default function computeAutoPlacement(
+      state: $Shape<State>,
+      options: Options = {}
+    ): Array<ComputedPlacement> {
+      const {
+        placement,
+        boundary,
+        rootBoundary,
+        padding,
+        flipVariations,
+        allowedAutoPlacements = allPlacements,
+      } = options;
+    
+      const variation = getVariation(placement);
+    
+      const placements = variation
+        ? flipVariations
+          ? variationPlacements
+          : variationPlacements.filter(
+              (placement) => getVariation(placement) === variation
+            )
+        : basePlacements;
+    
+      let allowedPlacements = placements.filter(
+        (placement) => allowedAutoPlacements.indexOf(placement) >= 0
+      );
+    
+      if (allowedPlacements.length === 0) {
+        allowedPlacements = placements;
+    
+        if (__DEV__) {
+          console.error(
+            [
+              'Popper: The `allowedAutoPlacements` option did not allow any',
+              'placements. Ensure the `placement` option matches the variation',
+              'of the allowed placements.',
+              'For example, "auto" cannot be used to allow "bottom-start".',
+              'Use "auto-start" instead.',
+            ].join(' ')
+          );
+        }
+      }
+    
+      // $FlowFixMe[incompatible-type]: Flow seems to have problems with two array unions...
+      const overflows: OverflowsMap = allowedPlacements.reduce((acc, placement) => {
+        acc[placement] = detectOverflow(state, {
+          placement,
+          boundary,
+          rootBoundary,
+          padding,
+        })[getBasePlacement(placement)];
+    
+        return acc;
+      }, {});
+    
+      return Object.keys(overflows).sort((a, b) => overflows[a] - overflows[b]);
+    }
+    ",
+    "// @flow
+    import type { Placement, Boundary, RootBoundary } from '../enums';
+    import type { ModifierArguments, Modifier, Padding } from '../types';
+    import getOppositePlacement from '../utils/getOppositePlacement';
+    import getBasePlacement from '../utils/getBasePlacement';
+    import getOppositeVariationPlacement from '../utils/getOppositeVariationPlacement';
+    import detectOverflow from '../utils/detectOverflow';
+    import computeAutoPlacement from '../utils/computeAutoPlacement';
+    import { bottom, top, start, right, left, auto } from '../enums';
+    import getVariation from '../utils/getVariation';
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      mainAxis: boolean,
+      altAxis: boolean,
+      fallbackPlacements: Array<Placement>,
+      padding: Padding,
+      boundary: Boundary,
+      rootBoundary: RootBoundary,
+      altBoundary: boolean,
+      flipVariations: boolean,
+      allowedAutoPlacements: Array<Placement>,
+    };
+    
+    function getExpandedFallbackPlacements(placement: Placement): Array<Placement> {
+      if (getBasePlacement(placement) === auto) {
+        return [];
+      }
+    
+      const oppositePlacement = getOppositePlacement(placement);
+    
+      return [
+        getOppositeVariationPlacement(placement),
+        oppositePlacement,
+        getOppositeVariationPlacement(oppositePlacement),
+      ];
+    }
+    
+    function flip({ state, options, name }: ModifierArguments<Options>) {
+      if (state.modifiersData[name]._skip) {
+        return;
+      }
+    
+      const {
+        mainAxis: checkMainAxis = true,
+        altAxis: checkAltAxis = true,
+        fallbackPlacements: specifiedFallbackPlacements,
+        padding,
+        boundary,
+        rootBoundary,
+        altBoundary,
+        flipVariations = true,
+        allowedAutoPlacements,
+      } = options;
+    
+      const preferredPlacement = state.options.placement;
+      const basePlacement = getBasePlacement(preferredPlacement);
+      const isBasePlacement = basePlacement === preferredPlacement;
+    
+      const fallbackPlacements =
+        specifiedFallbackPlacements ||
+        (isBasePlacement || !flipVariations
+          ? [getOppositePlacement(preferredPlacement)]
+          : getExpandedFallbackPlacements(preferredPlacement));
+    
+      const placements = [preferredPlacement, ...fallbackPlacements].reduce(
+        (acc, placement) => {
+          return acc.concat(
+            getBasePlacement(placement) === auto
+              ? computeAutoPlacement(state, {
+                  placement,
+                  boundary,
+                  rootBoundary,
+                  padding,
+                  flipVariations,
+                  allowedAutoPlacements,
+                })
+              : placement
+          );
+        },
+        []
+      );
+    
+      const referenceRect = state.rects.reference;
+      const popperRect = state.rects.popper;
+    
+      const checksMap = new Map();
+      let makeFallbackChecks = true;
+      let firstFittingPlacement = placements[0];
+    
+      for (let i = 0; i < placements.length; i++) {
+        const placement = placements[i];
+        const basePlacement = getBasePlacement(placement);
+        const isStartVariation = getVariation(placement) === start;
+        const isVertical = [top, bottom].indexOf(basePlacement) >= 0;
+        const len = isVertical ? 'width' : 'height';
+    
+        const overflow = detectOverflow(state, {
+          placement,
+          boundary,
+          rootBoundary,
+          altBoundary,
+          padding,
+        });
+    
+        let mainVariationSide: any = isVertical
+          ? isStartVariation
+            ? right
+            : left
+          : isStartVariation
+          ? bottom
+          : top;
+    
+        if (referenceRect[len] > popperRect[len]) {
+          mainVariationSide = getOppositePlacement(mainVariationSide);
+        }
+    
+        const altVariationSide: any = getOppositePlacement(mainVariationSide);
+    
+        const checks = [];
+    
+        if (checkMainAxis) {
+          checks.push(overflow[basePlacement] <= 0);
+        }
+    
+        if (checkAltAxis) {
+          checks.push(
+            overflow[mainVariationSide] <= 0,
+            overflow[altVariationSide] <= 0
+          );
+        }
+    
+        if (checks.every((check) => check)) {
+          firstFittingPlacement = placement;
+          makeFallbackChecks = false;
+          break;
+        }
+    
+        checksMap.set(placement, checks);
+      }
+    
+      if (makeFallbackChecks) {
+        // `2` may be desired in some cases – research later
+        const numberOfChecks = flipVariations ? 3 : 1;
+    
+        for (let i = numberOfChecks; i > 0; i--) {
+          const fittingPlacement = placements.find((placement) => {
+            const checks = checksMap.get(placement);
+            if (checks) {
+              return checks.slice(0, i).every((check) => check);
+            }
+          });
+    
+          if (fittingPlacement) {
+            firstFittingPlacement = fittingPlacement;
+            break;
+          }
+        }
+      }
+    
+      if (state.placement !== firstFittingPlacement) {
+        state.modifiersData[name]._skip = true;
+        state.placement = firstFittingPlacement;
+        state.reset = true;
+      }
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type FlipModifier = Modifier<'flip', Options>;
+    export default ({
+      name: 'flip',
+      enabled: true,
+      phase: 'main',
+      fn: flip,
+      requiresIfExists: ['offset'],
+      data: { _skip: false },
+    }: FlipModifier);
+    ",
+    "// @flow
+    import { max as mathMax, min as mathMin } from './math';
+    
+    export function within(min: number, value: number, max: number): number {
+      return mathMax(min, mathMin(value, max));
+    }
+    
+    export function withinMaxClamp(min: number, value: number, max: number) {
+      const v = within(min, value, max);
+      return v > max ? max : v;
+    }
+    ",
+    "// @flow
+    import { top, left, right, bottom, start } from '../enums';
+    import type { Placement, Boundary, RootBoundary } from '../enums';
+    import type { Rect, ModifierArguments, Modifier, Padding } from '../types';
+    import getBasePlacement from '../utils/getBasePlacement';
+    import getMainAxisFromPlacement from '../utils/getMainAxisFromPlacement';
+    import getAltAxis from '../utils/getAltAxis';
+    import { within, withinMaxClamp } from '../utils/within';
+    import getLayoutRect from '../dom-utils/getLayoutRect';
+    import getOffsetParent from '../dom-utils/getOffsetParent';
+    import detectOverflow from '../utils/detectOverflow';
+    import getVariation from '../utils/getVariation';
+    import getFreshSideObject from '../utils/getFreshSideObject';
+    import { min as mathMin, max as mathMax } from '../utils/math';
+    
+    type TetherOffset =
+      | (({
+          popper: Rect,
+          reference: Rect,
+          placement: Placement,
+        }) => number | { mainAxis: number, altAxis: number })
+      | number
+      | { mainAxis: number, altAxis: number };
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      /* Prevents boundaries overflow on the main axis */
+      mainAxis: boolean,
+      /* Prevents boundaries overflow on the alternate axis */
+      altAxis: boolean,
+      /* The area to check the popper is overflowing in */
+      boundary: Boundary,
+      /* If the popper is not overflowing the main area, fallback to this one */
+      rootBoundary: RootBoundary,
+      /* Use the reference's "clippingParents" boundary context */
+      altBoundary: boolean,
+      /**
+       * Allows the popper to overflow from its boundaries to keep it near its
+       * reference element
+       */
+      tether: boolean,
+      /* Offsets when the `tether` option should activate */
+      tetherOffset: TetherOffset,
+      /* Sets a padding to the provided boundary */
+      padding: Padding,
+    };
+    
+    function preventOverflow({ state, options, name }: ModifierArguments<Options>) {
+      const {
+        mainAxis: checkMainAxis = true,
+        altAxis: checkAltAxis = false,
+        boundary,
+        rootBoundary,
+        altBoundary,
+        padding,
+        tether = true,
+        tetherOffset = 0,
+      } = options;
+    
+      const overflow = detectOverflow(state, {
+        boundary,
+        rootBoundary,
+        padding,
+        altBoundary,
+      });
+      const basePlacement = getBasePlacement(state.placement);
+      const variation = getVariation(state.placement);
+      const isBasePlacement = !variation;
+      const mainAxis = getMainAxisFromPlacement(basePlacement);
+      const altAxis = getAltAxis(mainAxis);
+      const popperOffsets = state.modifiersData.popperOffsets;
+      const referenceRect = state.rects.reference;
+      const popperRect = state.rects.popper;
+      const tetherOffsetValue =
+        typeof tetherOffset === 'function'
+          ? tetherOffset({
+              ...state.rects,
+              placement: state.placement,
+            })
+          : tetherOffset;
+      const normalizedTetherOffsetValue =
+        typeof tetherOffsetValue === 'number'
+          ? { mainAxis: tetherOffsetValue, altAxis: tetherOffsetValue }
+          : { mainAxis: 0, altAxis: 0, ...tetherOffsetValue };
+      const offsetModifierState = state.modifiersData.offset
+        ? state.modifiersData.offset[state.placement]
+        : null;
+    
+      const data = { x: 0, y: 0 };
+    
+      if (!popperOffsets) {
+        return;
+      }
+    
+      if (checkMainAxis) {
+        const mainSide = mainAxis === 'y' ? top : left;
+        const altSide = mainAxis === 'y' ? bottom : right;
+        const len = mainAxis === 'y' ? 'height' : 'width';
+        const offset = popperOffsets[mainAxis];
+    
+        const min = offset + overflow[mainSide];
+        const max = offset - overflow[altSide];
+    
+        const additive = tether ? -popperRect[len] / 2 : 0;
+    
+        const minLen = variation === start ? referenceRect[len] : popperRect[len];
+        const maxLen = variation === start ? -popperRect[len] : -referenceRect[len];
+    
+        // We need to include the arrow in the calculation so the arrow doesn't go
+        // outside the reference bounds
+        const arrowElement = state.elements.arrow;
+        const arrowRect =
+          tether && arrowElement
+            ? getLayoutRect(arrowElement)
+            : { width: 0, height: 0 };
+        const arrowPaddingObject = state.modifiersData['arrow#persistent']
+          ? state.modifiersData['arrow#persistent'].padding
+          : getFreshSideObject();
+        const arrowPaddingMin = arrowPaddingObject[mainSide];
+        const arrowPaddingMax = arrowPaddingObject[altSide];
+    
+        // If the reference length is smaller than the arrow length, we don't want
+        // to include its full size in the calculation. If the reference is small
+        // and near the edge of a boundary, the popper can overflow even if the
+        // reference is not overflowing as well (e.g. virtual elements with no
+        // width or height)
+        const arrowLen = within(0, referenceRect[len], arrowRect[len]);
+    
+        const minOffset = isBasePlacement
+          ? referenceRect[len] / 2 -
+            additive -
+            arrowLen -
+            arrowPaddingMin -
+            normalizedTetherOffsetValue.mainAxis
+          : minLen -
+            arrowLen -
+            arrowPaddingMin -
+            normalizedTetherOffsetValue.mainAxis;
+        const maxOffset = isBasePlacement
+          ? -referenceRect[len] / 2 +
+            additive +
+            arrowLen +
+            arrowPaddingMax +
+            normalizedTetherOffsetValue.mainAxis
+          : maxLen +
+            arrowLen +
+            arrowPaddingMax +
+            normalizedTetherOffsetValue.mainAxis;
+    
+        const arrowOffsetParent =
+          state.elements.arrow && getOffsetParent(state.elements.arrow);
+        const clientOffset = arrowOffsetParent
+          ? mainAxis === 'y'
+            ? arrowOffsetParent.clientTop || 0
+            : arrowOffsetParent.clientLeft || 0
+          : 0;
+    
+        const offsetModifierValue = offsetModifierState?.[mainAxis] ?? 0;
+        const tetherMin = offset + minOffset - offsetModifierValue - clientOffset;
+        const tetherMax = offset + maxOffset - offsetModifierValue;
+    
+        const preventedOffset = within(
+          tether ? mathMin(min, tetherMin) : min,
+          offset,
+          tether ? mathMax(max, tetherMax) : max
+        );
+    
+        popperOffsets[mainAxis] = preventedOffset;
+        data[mainAxis] = preventedOffset - offset;
+      }
+    
+      if (checkAltAxis) {
+        const mainSide = mainAxis === 'x' ? top : left;
+        const altSide = mainAxis === 'x' ? bottom : right;
+        const offset = popperOffsets[altAxis];
+    
+        const len = altAxis === 'y' ? 'height' : 'width';
+    
+        const min = offset + overflow[mainSide];
+        const max = offset - overflow[altSide];
+    
+        const isOriginSide = [top, left].indexOf(basePlacement) !== -1;
+    
+        const offsetModifierValue = offsetModifierState?.[altAxis] ?? 0;
+        const tetherMin = isOriginSide
+          ? min
+          : offset -
+            referenceRect[len] -
+            popperRect[len] -
+            offsetModifierValue +
+            normalizedTetherOffsetValue.altAxis;
+        const tetherMax = isOriginSide
+          ? offset +
+            referenceRect[len] +
+            popperRect[len] -
+            offsetModifierValue -
+            normalizedTetherOffsetValue.altAxis
+          : max;
+    
+        const preventedOffset =
+          tether && isOriginSide
+            ? withinMaxClamp(tetherMin, offset, tetherMax)
+            : within(tether ? tetherMin : min, offset, tether ? tetherMax : max);
+    
+        popperOffsets[altAxis] = preventedOffset;
+        data[altAxis] = preventedOffset - offset;
+      }
+    
+      state.modifiersData[name] = data;
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type PreventOverflowModifier = Modifier<'preventOverflow', Options>;
+    export default ({
+      name: 'preventOverflow',
+      enabled: true,
+      phase: 'main',
+      fn: preventOverflow,
+      requiresIfExists: ['offset'],
+    }: PreventOverflowModifier);
+    ",
+    "// @flow
+    
+    export default function getAltAxis(axis: 'x' | 'y'): 'x' | 'y' {
+      return axis === 'x' ? 'y' : 'x';
+    }
+    ",
+    "// @flow
+    import type { Modifier, ModifierArguments, Padding, Rect } from '../types';
+    import type { Placement } from '../enums';
+    import getBasePlacement from '../utils/getBasePlacement';
+    import getLayoutRect from '../dom-utils/getLayoutRect';
+    import contains from '../dom-utils/contains';
+    import getOffsetParent from '../dom-utils/getOffsetParent';
+    import getMainAxisFromPlacement from '../utils/getMainAxisFromPlacement';
+    import { within } from '../utils/within';
+    import mergePaddingObject from '../utils/mergePaddingObject';
+    import expandToHashMap from '../utils/expandToHashMap';
+    import { left, right, basePlacements, top, bottom } from '../enums';
+    import { isHTMLElement } from '../dom-utils/instanceOf';
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type Options = {
+      element: HTMLElement | string | null,
+      padding:
+        | Padding
+        | (({|
+            popper: Rect,
+            reference: Rect,
+            placement: Placement,
+          |}) => Padding),
+    };
+    
+    const toPaddingObject = (padding, state) => {
+      padding =
+        typeof padding === 'function'
+          ? padding({ ...state.rects, placement: state.placement })
+          : padding;
+    
+      return mergePaddingObject(
+        typeof padding !== 'number'
+          ? padding
+          : expandToHashMap(padding, basePlacements)
+      );
+    };
+    
+    function arrow({ state, name, options }: ModifierArguments<Options>) {
+      const arrowElement = state.elements.arrow;
+      const popperOffsets = state.modifiersData.popperOffsets;
+      const basePlacement = getBasePlacement(state.placement);
+      const axis = getMainAxisFromPlacement(basePlacement);
+      const isVertical = [left, right].indexOf(basePlacement) >= 0;
+      const len = isVertical ? 'height' : 'width';
+    
+      if (!arrowElement || !popperOffsets) {
+        return;
+      }
+    
+      const paddingObject = toPaddingObject(options.padding, state);
+      const arrowRect = getLayoutRect(arrowElement);
+      const minProp = axis === 'y' ? top : left;
+      const maxProp = axis === 'y' ? bottom : right;
+    
+      const endDiff =
+        state.rects.reference[len] +
+        state.rects.reference[axis] -
+        popperOffsets[axis] -
+        state.rects.popper[len];
+      const startDiff = popperOffsets[axis] - state.rects.reference[axis];
+    
+      const arrowOffsetParent = getOffsetParent(arrowElement);
+      const clientSize = arrowOffsetParent
+        ? axis === 'y'
+          ? arrowOffsetParent.clientHeight || 0
+          : arrowOffsetParent.clientWidth || 0
+        : 0;
+    
+      const centerToReference = endDiff / 2 - startDiff / 2;
+    
+      // Make sure the arrow doesn't overflow the popper if the center point is
+      // outside of the popper bounds
+      const min = paddingObject[minProp];
+      const max = clientSize - arrowRect[len] - paddingObject[maxProp];
+      const center = clientSize / 2 - arrowRect[len] / 2 + centerToReference;
+      const offset = within(min, center, max);
+    
+      // Prevents breaking syntax highlighting...
+      const axisProp: string = axis;
+      state.modifiersData[name] = {
+        [axisProp]: offset,
+        centerOffset: offset - center,
+      };
+    }
+    
+    function effect({ state, options }: ModifierArguments<Options>) {
+      let { element: arrowElement = '[data-popper-arrow]' } = options;
+    
+      if (arrowElement == null) {
+        return;
+      }
+    
+      // CSS selector
+      if (typeof arrowElement === 'string') {
+        arrowElement = state.elements.popper.querySelector(arrowElement);
+    
+        if (!arrowElement) {
+          return;
+        }
+      }
+    
+      if (__DEV__) {
+        if (!isHTMLElement(arrowElement)) {
+          console.error(
+            [
+              'Popper: "arrow" element must be an HTMLElement (not an SVGElement).',
+              'To use an SVG arrow, wrap it in an HTMLElement that will be used as',
+              'the arrow.',
+            ].join(' ')
+          );
+        }
+      }
+    
+      if (!contains(state.elements.popper, arrowElement)) {
+        if (__DEV__) {
+          console.error(
+            [
+              'Popper: "arrow" modifier\'s `element` must be a child of the popper',
+              'element.',
+            ].join(' ')
+          );
+        }
+    
+        return;
+      }
+    
+      state.elements.arrow = arrowElement;
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type ArrowModifier = Modifier<'arrow', Options>;
+    export default ({
+      name: 'arrow',
+      enabled: true,
+      phase: 'main',
+      fn: arrow,
+      effect,
+      requires: ['popperOffsets'],
+      requiresIfExists: ['preventOverflow'],
+    }: ArrowModifier);
+    ",
+    "// @flow
+    import type {
+      ModifierArguments,
+      Modifier,
+      Rect,
+      SideObject,
+      Offsets,
+    } from '../types';
+    import { top, bottom, left, right } from '../enums';
+    import detectOverflow from '../utils/detectOverflow';
+    
+    function getSideOffsets(
+      overflow: SideObject,
+      rect: Rect,
+      preventedOffsets: Offsets = { x: 0, y: 0 }
+    ): SideObject {
+      return {
+        top: overflow.top - rect.height - preventedOffsets.y,
+        right: overflow.right - rect.width + preventedOffsets.x,
+        bottom: overflow.bottom - rect.height + preventedOffsets.y,
+        left: overflow.left - rect.width - preventedOffsets.x,
+      };
+    }
+    
+    function isAnySideFullyClipped(overflow: SideObject): boolean {
+      return [top, right, bottom, left].some((side) => overflow[side] >= 0);
+    }
+    
+    function hide({ state, name }: ModifierArguments<{||}>) {
+      const referenceRect = state.rects.reference;
+      const popperRect = state.rects.popper;
+      const preventedOffsets = state.modifiersData.preventOverflow;
+    
+      const referenceOverflow = detectOverflow(state, {
+        elementContext: 'reference',
+      });
+      const popperAltOverflow = detectOverflow(state, {
+        altBoundary: true,
+      });
+    
+      const referenceClippingOffsets = getSideOffsets(
+        referenceOverflow,
+        referenceRect
+      );
+      const popperEscapeOffsets = getSideOffsets(
+        popperAltOverflow,
+        popperRect,
+        preventedOffsets
+      );
+    
+      const isReferenceHidden = isAnySideFullyClipped(referenceClippingOffsets);
+      const hasPopperEscaped = isAnySideFullyClipped(popperEscapeOffsets);
+    
+      state.modifiersData[name] = {
+        referenceClippingOffsets,
+        popperEscapeOffsets,
+        isReferenceHidden,
+        hasPopperEscaped,
+      };
+    
+      state.attributes.popper = {
+        ...state.attributes.popper,
+        'data-popper-reference-hidden': isReferenceHidden,
+        'data-popper-escaped': hasPopperEscaped,
+      };
+    }
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export type HideModifier = Modifier<'hide', {||}>;
+    export default ({
+      name: 'hide',
+      enabled: true,
+      phase: 'main',
+      requiresIfExists: ['preventOverflow'],
+      fn: hide,
+    }: HideModifier);
+    ",
+    "// @flow
+    import { popperGenerator, detectOverflow } from './createPopper';
+    
+    import eventListeners from './modifiers/eventListeners';
+    import popperOffsets from './modifiers/popperOffsets';
+    import computeStyles from './modifiers/computeStyles';
+    import applyStyles from './modifiers/applyStyles';
+    
+    export type * from './types';
+    
+    const defaultModifiers = [
+      eventListeners,
+      popperOffsets,
+      computeStyles,
+      applyStyles,
+    ];
+    
+    const createPopper = popperGenerator({ defaultModifiers });
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export { createPopper, popperGenerator, defaultModifiers, detectOverflow };
+    ",
+    "// @flow
+    import { popperGenerator, detectOverflow } from './createPopper';
+    
+    import eventListeners from './modifiers/eventListeners';
+    import popperOffsets from './modifiers/popperOffsets';
+    import computeStyles from './modifiers/computeStyles';
+    import applyStyles from './modifiers/applyStyles';
+    import offset from './modifiers/offset';
+    import flip from './modifiers/flip';
+    import preventOverflow from './modifiers/preventOverflow';
+    import arrow from './modifiers/arrow';
+    import hide from './modifiers/hide';
+    
+    export type * from './types';
+    
+    const defaultModifiers = [
+      eventListeners,
+      popperOffsets,
+      computeStyles,
+      applyStyles,
+      offset,
+      flip,
+      preventOverflow,
+      arrow,
+      hide,
+    ];
+    
+    const createPopper = popperGenerator({ defaultModifiers });
+    
+    // eslint-disable-next-line import/no-unused-modules
+    export { createPopper, popperGenerator, defaultModifiers, detectOverflow };
+    // eslint-disable-next-line import/no-unused-modules
+    export { createPopper as createPopperLite } from './popper-lite';
+    // eslint-disable-next-line import/no-unused-modules
+    export * from './modifiers';
+    "
+    ],
+    names: [
+    "getWindow",
+    "node",
+    "window",
+    "toString",
+    "ownerDocument",
+    "defaultView",
+    "isElement",
+    "Element",
+    "isHTMLElement",
+    "HTMLElement",
+    "isShadowRoot",
+    "ShadowRoot",
+    "max",
+    "Math",
+    "min",
+    "round",
+    "getBoundingClientRect",
+    "element",
+    "includeScale",
+    "rect",
+    "scaleX",
+    "scaleY",
+    "offsetHeight",
+    "offsetWidth",
+    "width",
+    "height",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "x",
+    "y",
+    "getWindowScroll",
+    "win",
+    "scrollLeft",
+    "pageXOffset",
+    "scrollTop",
+    "pageYOffset",
+    "getNodeName",
+    "nodeName",
+    "toLowerCase",
+    "getDocumentElement",
+    "document",
+    "documentElement",
+    "getWindowScrollBarX",
+    "getComputedStyle",
+    "isScrollParent",
+    "overflow",
+    "overflowX",
+    "overflowY",
+    "test",
+    "getCompositeRect",
+    "elementOrVirtualElement",
+    "offsetParent",
+    "isFixed",
+    "isOffsetParentAnElement",
+    "offsetParentIsScaled",
+    "isElementScaled",
+    "scroll",
+    "offsets",
+    "clientLeft",
+    "clientTop",
+    "getLayoutRect",
+    "clientRect",
+    "abs",
+    "offsetLeft",
+    "offsetTop",
+    "getParentNode",
+    "assignedSlot",
+    "parentNode",
+    "host",
+    "getScrollParent",
+    "indexOf",
+    "body",
+    "listScrollParents",
+    "list",
+    "scrollParent",
+    "isBody",
+    "_element$ownerDocumen",
+    "target",
+    "concat",
+    "visualViewport",
+    "updatedList",
+    "isTableElement",
+    "getTrueOffsetParent",
+    "position",
+    "getOffsetParent",
+    "isFirefox",
+    "navigator",
+    "userAgent",
+    "currentNode",
+    "css",
+    "transform",
+    "perspective",
+    "contain",
+    "willChange",
+    "filter",
+    "getContainingBlock",
+    "auto",
+    "basePlacements",
+    "start",
+    "end",
+    "viewport",
+    "popper",
+    "variationPlacements",
+    "reduce",
+    "acc",
+    "placement",
+    "placements",
+    "modifierPhases",
+    "order",
+    "modifiers",
+    "map",
+    "Map",
+    "visited",
+    "Set",
+    "result",
+    "sort",
+    "modifier",
+    "add",
+    "name",
+    "requires",
+    "requiresIfExists",
+    "forEach",
+    "dep",
+    "has",
+    "depModifier",
+    "get",
+    "push",
+    "set",
+    "getBasePlacement",
+    "split",
+    "contains",
+    "parent",
+    "child",
+    "rootNode",
+    "getRootNode",
+    "next",
+    "isSameNode",
+    "rectToClientRect",
+    "getClientRectFromMixedType",
+    "clippingParent",
+    "html",
+    "clientWidth",
+    "clientHeight",
+    "getViewportRect",
+    "getInnerBoundingClientRect",
+    "winScroll",
+    "scrollWidth",
+    "scrollHeight",
+    "direction",
+    "getDocumentRect",
+    "getClippingRect",
+    "boundary",
+    "rootBoundary",
+    "mainClippingParents",
+    "clippingParents",
+    "clipperElement",
+    "getClippingParents",
+    "firstClippingParent",
+    "clippingRect",
+    "accRect",
+    "getVariation",
+    "getMainAxisFromPlacement",
+    "computeOffsets",
+    "reference",
+    "basePlacement",
+    "variation",
+    "commonX",
+    "commonY",
+    "mainAxis",
+    "len",
+    "mergePaddingObject",
+    "paddingObject",
+    "expandToHashMap",
+    "value",
+    "keys",
+    "hashMap",
+    "key",
+    "detectOverflow",
+    "state",
+    "options",
+    "elementContext",
+    "altBoundary",
+    "padding",
+    "altContext",
+    "popperRect",
+    "rects",
+    "elements",
+    "clippingClientRect",
+    "contextElement",
+    "referenceClientRect",
+    "popperOffsets",
+    "strategy",
+    "popperClientRect",
+    "elementClientRect",
+    "overflowOffsets",
+    "offsetData",
+    "modifiersData",
+    "offset",
+    "Object",
+    "multiply",
+    "axis",
+    "DEFAULT_OPTIONS",
+    "areValidElements",
+    "args",
+    "some",
+    "popperGenerator",
+    "generatorOptions",
+    "defaultModifiers",
+    "defaultOptions",
+    "fn",
+    "pending",
+    "orderedModifiers",
+    "attributes",
+    "styles",
+    "effectCleanupFns",
+    "isDestroyed",
+    "instance",
+    "setOptions",
+    "setOptionsAction",
+    "cleanupModifierEffects",
+    "scrollParents",
+    "merged",
+    "phase",
+    "orderModifiers",
+    "current",
+    "existing",
+    "data",
+    "m",
+    "enabled",
+    "effect",
+    "cleanupFn",
+    "noopFn",
+    "update",
+    "forceUpdate",
+    "reset",
+    "index",
+    "length",
+    "Promise",
+    "resolve",
+    "then",
+    "undefined",
+    "destroy",
+    "onFirstUpdate",
+    "passive",
+    "resize",
+    "addEventListener",
+    "removeEventListener",
+    "unsetSides",
+    "mapToStyles",
+    "gpuAcceleration",
+    "adaptive",
+    "roundOffsets",
+    "hasX",
+    "hasOwnProperty",
+    "hasY",
+    "sideX",
+    "sideY",
+    "heightProp",
+    "widthProp",
+    "commonStyles",
+    "dpr",
+    "devicePixelRatio",
+    "roundOffsetsByDPR",
+    "arrow",
+    "style",
+    "assign",
+    "removeAttribute",
+    "setAttribute",
+    "initialStyles",
+    "margin",
+    "property",
+    "attribute",
+    "invertDistance",
+    "skidding",
+    "distance",
+    "distanceAndSkiddingToXY",
+    "hash",
+    "getOppositePlacement",
+    "replace",
+    "matched",
+    "getOppositeVariationPlacement",
+    "computeAutoPlacement",
+    "flipVariations",
+    "allowedAutoPlacements",
+    "allPlacements",
+    "allowedPlacements",
+    "overflows",
+    "a",
+    "b",
+    "_skip",
+    "checkMainAxis",
+    "altAxis",
+    "checkAltAxis",
+    "specifiedFallbackPlacements",
+    "fallbackPlacements",
+    "preferredPlacement",
+    "oppositePlacement",
+    "getExpandedFallbackPlacements",
+    "referenceRect",
+    "checksMap",
+    "makeFallbackChecks",
+    "firstFittingPlacement",
+    "i",
+    "isStartVariation",
+    "isVertical",
+    "mainVariationSide",
+    "altVariationSide",
+    "checks",
+    "every",
+    "check",
+    "fittingPlacement",
+    "find",
+    "slice",
+    "within",
+    "mathMax",
+    "mathMin",
+    "tether",
+    "tetherOffset",
+    "isBasePlacement",
+    "tetherOffsetValue",
+    "normalizedTetherOffsetValue",
+    "offsetModifierState",
+    "mainSide",
+    "altSide",
+    "additive",
+    "minLen",
+    "maxLen",
+    "arrowElement",
+    "arrowRect",
+    "arrowPaddingObject",
+    "arrowPaddingMin",
+    "arrowPaddingMax",
+    "arrowLen",
+    "minOffset",
+    "maxOffset",
+    "arrowOffsetParent",
+    "clientOffset",
+    "offsetModifierValue",
+    "tetherMax",
+    "preventedOffset",
+    "isOriginSide",
+    "tetherMin",
+    "v",
+    "withinMaxClamp",
+    "toPaddingObject",
+    "minProp",
+    "maxProp",
+    "endDiff",
+    "startDiff",
+    "clientSize",
+    "centerToReference",
+    "center",
+    "axisProp",
+    "centerOffset",
+    "querySelector",
+    "getSideOffsets",
+    "preventedOffsets",
+    "isAnySideFullyClipped",
+    "side",
+    "preventOverflow",
+    "referenceOverflow",
+    "popperAltOverflow",
+    "referenceClippingOffsets",
+    "popperEscapeOffsets",
+    "isReferenceHidden",
+    "hasPopperEscaped",
+    "createPopper",
+    "eventListeners",
+    "computeStyles",
+    "applyStyles",
+    "flip",
+    "hide"
+    ],
+    mappings: "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"
+}
