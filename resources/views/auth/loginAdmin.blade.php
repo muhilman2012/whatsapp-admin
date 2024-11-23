@@ -1,14 +1,14 @@
 @extends('auth.layouts.panel')
 
 @section('head')
-    <title>DISKOMINFO KAB. NIAS UTARA - Login Pages</title>
+    <title>Admin LaporMasWapres! - Login</title>
 @endsection
 
 @section('pages')
     <div class="box-auth">
         <div class="box-head">
             <h3 class="text-orange fw-bold">MASUK</h3>
-            <p class="mb-0">Selamat Datang di Panel Admin <br> DISKOMINFO Kab. Nias Utara</p>
+            <p class="mb-0">Selamat Datang di Panel Admin <br>LaporMasWapres!</p>
         </div>
         <div class="box-body pb-5">
             <form method="POST" action="{{ route('admin.login.store') }}">

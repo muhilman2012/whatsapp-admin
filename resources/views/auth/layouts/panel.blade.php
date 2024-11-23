@@ -6,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="author" content="Muhammad Hilman">
-    <meta name="description" content="Diskominfo Kab. Nias Utara">
-    <meta name="keywords" content="Diskominfo, Nias Utara, Kominfo" type="application/rss+xml" title="Diskominfo Kab. Nias Utara">
     <meta name="msapplication-navbutton-color" content="#dd894c" />
     <meta name="apple-mobile-web-app-status-bar-style" content="#dd894c" />
-    <link rel="icon" type="image/png" href="{{asset('/images/logo/diskominfo.png')}}" />
+    <link rel="icon" type="image/png" href="{{asset('/images/logo/LaporMasWapres.png')}}" />
     @yield('head')
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com">
