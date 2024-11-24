@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class laporanAdmin extends Controller
 {
@@ -23,84 +24,96 @@ class laporanAdmin extends Controller
         return view('admin.laporan.create');
     }
 
-    // public function show($id)
-    // {
-    //     $data= Laporan::find($id);
-    //     return view('admin.laporan.edit', [
-    //         'data' => $data
-    //     ]);
-    // }
-
-    public function edit($id)
+    public function store(Request $request)
     {
-        $data = Laporan::find($id);
-        return view('admin.laporan.edit', [
-            'data' => $data
+        // Validasi data
+        $request->validate([
+            'nomor_pengadu' => 'required|string|max:15', // Nomor pengadu wajib
+            'email' => 'nullable|email|max:255', // Email opsional
+            'nama_lengkap' => 'required|string|max:255',
+            'nik' => 'required|digits:16',
+            'jenis_kelamin' => 'required|in:L,P',
+            'alamat_lengkap' => 'required',
+            'judul' => 'required|max:255',
+            'lokasi' => 'required|string|max:255',
+            'detail' => 'required',
+            'tanggal_kejadian' => 'nullable|date',
+            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
+
+        // Generate nomor tiket unik berupa angka 7 digit
+        $nomorTiket = $this->generateNomorTiket();
+
+        // Proses dokumen pendukung
+        $fileName = null;
+        if ($request->hasFile('dokumen_pendukung')) {
+            $file = $request->file('dokumen_pendukung');
+            $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension(); // Rename file dengan ID tiket
+            $file->move(storage_path('app/public/dokumen'), $fileName); // Simpan file di storage/public
+        }
+
+        // Simpan data ke database
+        Laporan::create([
+            'nomor_tiket' => $nomorTiket,
+            'nomor_pengadu' => $request->nomor_pengadu,
+            'email' => $request->email,
+            'nama_lengkap' => $request->nama_lengkap,
+            'nik' => $request->nik,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'alamat_lengkap' => $request->alamat_lengkap,
+            'judul' => $request->judul,
+            'lokasi' => $request->lokasi,
+            'detail' => $request->detail,
+            'lokasi' => $request->lokasi,
+            'dokumen_pendukung' => $fileName,
+            'tanggal_kejadian' => $request->tanggal_kejadian,
+        ]);
+
+        return redirect()->route('admin.laporan')->with('success', 'Laporan berhasil ditambahkan.');
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Generate Nomor Tiket Unik Berupa Angka
+     *
+     * @return string
+     */
+    private function generateNomorTiket()
     {
-        $validator = Validator::make($request->all(), [
-            'title'        => 'required',
-            'description'  => 'required',
-            'content'      => 'required',
-            // 'imagesMultiple.*'  => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-        ], [
-            'title.required'        => 'Please input field title Laporan',
-            'description.required'  => 'Please input field description Laporan',
-            'content.required'      => 'Please input field content Laporan',
-        ]);
+        do {
+            $nomorTiket = str_pad(mt_rand(1, 9999999), 7, '0', STR_PAD_LEFT); // Generate angka 7 digit
+        } while (Laporan::where('nomor_tiket', $nomorTiket)->exists()); // Pastikan unik
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        } else {
-            // slug from title
-            $slug = Str::slug($request->title);
-            if ($request->images) {
-                $validImages = Validator::make($request->all(), [
-                    'images'       => 'image|mimes:jpeg,png,jpg,gif,svg|max:4512',
-                ], [
-                    'images.image'          => 'File is not images',
-                    'images.mimes'          => 'File must be images',
-                    'images.max'            => 'File images oversized',
-                ]);
-                if ($validImages->fails()) {
-                    return redirect()->back()->withErrors($validImages)->withInput();
-                } else {
-                    // images 
-                    $resorce = $request->images;
-                    $originNamaImages = $resorce->getClientOriginalName();
-                    $NewNameImage = "IMG-" . substr(md5($originNamaImages . date("YmdHis")), 0, 14);
-                    $namasamplefoto = $NewNameImage . "." . $resorce->getClientOriginalExtension();
-                    // update with images
-                    $data = Laporan::find($id);
-                    $data->title = $request->title;
-                    $data->slug = $slug;
-                    $data->content = $request->content;
-                    $data->description = $request->description;
-                    $data->images = $namasamplefoto;
-                    $resorce->move(public_path() . "/images/Laporan/", $namasamplefoto);
-                    if ($data->save()) {
-                        return redirect()->route('admin.Laporan')->with('success', 'Data Berita Berhasil Diperbaharui!');
-                    } else {
-                        return redirect()->back()->with('error', 'Maaf Database Error! Coba Lagi Nanti');
-                    }
-                }
-            } else {
-                // update no images
-                $data = Laporan::find($id);
-                $data->title = $request->title;
-                $data->slug = $slug;
-                $data->content = $request->content;
-                $data->description = $request->description;
-                if ($data->save()) {
-                    return redirect()->route('admin.laporan')->with('success', 'Data Berita Berhasil Diperbaharui!');
-                } else {
-                    return redirect()->back()->with('error', 'Maaf Database Error! Coba Lagi Nanti');
-                }
-            }
-        }
+        return $nomorTiket;
+    }
+
+    public function show($nomor_tiket)
+    {
+        $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        return view('admin.laporan.detail', compact('data'));
+    }
+
+    public function edit($nomor_tiket)
+    {
+        $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Data dummy untuk kategori, klasifikasi, dan disposisi
+        $kategori = ['Bantuan Sosial', 'Hukum', 'Ekonomi dan Keuangan', 'Ketenagakerjaan',  'Pendidikan', 'Kesehatan', 'Infrastruktur', 'Lainnya'];
+        $klasifikasi = ['Urgensi Tinggi', 'Urgensi Sedang', 'Urgensi Rendah'];
+        $disposisi = ['D1', 'D2', 'D3', 'D4'];
+
+        return view('admin.laporan.edit', compact('data', 'kategori', 'klasifikasi', 'disposisi'));
+    }
+
+    public function update(Request $request, $nomor_tiket)
+    {
+        $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        $data->update($request->only([
+            'status', 'tanggapan', 'kategori', 'klasifikasi', 'disposisi'
+        ]));
+
+        return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -158,5 +171,25 @@ class laporanAdmin extends Controller
             new LaporanExport($startDate, $endDate),
             'laporan-' . $formattedStartDate . '-to-' . $formattedEndDate . '.xlsx'
         );
+    }
+
+    public function downloadPDF($nomor_tiket)
+    {
+        // Cari laporan berdasarkan nomor tiket
+        $laporan = \App\Models\Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Data yang akan dikirim ke view PDF
+        $data = [
+            'laporan' => $laporan,
+        ];
+
+        // Generate PDF
+        $pdf = Pdf::loadView('admin.laporan.pdf', $data);
+
+        // Tambahkan watermark jika diperlukan
+        $pdf->setPaper('A4', 'portrait');
+
+        // Download file PDF
+        return $pdf->download('Bukti_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
     }
 }

@@ -1,7 +1,7 @@
 @extends('admin.layouts.panel')
 
 @section('head')
-<title>DISKOMINFO Kab. Nias Utara - Tambah Berita Baru</title>
+<title>LaporMasWapres! - Tambah Pengaduan Baru</title>
 <style>
     .ck-editor__editable {
         min-height: 200px;
@@ -15,52 +15,100 @@
 <div class="container-fluid">
     <div class="d-block rounded bg-white shadow">
         <div class="p-3 border-bottom">
-            <p class="fs-4 fw-bold mb-0">Tambah Berita Baru</p>
+            <p class="fs-4 fw-bold mb-0">Tambah Pengaduan Baru</p>
         </div>
         <div class="d-block p-3">
-            <form action="{{ route('admin.news.create.store') }}" method="post" enctype="multipart/form-data">
+            @if(session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
+            <form action="{{ route('admin.laporan.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('post')
                 <div class="mb-3">
-                    <label for="images" class="form-label">Images</label>
-                    <input type="file" name="images" id="images" class="form-control @error('images') is-invalid @enderror">
-                    @error('images')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <label for="nama_lengkap" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                    <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap') }}">
+                    @error('nama_lengkap')
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <label for="title" class="form-label">Title</label>
-                    <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}">
-                    @error('title')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <label for="nik" class="form-label">NIK <span class="text-danger">*</span></label>
+                    <input type="text" name="nik" id="nik" class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik') }}">
+                    @error('nik')
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <label for="description" class="form-label">Small Description</label>
-                    <textarea name="description" id="description" rows="3"
-                        class="form-control @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
-                    @error('description')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <label for="jenis_kelamin" class="form-label">Jenis Kelamin <span class="text-danger">*</span></label>
+                    <select name="jenis_kelamin" id="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror">
+                        <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                        <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-Laki</option>
+                        <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                    @error('jenis_kelamin')
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <label for="content" class="form-label">Content</label>
-                    <textarea name="content" id="editors" rows="10"
-                        class=" editors form-control @error('content') is-invalid @enderror">{{ old('content') }}</textarea>
-                    @error('content')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
+                    <label for="nomor_pengadu" class="form-label">Nomor Pengadu <span class="text-danger">*</span></label>
+                    <input type="text" name="nomor_pengadu" id="nomor_pengadu" class="form-control @error('nomor_pengadu') is-invalid @enderror" value="{{ old('nomor_pengadu') }}">
+                    @error('nomor_pengadu')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Pengadu</label>
+                    <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}">
+                    @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
                 <div class="mb-3">
-                    <button type="submit" class="btn btn-outline-secondary form-control">Save</button>
+                    <label for="alamat_lengkap" class="form-label">Alamat Lengkap <span class="text-danger">*</span></label>
+                    <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control @error('alamat_lengkap') is-invalid @enderror">{{ old('alamat_lengkap') }}</textarea>
+                    @error('alamat_lengkap')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="judul" class="form-label">Judul Laporan <span class="text-danger">*</span></label>
+                    <input type="text" name="judul" id="judul" class="form-control @error('judul') is-invalid @enderror" value="{{ old('judul') }}">
+                    @error('judul')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="lokasi" class="form-label">Lokasi Kejadian <span class="text-danger">*</span></label>
+                    <input type="text" name="lokasi" id="lokasi" class="form-control @error('lokasi') is-invalid @enderror" value="{{ old('lokasi') }}">
+                    @error('lokasi')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="detail" class="form-label">Detail Laporan <span class="text-danger">*</span></label>
+                    <textarea name="detail" id="detail" class="form-control @error('detail') is-invalid @enderror" rows="4">{{ old('detail') }}</textarea>
+                    @error('detail')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="tanggal_kejadian" class="form-label">Tanggal Kejadian</label>
+                    <input type="date" name="tanggal_kejadian" id="tanggal_kejadian" class="form-control @error('tanggal_kejadian') is-invalid @enderror" value="{{ old('tanggal_kejadian') }}">
+                    @error('tanggal_kejadian')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <label for="dokumen_pendukung" class="form-label">Dokumen Pendukung</label>
+                    <input type="file" name="dokumen_pendukung" id="dokumen_pendukung" class="form-control @error('dokumen_pendukung') is-invalid @enderror">
+                    @error('dokumen_pendukung')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-outline-secondary form-control">Simpan</button>
                 </div>
             </form>
         </div>
@@ -78,7 +126,7 @@
     //     console.error(error);
     // });
     CKEDITOR.replace( 'editors', {
-        filebrowserUploadUrl: "{{route('admin.news.upload.editor', ['_token' => csrf_token() ])}}",
+        filebrowserUploadUrl: "{{route('admin.laporan.upload.editor', ['_token' => csrf_token() ])}}",
         filebrowserUploadMethod: 'form'
     });
 </script>

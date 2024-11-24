@@ -37,11 +37,11 @@
                     <th>Nama Lengkap</th>
                     <th>NIK</th>
                     <th>No Telp</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Alamat Lengkap</th>
+                    <th>JK</th>
                     <th>Judul Pengaduan</th>
                     <th>Status</th>
                     <th>Dikirim</th>
+                    <th>Sisa Hari</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -54,14 +54,17 @@
                     <td>{{ $item->nik }}</td>
                     <td>{{ $item->nomor_pengadu }}</td>
                     <td>{{ $item->jenis_kelamin }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->alamat_lengkap, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->judul, 20) }}</td>
-                    <td>{{ $item->status }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->status, 10) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $item->sisa_hari }}</td>
                     <td class="text-nowrap">
-                        <!-- <a href="{{ route('admin.laporan.edit', ['id' => $item->id]) }}" class="btn btn-outline-secondary btn-sm">
+                        <a href="{{ route('admin.laporan.detail', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-eye fa-sm fa-fw"></i>
+                        </a>
+                        <a href="{{ route('admin.laporan.edit', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-pencil-alt fa-sm fa-fw"></i>
-                        </a> -->
+                        </a>
                         <button onclick="confirm('Apakah Anda yakin ingin menghapus laporan ini?') || event.stopImmediatePropagation()" 
                             wire:click="removed({{ $item->id }})" 
                             type="button" 

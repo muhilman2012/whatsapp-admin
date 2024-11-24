@@ -1,7 +1,7 @@
 @extends('admin.layouts.panel')
 
 @section('head')
-<title>DISKOMINFO Kab. Nias Utara - Profile Admin</title>
+<title>LaporMasWapres! - Profile Admin</title>
 <link rel="stylesheet" href="{{ url('/assets/dist/css/admin/profile.css') }}">
 @endsection
 

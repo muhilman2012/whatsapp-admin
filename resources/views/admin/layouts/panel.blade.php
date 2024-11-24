@@ -96,9 +96,21 @@
                         <i class="fas fa-user box-icon" aria-hidden="true"></i>Profile
                     </a>
                     <hr class="soft my-1 text-white">
-                    <a class="nav-link px-3" href="{{ route('admin.laporan') }}">
-                        <i class="fas fa-newspaper box-icon" aria-hidden="true"></i>Laporan Pengaduan
+                    <a class="nav-link collapsed" href="#laporan" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#laporan">
+                        <i class="fas fa-newspaper box-icon"></i>Laporan Pengaduan
+                        <span class="indications">
+                            <i class="fas fa-angle-up fa-sm fa-fw"></i>
+                        </span>
                     </a>
+                    <div id="laporan" class="accordion-collapse collapse" data-bs-parent="#nav-accordion">
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan') }}">
+                            <i class="fas fa-newspaper box-icon text-center"></i>Data Pengaduan
+                        </a>
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan.create') }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Form Pengaduan
+                        </a>
+                    </div>
                     <hr class="soft my-1 text-white">
                     <a class="btnLogout nav-link px-3" href="#">
                         <i class="fas fa-sign-out-alt box-icon"></i>Logout
