@@ -67,6 +67,7 @@ class laporanAdmin extends Controller
             'lokasi' => $request->lokasi,
             'dokumen_pendukung' => $fileName,
             'tanggal_kejadian' => $request->tanggal_kejadian,
+            'sumber_pengaduan' => 'tatap muka',
         ]);
 
         return redirect()->route('admin.laporan')->with('success', 'Laporan berhasil ditambahkan.');

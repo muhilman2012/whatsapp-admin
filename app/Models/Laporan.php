@@ -29,6 +29,7 @@ class Laporan extends Model
         'klasifikasi',
         'kategori',
         'disposisi',
+        'sumber_pengaduan',
     ];
 
     protected $casts = [
