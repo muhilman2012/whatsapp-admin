@@ -38,7 +38,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ asset('images/logo/LaporMasWapres.png') }}" alt="Logo">
+        <img src="{{ public_path('images/logo/LaporMasWapres.png') }}" alt="Logo" style="width: 150px;">
         <h1>Bukti Pengaduan</h1>
         <p>Nomor Pengaduan: <strong>{{ $laporan->nomor_tiket }}</strong></p>
     </div>
@@ -58,7 +58,7 @@
     </ol>
 
     <div class="watermark">
-        <img src="{{ asset('images/logo/LaporMasWapres.png') }}" alt="Watermark">
+        <img src="{{ public_path('images/logo/LaporMasWapres.png') }}" alt="Logo" style="width: 200px;">
     </div>
 </body>
 </html>

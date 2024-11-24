@@ -32,9 +32,9 @@ Route::group(['prefix' => 'admin',  'middleware' => 'auth:admin'], function () {
     Route::get('/dashboard/laporan/edit/{nomor_tiket}', [laporanAdmin::class, 'edit'])->name('admin.laporan.edit');
     Route::put('/dashboard/laporan/update/{nomor_tiket}', [laporanAdmin::class, 'update'])->name('admin.laporan.update');
     Route::post('/dashboard/laporan/upload/editor', [laporanAdmin::class, 'editor'])->name('admin.laporan.upload.editor');
-    Route::get('/admin/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
+    Route::get('/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
 
-    Route::get('/dashboard/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
+    Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
 
     Route::get('/logout', [indexAdmin::class, 'logout'])->name('admin.logout');
 });
