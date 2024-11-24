@@ -10,10 +10,23 @@ use Illuminate\Support\Facades\Auth;
 class indexAdmin extends Controller
 {
     // show dashboard
-    public function index(){
-        $Laporan = Laporan::count();
+    public function index()
+    {
+        $totalLaporan = Laporan::count(); // Total laporan
+        $lakiLaki = Laporan::where('jenis_kelamin', 'L')->count(); // Pengadu laki-laki
+        $perempuan = Laporan::where('jenis_kelamin', 'P')->count(); // Pengadu perempuan
+
+        // Ambil data laporan per hari untuk chart
+        $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'ASC')
+            ->get();
+
         return view('admin.index', [
-            'laporan'      => $Laporan,
+            'totalLaporan' => $totalLaporan,
+            'lakiLaki' => $lakiLaki,
+            'perempuan' => $perempuan,
+            'laporanHarian' => $laporanHarian, // Data untuk chart
         ]);
     }
 
