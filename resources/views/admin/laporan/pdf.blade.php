@@ -58,7 +58,7 @@
     </ol>
 
     <div class="watermark">
-        <img src="{{ public_path('images/logo/LaporMasWapres.png') }}" alt="Logo" style="width: 200px;">
+        <img src="{{ public_path('images/logo/LaporMasWapres.png') }}" alt="Logo" style="width: 500px;">
     </div>
 </body>
 </html>
