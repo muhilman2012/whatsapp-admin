@@ -79,7 +79,7 @@
                     <option value="Proses verifikasi dan telaah" {{ $data->status == 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
                     <option value="Diteruskan ke instansi terkait" {{ $data->status == 'Diteruskan ke instansi terkait' ? 'selected' : '' }}>Diteruskan ke instansi terkait</option>
                     <option value="Penanganan selesai" {{ $data->status == 'Penanganan selesai' ? 'selected' : '' }}>Penanganan selesai</option>
-                    <option value="Tidak ditindaklanjuti (UDK)" {{ $data->status == 'Tidak ditindaklanjuti (UDK)' ? 'selected' : '' }}>Tidak ditindaklanjuti (UDK)</option>
+                    <option value="Tidak dapat diproses lebih lanjut" {{ $data->status == 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
                 </select>
             </div>
 
