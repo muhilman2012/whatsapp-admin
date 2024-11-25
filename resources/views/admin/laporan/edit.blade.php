@@ -35,10 +35,10 @@
                     <p class="text-label fw-bold mb-1">Kategori:</p>
                     <p>{{ $data->kategori ?? 'Belum ada kategori' }}</p>
                 </div>
-                <div class="col-md-6">
+                <!-- <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Klasifikasi:</p>
                     <p>{{ $data->klasifikasi ?? 'Belum ada klasifikasi' }}</p>
-                </div>
+                </div> -->
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Disposisi:</p>
                     <p>{{ $data->disposisi ?? 'Belum ada disposisi' }}</p>
@@ -52,6 +52,26 @@
         <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post">
             @csrf
             @method('put')
+            <div class="mb-3">
+                <label for="kategori" class="form-label fw-bold">Kategori</label>
+                <select name="kategori" id="kategori" class="form-control select2">
+                    <option value="" selected>Pilih Kategori</option>
+                    @foreach ($kategori as $item)
+                        <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="disposisi" class="form-label fw-bold">Disposisi</label>
+                <select name="disposisi" id="disposisi" class="form-control select2">
+                    <option value="" selected>Pilih Disposisi</option>
+                    @foreach ($disposisi as $item)
+                        <option value="{{ $item }}" {{ $data->disposisi == $item ? 'selected' : '' }}>{{ $item }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="mb-3">
                 <label for="status" class="form-label fw-bold">Status</label>
                 <select name="status" id="status" class="form-control select2">
@@ -68,17 +88,7 @@
                 <textarea name="tanggapan" id="tanggapan" rows="3" class="form-control">{{ $data->tanggapan }}</textarea>
             </div>
 
-            <div class="mb-3">
-                <label for="kategori" class="form-label fw-bold">Kategori</label>
-                <select name="kategori" id="kategori" class="form-control select2">
-                    <option value="" selected>Pilih Kategori</option>
-                    @foreach ($kategori as $item)
-                        <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="klasifikasi" class="form-label fw-bold">Klasifikasi</label>
                 <select name="klasifikasi" id="klasifikasi" class="form-control select2">
                     <option value="" selected>Pilih Klasifikasi</option>
@@ -86,17 +96,7 @@
                         <option value="{{ $item }}" {{ $data->klasifikasi == $item ? 'selected' : '' }}>{{ $item }}</option>
                     @endforeach
                 </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="disposisi" class="form-label fw-bold">Disposisi</label>
-                <select name="disposisi" id="disposisi" class="form-control select2">
-                    <option value="" selected>Pilih Disposisi</option>
-                    @foreach ($disposisi as $item)
-                        <option value="{{ $item }}" {{ $data->disposisi == $item ? 'selected' : '' }}>{{ $item }}</option>
-                    @endforeach
-                </select>
-            </div>
+            </div> -->
 
             <div class="my-3 mx-auto" style="width:200px;">
                 <button type="submit" class="btn btn-primary form-control">Update</button>

@@ -65,10 +65,7 @@
                         <a href="{{ route('admin.laporan.edit', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-pencil-alt fa-sm fa-fw"></i>
                         </a>
-                        <button onclick="confirm('Apakah Anda yakin ingin menghapus laporan ini?') || event.stopImmediatePropagation()" 
-                            wire:click="removed({{ $item->id }})" 
-                            type="button" 
-                            class="btn btn-outline-secondary btn-sm">
+                        <button wire:click="removed({{ $item->nomor_tiket }})" type="button" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-trash fa-sm fa-fw"></i>
                         </button>
                     </td>
@@ -98,7 +95,7 @@
 
 
     <script>
-        document.addEventListener('deleteConfrimed', function() {
+        document.addEventListener('deleteConfirmed', function() {
             Swal.fire({
                     title: "Hapus?",
                     text: "Yakin Data Hapus Pengaduan?",

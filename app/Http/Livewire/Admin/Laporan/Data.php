@@ -9,27 +9,26 @@ use Livewire\WithPagination;
 class Data extends Component
 {
     use WithPagination;
-    public $laporanId;
+    public $nomor_tiket;
     public $search, $pages;
 
     protected $listeners = ["deleteAction" => "delete"];
 
-    public function removed($laporanId)
-    {
-        // Logika penghapusan laporan
-        Laporan::findOrFail($laporanId)->delete();
-
-        session()->flash('message', 'Laporan berhasil dihapus!');
+    public function removed($nomor_tiket){
+        $this->nomor_tiket = $nomor_tiket;  // Gunakan variabel yang baru
+        $this->dispatchBrowserEvent('deleteConfirmed');
     }
 
     public function delete()
     {
-        $data = Laporan::find($this->id);
+        // Pastikan nomor_tiket di-query sebagai nilai, bukan kolom
+        $data = Laporan::where('nomor_tiket', '=', $this->nomor_tiket)->first();
+
         if ($data) {
-            $data->delete();
-            return session()->flash('success', 'Data telah Dihapus!');
+            $data->delete(); // Hapus data
+            session()->flash('success', 'Data telah Dihapus!'); // Flash message sukses
         } else {
-            return session()->flash('error', 'Maaf ada kesalahan!');
+            session()->flash('error', 'Maaf, data tidak ditemukan!'); // Flash message error
         }
     }
 
