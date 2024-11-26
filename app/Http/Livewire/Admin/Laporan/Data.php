@@ -44,6 +44,8 @@ class Data extends Component
             $data = Laporan::where('nomor_tiket', 'like', '%' . $this->search . '%')
                 ->orWhere('nama_lengkap', 'like', '%' . $this->search . '%')
                 ->orWhere('nik', 'like', '%' . $this->search . '%')
+                ->orWhere('status', 'like', '%' . $this->search . '%')
+                ->orWhere('judul', 'like', '%' . $this->search . '%')
                 ->orderBy('created_at', 'desc')
                 ->paginate($this->pages);
         } else {

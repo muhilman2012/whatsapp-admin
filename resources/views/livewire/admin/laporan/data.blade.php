@@ -1,32 +1,59 @@
 <div>
-    <div class="d-flex mb-3">
-    <form method="GET" action="{{ route('admin.laporan.export') }}" class="mb-3">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label for="start_date">Tanggal Mulai</label>
-                        <input type="date" name="start_date" id="start_date" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="end_date">Tanggal Akhir</label>
-                        <input type="date" name="end_date" id="end_date" class="form-control">
-                    </div>
-                    <div class="col-md-4 align-self-end">
-                        <button type="submit" class="btn btn-primary w-100">Export Data</button>
-                    </div>
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+    <div class="d-flex mb-3 justify-content-between align-items-center">
+        <!-- <form method="GET" action="{{ route('admin.laporan.export') }}" class="mb-3">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="start_date">Tanggal Mulai</label>
+                    <input type="date" name="start_date" id="start_date" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date">Tanggal Akhir</label>
+                    <input type="date" name="end_date" id="end_date" class="form-control">
+                </div>
+                <div class="col-md-4 align-self-end">
+                    <button type="submit" class="btn btn-primary w-100">Export Data</button>
+                </div>
+            </div>
+        </form> -->
+        <!-- Bagian Export Data -->
+        <div class="d-flex">
+            <form action="{{ route('admin.laporan.export.tanggal') }}" method="GET" class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <input type="date" name="tanggal" id="tanggal" class="form-control" required>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Export Data</button>
                 </div>
             </form>
-        <div class="d-flex ms-auto">
-			<input wire:model='search' type="text" class="form-control" placeholder="Cari...">
-			<div class="ms-2" style="width: 100px">
-				<select wire:model='pages' class="form-select" aria-label="Default select example">
-					<option value="25">25</option>
-					<option value="50">50</option>
-					<option value="100">100</option>
-					<option value="200">200</option>
-					<option value="99999999999">all</option>
-				</select>
-			</div>
-		</div>
+        </div>
+        <!-- Bagian Cari dan Pengaturan Halaman -->
+        <div class="d-flex align-items-center">
+            <!-- Input Cari -->
+            <div>
+                <input wire:model="search" type="text" class="form-control" placeholder="Cari...">
+            </div>
+            <!-- Select Jumlah Halaman -->
+            <div class="ms-2">
+                <select wire:model="pages" class="form-select">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="99999999999">All</option>
+                </select>
+            </div>
+        </div>
     </div>
     <div class="table-responsive" wire:loading.remove wire:target='search'>
         <table class="table table-borderless">

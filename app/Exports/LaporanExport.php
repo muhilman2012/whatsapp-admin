@@ -9,16 +9,28 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 
-class LaporanExport implements FromQuery, WithMapping, ShouldAutoSize, WithColumnFormatting, WithHeadings
+class LaporanExport implements WithMapping, ShouldAutoSize, WithColumnFormatting, WithHeadings, FromView
 {
     protected $startDate;
     protected $endDate;
+    protected $data;
 
-    public function __construct($startDate, $endDate)
+    public function view(): View
     {
-        $this->startDate = $startDate;
-        $this->endDate = $endDate;
+        return view('admin.laporan.export.laporan', [
+            'laporans' => $this->data
+        ]);
+    }
+
+    public function __construct($data)
+    {
+        $this->data = $data->map(function ($item) {
+            $item->created_at = $item->created_at->format('d-m-Y');
+            return $item;
+        });
     }
 
     public function query()
