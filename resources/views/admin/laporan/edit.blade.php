@@ -43,6 +43,14 @@
                     <p class="text-label fw-bold mb-1">Disposisi:</p>
                     <p>{{ $data->disposisi ?? 'Belum ada disposisi' }}</p>
                 </div>
+                <div class="col-md-6">
+                    <p class="text-label fw-bold mb-1">Judul:</p>
+                    <p>{{ $data->judul }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="text-label fw-bold mb-1">Detail Pengaduan:</p>
+                    <p>{{ $data->detail }}</p>
+                </div>
             </div>
         </div>
     </div>

@@ -51,7 +51,7 @@
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Dokumen Pendukung:</p>
                     @if($data->dokumen_pendukung)
-                        <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank">
+                        <a href="{{ $data->dokumen_pendukung }}" target="_blank">
                             Lihat Dokumen
                         </a>
                     @else

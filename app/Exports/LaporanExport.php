@@ -30,6 +30,7 @@ class LaporanExport implements FromQuery, WithMapping, ShouldAutoSize, WithColum
     public function headings(): array
     {
         return [
+            'Tgl Pengaduan',
             'Nomor Tiket',
             'Nama Lengkap',
             'NIK',
@@ -40,13 +41,15 @@ class LaporanExport implements FromQuery, WithMapping, ShouldAutoSize, WithColum
             'Tanggal Kejadian',
             'Lokasi',
             'Judul',
-            'Tgl Pengaduan',
+            'Detail Pengaduan',
+            'Dokumen Pendukung'
         ];
     }
 
     public function map($laporan): array
     {
         return [
+            $laporan->created_at ? \Carbon\Carbon::parse($laporan->created_at)->format('d-m-Y') : '-',
             $laporan->nomor_tiket,
             $laporan->nama_lengkap,
             "'".$laporan->nik,
@@ -57,7 +60,8 @@ class LaporanExport implements FromQuery, WithMapping, ShouldAutoSize, WithColum
             $laporan->tanggal_kejadian ? \Carbon\Carbon::parse($laporan->tanggal_kejadian)->format('d-m-Y') : '-',
             $laporan->lokasi,
             $laporan->judul,
-            $laporan->created_at ? \Carbon\Carbon::parse($laporan->created_at)->format('d-m-Y') : '-',
+            $laporan->detail,
+            $laporan->dokumen_pendukung
         ];
     }
 
