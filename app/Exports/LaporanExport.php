@@ -29,6 +29,8 @@ class LaporanExport implements WithMapping, ShouldAutoSize, WithColumnFormatting
     {
         $this->data = $data->map(function ($item) {
             $item->created_at = $item->created_at->format('d-m-Y');
+            $item->nik = "'" . $item->nik; // Tambahkan kutipan tunggal di depan NIK
+            $item->nomor_pengadu = "'" . $item->nomor_pengadu; // Tambahkan kutipan tunggal di depan Nomor Pengadu
             return $item;
         });
     }
@@ -79,15 +81,15 @@ class LaporanExport implements WithMapping, ShouldAutoSize, WithColumnFormatting
 
     public static function afterSheet(AfterSheet $event)
     {
-        $event->sheet->getStyle('C')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
         $event->sheet->getStyle('D')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+        $event->sheet->getStyle('E')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
     }
 
     public function columnFormats(): array
     {
         return [
-            'C' => NumberFormat::FORMAT_TEXT, // Format kolom C (NIK) sebagai teks
             'D' => NumberFormat::FORMAT_TEXT, // Format kolom C (NIK) sebagai teks
+            'E' => NumberFormat::FORMAT_TEXT, // Format kolom C (NIK) sebagai teks
         ];
     }
 }
