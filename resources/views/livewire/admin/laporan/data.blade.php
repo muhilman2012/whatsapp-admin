@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="table-responsive" wire:loading.remove wire:target='search'>
-        <table class="table table-borderless">
+        <table class="table table-borderless table-striped table-hover mt-3">
             <thead class="alert-secondary">
                 <tr>
                     <th scope="col">#</th>
