@@ -117,6 +117,28 @@ class laporanAdmin extends Controller
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
     }
 
+    public function updateNama(Request $request, $nomor_tiket)
+    {
+        // Validasi input
+        $request->validate([
+            'nama_lengkap' => 'required|string|max:255',
+        ]);
+
+        // Cari laporan berdasarkan nomor_tiket
+        $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->first();
+
+        if (!$laporan) {
+            return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
+        }
+
+        // Update nama lengkap
+        $laporan->update([
+            'nama_lengkap' => $request->nama_lengkap,
+        ]);
+
+        return redirect()->back()->with('success', 'Nama lengkap berhasil diperbarui.');
+    }
+
     public function destroy($id)
     {
         //

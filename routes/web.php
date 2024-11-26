@@ -33,6 +33,7 @@ Route::group(['prefix' => 'admin',  'middleware' => 'auth:admin'], function () {
     Route::put('/dashboard/laporan/update/{nomor_tiket}', [laporanAdmin::class, 'update'])->name('admin.laporan.update');
     Route::post('/dashboard/laporan/upload/editor', [laporanAdmin::class, 'editor'])->name('admin.laporan.upload.editor');
     Route::get('/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
+    Route::put('/admin/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');
 
     Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
 

@@ -7,6 +7,19 @@
 @endsection
 
 @section('pages')
+@if (session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 <div class="container-fluid">
     <!-- Bagian Data Saat Ini -->
     <div class="d-block rounded bg-white shadow mb-3">
@@ -21,7 +34,11 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Nama Lengkap:</p>
-                    <p>{{ $data->nama_lengkap }}</p>
+                    <p>{{ $data->nama_lengkap }}
+                        <button type="button" class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#editNamaModal">
+                            Edit
+                        </button>
+                    </p>
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status:</p>
@@ -112,6 +129,32 @@
         </form>
     </div>
 </div>
+
+<!-- Modal Edit Nama -->
+<div class="modal fade" id="editNamaModal" tabindex="-1" aria-labelledby="editNamaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.laporan.updateNama', $data->nomor_tiket) }}" method="post">
+                @csrf
+                @method('put')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editNamaModalLabel">Edit Nama Lengkap</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+                        <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" value="{{ $data->nama_lengkap }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -120,4 +163,6 @@
         $('.select2').select2();
     });
 </script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
