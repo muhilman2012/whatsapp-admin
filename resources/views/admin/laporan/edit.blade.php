@@ -81,7 +81,7 @@
                 <label for="kategori" class="form-label fw-bold">Kategori</label>
                 <select name="kategori" id="kategori" class="form-control select2">
                     <option value="" selected>Pilih Kategori</option>
-                    @foreach ($kategori as $item)
+                    @foreach ($semuaKategori as $item) <!-- Menampilkan semua kategori -->
                         <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
                     @endforeach
                 </select>
@@ -91,8 +91,8 @@
                 <label for="disposisi" class="form-label fw-bold">Disposisi</label>
                 <select name="disposisi" id="disposisi" class="form-control select2">
                     <option value="" selected>Pilih Disposisi</option>
-                    @foreach ($disposisi as $item)
-                        <option value="{{ $item }}" {{ $data->disposisi == $item ? 'selected' : '' }}>{{ $item }}</option>
+                    @foreach ($semuaDisposisi as $key => $value) <!-- Menampilkan semua Deputi -->
+                        <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>{{ $value }}</option>
                     @endforeach
                 </select>
             </div>
@@ -112,16 +112,6 @@
                 <label for="tanggapan" class="form-label fw-bold">Tanggapan</label>
                 <textarea name="tanggapan" id="tanggapan" rows="3" class="form-control">{{ $data->tanggapan }}</textarea>
             </div>
-
-            <!-- <div class="mb-3">
-                <label for="klasifikasi" class="form-label fw-bold">Klasifikasi</label>
-                <select name="klasifikasi" id="klasifikasi" class="form-control select2">
-                    <option value="" selected>Pilih Klasifikasi</option>
-                    @foreach ($klasifikasi as $item)
-                        <option value="{{ $item }}" {{ $data->klasifikasi == $item ? 'selected' : '' }}>{{ $item }}</option>
-                    @endforeach
-                </select>
-            </div> -->
 
             <div class="my-3 mx-auto" style="width:200px;">
                 <button type="submit" class="btn btn-primary form-control">Update</button>

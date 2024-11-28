@@ -14,9 +14,40 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class laporanAdmin extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.laporan.data');
+        $userRole = auth()->guard('admin')->user()->role; // Ambil role admin
+
+        // Daftar kategori yang sesuai untuk Deputi
+        $kategoriDeputi = [
+            'deputi_1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
+            'deputi_2' => ['Kesehatan', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Pembangunan Desa, Daerah Tetinggal, dan Transmigrasi', 'Kesetaraan Gender dan Sosial Inklusif', 'Ketenagakerjaan', 'Kependudukan'],
+            'deputi_3' => ['Politisasi ASN', 'Netralitas ASN', 'Administrasi Pemerintahan', 'Dukungan Sistem Pengelolaan', 'SP4N Lapor', 'Topik Khusus'],
+            'deputi_4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)', 'Lingkungan Hidup dan Kehutanan', 'Agama', 'Kekerasan di Satuan Pendidikan', 'Peniadaan Mudik'],
+        ];
+
+        // Ambil kategori sesuai role
+        $kategori = $kategoriDeputi[$userRole] ?? [];
+
+        // Query data
+        $data = Laporan::query()
+            ->when($request->filterKategori, function ($query) use ($request) {
+                $query->where('kategori', $request->filterKategori);
+            })
+            ->when($request->search, function ($query) use ($request) {
+                $query->where(function ($subQuery) use ($request) {
+                    $subQuery->where('nomor_tiket', 'like', '%' . $request->search . '%')
+                        ->orWhere('nama_lengkap', 'like', '%' . $request->search . '%')
+                        ->orWhere('nik', 'like', '%' . $request->search . '%')
+                        ->orWhere('status', 'like', '%' . $request->search . '%')
+                        ->orWhere('judul', 'like', '%' . $request->search . '%');
+                });
+            })
+            ->whereIn('kategori', $kategori) // Filter kategori berdasarkan Deputi
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.laporan.data', compact('data', 'kategori'));
     }
 
     public function create()
@@ -98,21 +129,42 @@ class laporanAdmin extends Controller
     {
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        // Data dummy untuk kategori, klasifikasi, dan disposisi
-        $kategori = ['Bantuan Sosial', 'Hukum', 'Ekonomi dan Keuangan', 'Ketenagakerjaan',  'Pendidikan', 'Kesehatan', 'Infrastruktur', 'Lainnya'];
-        $klasifikasi = ['Urgensi Tinggi', 'Urgensi Sedang', 'Urgensi Rendah'];
-        $disposisi = ['D1', 'D2', 'D3', 'D4'];
+        $semuaKategori = [
+            'Agama', 'Corona Virus', 'Ekonomi dan Keuangan', 'Kesehatan', 
+            'Kesetaraan Gender dan Sosial Inklusif', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat',
+            'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang',
+            'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan',
+            'Pertanian dan Peternakan', 'Politik dan Hukum', 'Politisasi ASN', 
+            'Sosial dan Kesejahteraan', 'SP4N Lapor', 'Energi dan SDA', 
+            'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Kependudukan',
+            'Ketenagakerjaan', 'Netralitas ASN', 'Pemulihan Ekonomi Nasional',
+            'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)', 
+            'Peniadaan Mudik', 'Perairan', 'Perhubungan', 'Perlindungan Konsumen', 
+            'Teknologi Informasi dan Komunikasi', 'Topik Khusus', 'Lainnya'
+        ];
 
-        return view('admin.laporan.edit', compact('data', 'kategori', 'klasifikasi', 'disposisi'));
+        $semuaDisposisi = [
+            'deputi_1' => 'Deputi Dukungan Kebijakan Ekonomi dan Peningkatan Daya Saing',
+            'deputi_2' => 'Deputi Dukungan Kebijakan Pembangunan Manusia dan Pemerataan Pembangunan',
+            'deputi_3' => 'Deputi Administrasi',
+            'deputi_4' => 'Deputi Dukungan Kebijakan Pemerintahan dan Wawasan Kebangsaan',
+        ];
+
+        return view('admin.laporan.edit', compact('data', 'semuaKategori', 'semuaDisposisi'));
     }
 
     public function update(Request $request, $nomor_tiket)
     {
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        $data->update($request->only([
-            'status', 'tanggapan', 'kategori', 'klasifikasi', 'disposisi'
-        ]));
+        $result = Laporan::tentukanKategoriDanDeputi($request->judul);
+        $data->update([
+            'judul' => $request->judul,
+            'kategori' => $result['kategori'],
+            'disposisi' => $result['deputi'],
+            'status' => $request->status,
+            'tanggapan' => $request->tanggapan,
+        ]);
 
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
     }

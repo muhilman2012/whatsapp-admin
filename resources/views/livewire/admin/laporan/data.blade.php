@@ -11,21 +11,6 @@
         </div>
     @endif
     <div class="d-flex mb-3 justify-content-between align-items-center">
-        <!-- <form method="GET" action="{{ route('admin.laporan.export') }}" class="mb-3">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="start_date">Tanggal Mulai</label>
-                    <input type="date" name="start_date" id="start_date" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label for="end_date">Tanggal Akhir</label>
-                    <input type="date" name="end_date" id="end_date" class="form-control">
-                </div>
-                <div class="col-md-4 align-self-end">
-                    <button type="submit" class="btn btn-primary w-100">Export Data</button>
-                </div>
-            </div>
-        </form> -->
         <!-- Bagian Export Data -->
         <div class="d-flex">
             <form action="{{ route('admin.laporan.export.tanggal') }}" method="GET" class="row g-2 align-items-center">
@@ -37,11 +22,20 @@
                 </div>
             </form>
         </div>
-        <!-- Bagian Cari dan Pengaturan Halaman -->
+        <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
         <div class="d-flex align-items-center">
             <!-- Input Cari -->
             <div>
                 <input wire:model="search" type="text" class="form-control" placeholder="Cari...">
+            </div>
+            <!-- Select Kategori -->
+            <div class="ms-2">
+                <select wire:model="filterKategori" class="form-select" style="width: 200px;">
+                    <option value="" selected>Semua Kategori</option>
+                    @foreach ($kategori as $item)
+                        <option value="{{ $item }}">{{ $item }}</option>
+                    @endforeach
+                </select>
             </div>
             <!-- Select Jumlah Halaman -->
             <div class="ms-2">
