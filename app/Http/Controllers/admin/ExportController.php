@@ -33,7 +33,7 @@ class ExportController extends Controller
         // Ambil data sesuai kategori dan tanggal
         $tanggal = $request->tanggal;
         $data = Laporan::whereDate('created_at', $tanggal)
-            ->whereIn('kategori', $kategori) // Filter kategori berdasarkan Deputi
+            // ->whereIn('kategori', $kategori) // Filter kategori berdasarkan Deputi
             ->get();
 
         if ($data->isEmpty()) {
