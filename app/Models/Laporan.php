@@ -32,6 +32,8 @@ class Laporan extends Model
         'sumber_pengaduan',
     ];
 
+    public $timestamps = false; // Nonaktifkan timestamps otomatis
+    
     protected $casts = [
         'tanggal_kejadian' => 'datetime',
         'created_at' => 'datetime',

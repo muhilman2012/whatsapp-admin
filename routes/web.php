@@ -5,6 +5,8 @@ use App\Http\Controllers\admin\indexAdmin;
 use App\Http\Controllers\admin\laporanAdmin;
 use App\Http\Controllers\admin\profileAdmin;
 use App\Http\Controllers\admin\ExportController;
+use App\Http\Controllers\admin\ImportController;
+
 use App\Http\Controllers\auth\authAdmin;
 
 /*
@@ -38,6 +40,7 @@ Route::group(['prefix' => 'admin',  'middleware' => 'auth:admin'], function () {
 
     Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
     Route::get('/admin/export/tanggal', [ExportController::class, 'exportByDate'])->name('admin.laporan.export.tanggal');
+    Route::post('/admin/laporan/import', [ImportController::class, 'import'])->name('admin.laporan.import');
 
     Route::get('/logout', [indexAdmin::class, 'logout'])->name('admin.logout');
 });

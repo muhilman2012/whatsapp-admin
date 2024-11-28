@@ -24,6 +24,12 @@
         </div>
         <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
         <div class="d-flex align-items-center">
+            <!-- Tombol Import -->
+            @if (auth('admin')->user()->role === 'admin')
+                <div class="ms-2">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
+                </div>
+            @endif
             <!-- Input Cari -->
             <div>
                 <input wire:model="search" type="text" class="form-control" placeholder="Cari...">
@@ -112,6 +118,28 @@
             {{ $data->links('admin.layouts.paginations') }}
         </nav>
         @endif
+    </div>
+
+    <!-- Modal Import -->
+    <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">Import Data Laporan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('admin.laporan.import') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Upload File Excel</label>
+                            <input type="file" name="file" id="file" class="form-control" accept=".xlsx,.xls" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Import</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 
