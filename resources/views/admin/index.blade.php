@@ -61,6 +61,21 @@
                 <div class="card border-0 shadow-sm p-3">
                     <canvas id="laporanHarianChart"></canvas>
                 </div>
+                <div class="container-fluid">
+                    <div class="d-block mb-3">
+                        <div class="row g-3">
+                            <!-- Chart Provinsi -->
+                            <div class="card border-0 shadow-sm p-3 mb-3">
+                                <canvas id="provinsiChart"></canvas>
+                            </div>
+
+                            <!-- Judul paling sering disebut -->
+                            <div class="card border-0 shadow-sm p-3 mb-3">
+                                <canvas id="judulChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -98,6 +113,63 @@
                 scales: {
                     x: { title: { display: true, text: 'Tanggal' } },
                     y: { title: { display: true, text: 'Jumlah Laporan' }, beginAtZero: true },
+                }
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Data untuk Chart Provinsi
+        const provinsiData = @json($provinsiData);
+
+        const labelsProvinsi = provinsiData.map(item => item.provinsi); // Nama provinsi
+        const dataProvinsi = provinsiData.map(item => item.total); // Jumlah laporan
+
+        new Chart(document.getElementById('provinsiChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labelsProvinsi,
+                datasets: [{
+                    label: 'Jumlah Laporan per Provinsi',
+                    data: dataProvinsi,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Provinsi' } },
+                    y: { title: { display: true, text: 'Jumlah Laporan' }, beginAtZero: true }
+                }
+            }
+        });
+
+        // Data untuk Chart Judul
+        const judulData = @json($judulFrequencies);
+
+        const labelsJudul = judulData.map(item => item.judul); // Judul pengaduan
+        const dataJudul = judulData.map(item => item.total); // Frekuensi judul
+
+        new Chart(document.getElementById('judulChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labelsJudul,
+                datasets: [{
+                    label: 'Judul Pengaduan Paling Sering',
+                    data: dataJudul,
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Judul Pengaduan' } },
+                    y: { title: { display: true, text: 'Jumlah Pengaduan' }, beginAtZero: true }
                 }
             }
         });
