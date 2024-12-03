@@ -24,15 +24,25 @@ class indexAdmin extends Controller
             'deputi_4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)', 'Agama', 'Kekerasan di Satuan Pendidikan', 'Peniadaan Mudik'],
         ];
 
+        // Keywords untuk provinsi
+        $provinsiKeywords = [
+            'Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Kepulauan Riau', 'Jambi', 'Sumatera Selatan', 'Bangka Belitung',
+            'Bengkulu', 'Lampung', 'DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Yogyakarta', 'Jawa Timur', 'Banten',
+            'Bali', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur', 'Kalimantan Barat', 'Kalimantan Tengah', 'Kalimantan Selatan',
+            'Kalimantan Timur', 'Kalimantan Utara', 'Sulawesi Utara', 'Sulawesi Tengah', 'Sulawesi Selatan', 'Sulawesi Tenggara',
+            'Gorontalo', 'Sulawesi Barat', 'Maluku', 'Maluku Utara', 'Papua', 'Papua Barat', 'Papua Tengah', 'Papua Selatan',
+            'Papua Pegunungan'
+        ];
+
         // Inisialisasi variabel
         $totalLaporan = $lakiLaki = $perempuan = 0;
         $laporanHarian = collect();
         $provinsiData = collect();
         $judulFrequencies = collect();
 
-        // Periksa apakah user adalah admin
+        // Periksa role admin
         if ($admin->role === 'admin') {
-            // Admin bisa melihat semua data
+            // Admin melihat semua data
             $totalLaporan = Laporan::count();
             $lakiLaki = Laporan::where('jenis_kelamin', 'L')->count();
             $perempuan = Laporan::where('jenis_kelamin', 'P')->count();
@@ -41,32 +51,11 @@ class indexAdmin extends Controller
                 ->orderBy('tanggal', 'ASC')
                 ->get();
 
-            // Data Provinsi
-            $provinsiKeywords = [
-                'Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Kepulauan Riau', 'Jambi', 'Sumatera Selatan', 'Bangka Belitung',
-                'Bengkulu', 'Lampung', 'DKI Jakarta', 'Jawa Barat', 'Jawa Tengah', 'Yogyakarta', 'Jawa Timur', 'Banten',
-                'Bali', 'Nusa Tenggara Barat', 'Nusa Tenggara Timur', 'Kalimantan Barat', 'Kalimantan Tengah', 'Kalimantan Selatan',
-                'Kalimantan Timur', 'Kalimantan Utara', 'Sulawesi Utara', 'Sulawesi Tengah', 'Sulawesi Selatan', 'Sulawesi Tenggara',
-                'Gorontalo', 'Sulawesi Barat', 'Maluku', 'Maluku Utara', 'Papua', 'Papua Barat', 'Papua Tengah', 'Papua Selatan',
-                'Papua Pegunungan'
-            ];
-
-            $provinsiData = Laporan::selectRaw("
-                CASE " . implode(' ', array_map(fn($provinsi) => "WHEN alamat_lengkap LIKE '%$provinsi%' THEN '$provinsi'", $provinsiKeywords)) . "
-                ELSE 'Lainnya' END as provinsi, COUNT(*) as total
-            ")
-                ->groupBy('provinsi')
-                ->get();
-
-            // Judul paling sering disebutkan
-            $judulFrequencies = Laporan::selectRaw('judul, COUNT(*) as total')
-                ->groupBy('judul')
-                ->orderBy('total', 'desc')
-                ->take(5)
-                ->get();
+            $provinsiData = $this->getProvinsiData($provinsiKeywords);
+            $judulFrequencies = $this->getJudulFrequencies();
         } else {
-            // Jika Deputi, filter berdasarkan disposisi dan kategori
-            $kategori = $kategoriDeputi[$admin->role] ?? []; // Kategori sesuai role Deputi
+            // Deputi melihat data berdasarkan kategori dan disposisi
+            $kategori = $kategoriDeputi[$admin->role] ?? [];
 
             $totalLaporan = Laporan::whereIn('kategori', $kategori)
                 ->where('disposisi', $admin->role)
@@ -89,24 +78,8 @@ class indexAdmin extends Controller
                 ->orderBy('tanggal', 'ASC')
                 ->get();
 
-            // Data Provinsi untuk Deputi
-            $provinsiData = Laporan::selectRaw("
-                CASE " . implode(' ', array_map(fn($provinsi) => "WHEN alamat_lengkap LIKE '%$provinsi%' THEN '$provinsi'", $provinsiKeywords)) . "
-                ELSE 'Lainnya' END as provinsi, COUNT(*) as total
-            ")
-                ->whereIn('kategori', $kategori)
-                ->where('disposisi', $admin->role)
-                ->groupBy('provinsi')
-                ->get();
-
-            // Judul paling sering disebutkan untuk Deputi
-            $judulFrequencies = Laporan::selectRaw('judul, COUNT(*) as total')
-                ->whereIn('kategori', $kategori)
-                ->where('disposisi', $admin->role)
-                ->groupBy('judul')
-                ->orderBy('total', 'desc')
-                ->take(5)
-                ->get();
+            $provinsiData = $this->getProvinsiData($provinsiKeywords, $kategori, $admin->role);
+            $judulFrequencies = $this->getJudulFrequencies($kategori, $admin->role);
         }
 
         return view('admin.index', [
@@ -119,9 +92,37 @@ class indexAdmin extends Controller
         ]);
     }
 
+    private function getProvinsiData($provinsiKeywords, $kategori = [], $role = null)
+    {
+        $query = Laporan::selectRaw("
+            CASE " . implode(' ', array_map(fn($provinsi) => "WHEN alamat_lengkap LIKE '%$provinsi%' THEN '$provinsi'", $provinsiKeywords)) . "
+            ELSE 'Lainnya' END as provinsi, COUNT(*) as total
+        ");
+
+        if (!empty($kategori)) {
+            $query->whereIn('kategori', $kategori)->where('disposisi', $role);
+        }
+
+        return $query->groupBy('provinsi')->get();
+    }
+
+    private function getJudulFrequencies($kategori = [], $role = null)
+    {
+        $query = Laporan::selectRaw('judul, COUNT(*) as total')
+            ->groupBy('judul')
+            ->orderBy('total', 'desc')
+            ->take(5);
+
+        if (!empty($kategori)) {
+            $query->whereIn('kategori', $kategori)->where('disposisi', $role);
+        }
+
+        return $query->get();
+    }
+
     public function logout()
     {
-        if(Auth::guard('admin')->check()){
+        if (Auth::guard('admin')->check()) {
             Auth::guard('admin')->logout();
             return redirect('/');
         }

@@ -32,7 +32,7 @@ class Laporan extends Model
         'sumber_pengaduan',
     ];
 
-    public $timestamps = false; // Nonaktifkan timestamps otomatis
+    // public $timestamps = false;  Nonaktifkan timestamps otomatis
     
     protected $casts = [
         'tanggal_kejadian' => 'datetime',
@@ -95,7 +95,7 @@ class Laporan extends Model
             'Pertanian dan Peternakan' => ['pertanian', 'peternakan', 'tanaman', 'pupuk', 'petani', 'ternak', 'hasil panen', 'sapi', 'ayam'],
             'Politik dan Hukum' => ['politik', 'hukum', 'peraturan', 'pemilu', 'korupsi', 'regulasi', 'pengadilan', 'keadilan', 'legislasi'],
             'Politisasi ASN' => ['asn', 'politisasi', 'netralitas', 'kampanye', 'pegawai negeri', 'pns'],
-            'Sosial dan Kesejahteraan' => ['sosial', 'kesejahteraan', 'bansos', 'kesejahteraan sosial', 'program pemerintah', 'keluarga'],
+            'Sosial dan Kesejahteraan' => ['sosial', 'kesejahteraan', 'bansos', 'kesejahteraan sosial', 'program pemerintah', 'keluarga', 'lansia', 'bantuan'],
             'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
             'Energi dan SDA' => ['energi', 'minyak', 'gas', 'pertambangan', 'sumber daya alam', 'listrik', 'pembangkit', 'bbm'],
             'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan', 'bullying', 'pelecehan', 'perundungan', 'kampus', 'sekolah', 'pendidikan'],
