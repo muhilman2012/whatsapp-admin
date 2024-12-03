@@ -9,62 +9,55 @@ use Livewire\WithPagination;
 class Data extends Component
 {
     use WithPagination;
+
     public $nomor_tiket;
     public $search, $pages;
     public $filterKategori = '';
 
     protected $listeners = ["deleteAction" => "delete"];
 
-    public function removed($nomor_tiket){
-        $this->nomor_tiket = $nomor_tiket;  // Gunakan variabel yang baru
-        $this->dispatchBrowserEvent('deleteConfirmed');
+    public function mount()
+    {
+        $this->pages = 25;
+
+        // Terima filter kategori dari URL
+        $this->filterKategori = request()->get('filterKategori', '');
+    }
+
+    public function removed($nomor_tiket)
+    {
+        $this->nomor_tiket = $nomor_tiket; // Simpan nomor tiket yang akan dihapus
+        $this->dispatchBrowserEvent('deleteConfirmed'); // Kirim event ke browser
     }
 
     public function delete()
     {
-        // Pastikan nomor_tiket di-query sebagai nilai, bukan kolom
-        $data = Laporan::where('nomor_tiket', '=', $this->nomor_tiket)->first();
+        $data = Laporan::where('nomor_tiket', $this->nomor_tiket)->first();
 
         if ($data) {
             $data->delete(); // Hapus data
-            session()->flash('success', 'Data telah Dihapus!'); // Flash message sukses
+            session()->flash('success', 'Data berhasil dihapus!'); // Flash message sukses
         } else {
-            session()->flash('error', 'Maaf, data tidak ditemukan!'); // Flash message error
+            session()->flash('error', 'Data tidak ditemukan!'); // Flash message error
         }
     }
 
-    public function mount()
-    {
-        $this->pages = 25;
-    }
-    
     public function render()
     {
-        $user = auth()->guard('admin')->user();
+        $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini
 
-        // Jika user adalah admin, tampilkan semua kategori
-        $kategori = [
-            'Agama', 'Corona Virus', 'Ekonomi dan Keuangan', 'Kesehatan',
-            'Kesetaraan Gender dan Sosial Inklusif', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat',
-            'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang',
-            'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan',
-            'Pertanian dan Peternakan', 'Politik dan Hukum', 'Politisasi ASN',
-            'Sosial dan Kesejahteraan', 'SP4N Lapor', 'Energi dan SDA',
-            'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Kependudukan',
-            'Ketenagakerjaan', 'Netralitas ASN', 'Pemulihan Ekonomi Nasional',
-            'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)',
-            'Peniadaan Mudik', 'Perairan', 'Perhubungan', 'Perlindungan Konsumen',
-            'Teknologi Informasi dan Komunikasi', 'Topik Khusus', 'Lainnya'
-        ];
+        // Ambil kategori dari model Laporan
+        $kategori = array_keys(Laporan::getKategoriKataKunci());
 
         // Query data laporan
         $data = Laporan::query();
 
-        // Jika role adalah Deputi, filter berdasarkan disposisi
+        // Filter berdasarkan role pengguna (admin atau deputi)
         if ($user->role !== 'admin') {
-            $data->where('disposisi', $user->role); // Filter data hanya untuk disposisi Deputi
+            $data->where('disposisi', $user->role); // Filter berdasarkan disposisi
         }
-        // Pencarian
+
+        // Pencarian berdasarkan kolom tertentu
         if (!empty($this->search)) {
             $data->where(function ($query) {
                 $query->where('nomor_tiket', 'like', '%' . $this->search . '%')
@@ -75,7 +68,7 @@ class Data extends Component
             });
         }
 
-        // Filter kategori (opsional, hanya jika dipilih)
+        // Filter berdasarkan kategori yang dipilih
         if (!empty($this->filterKategori)) {
             $data->where('kategori', $this->filterKategori);
         }
@@ -85,7 +78,7 @@ class Data extends Component
 
         return view('livewire.admin.laporan.data', [
             'data' => $data,
-            'kategori' => $kategori, // Kirim kategori ke view
+            'kategori' => $kategori, // Kirim daftar kategori ke view
         ]);
     }
 }

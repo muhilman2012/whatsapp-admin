@@ -78,6 +78,7 @@
                     <p>{{ $data->tanggapan ?? 'Belum ada tanggapan' }}</p>
                 </div>
             </div>
+            <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Update Pengaduan</a>
         </div>
     </div>
     <div class="mt-3 text-end">

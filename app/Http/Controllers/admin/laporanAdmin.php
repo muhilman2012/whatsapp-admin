@@ -146,8 +146,8 @@ class laporanAdmin extends Controller
         $semuaDisposisi = [
             'deputi_1' => 'Deputi Dukungan Kebijakan Ekonomi dan Peningkatan Daya Saing',
             'deputi_2' => 'Deputi Dukungan Kebijakan Pembangunan Manusia dan Pemerataan Pembangunan',
-            'deputi_3' => 'Deputi Administrasi',
-            'deputi_4' => 'Deputi Dukungan Kebijakan Pemerintahan dan Wawasan Kebangsaan',
+            'deputi_3' => 'Deputi Dukungan Kebijakan Pemerintahan dan Wawasan Kebangsaan',
+            'deputi_4' => 'Deputi Administrasi',
         ];
 
         return view('admin.laporan.edit', compact('data', 'semuaKategori', 'semuaDisposisi'));

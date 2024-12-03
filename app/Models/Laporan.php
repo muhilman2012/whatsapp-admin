@@ -49,17 +49,21 @@ class Laporan extends Model
 
         // Automasi kategori dan disposisi saat data dibuat
         static::creating(function ($laporan) {
-            $result = self::tentukanKategoriDanDeputi($laporan->judul); // Tentukan kategori dan disposisi
-            $laporan->kategori = $result['kategori']; // Tetapkan kategori
-            $laporan->disposisi = $result['deputi']; // Tetapkan disposisi
+            if (!empty($laporan->judul)) {
+                $result = self::tentukanKategoriDanDeputi($laporan->judul);
+                $laporan->kategori = $result['kategori'] ?? 'Lainnya'; // Tetapkan kategori default jika tidak ada
+                $laporan->disposisi = $result['deputi'] ?? null; // Tetapkan disposisi ke null jika tidak cocok
+            }
+        
             $laporan->deadline = now()->addDays(20)->format('Y-m-d'); // Tetapkan deadline 20 hari
         });
-
-        // Automasi kategori dan disposisi saat data diperbarui
+        
         static::updating(function ($laporan) {
-            $result = self::tentukanKategoriDanDeputi($laporan->judul); // Tentukan kategori dan disposisi
-            $laporan->kategori = $result['kategori']; // Perbarui kategori
-            $laporan->disposisi = $result['deputi']; // Perbarui disposisi
+            if (!empty($laporan->judul)) {
+                $result = self::tentukanKategoriDanDeputi($laporan->judul);
+                $laporan->kategori = $result['kategori'] ?? 'Lainnya'; // Tetapkan kategori default jika tidak ada
+                $laporan->disposisi = $result['deputi'] ?? null; // Tetapkan disposisi ke null jika tidak cocok
+            }
         });
     }
 
@@ -77,69 +81,94 @@ class Laporan extends Model
         }
     }
 
+    // Daftar kata kunci dan kategori
+    private static $kategoriKataKunci = [
+        // Tambahkan kata kunci berdasarkan data Excel
+        'Agama' => ['agama', 'ibadah', 'rumah ibadah', 'masjid', 'gereja', 'penistaan', 'hari besar keagamaan', 'yayasan keagamaan', 'zakat', 'wakaf', 'pesantren', 'haji', 'umroh', 'toleransi', 'santri'],
+        'Ekonomi dan Keuangan' => ['ekonomi', 'keuangan', 'uang', 'investasi', 'bank', 'pinjaman', 'kredit', 'tabungan', 'inflasi', 'pinjol', 'utang', 'modal usaha', 'hutang', 'bodong', 'dana', 'asuransi', 'online', 'pajak', 'modal', 'penjaminan', 'pailit'],
+        'Kesehatan' => ['kesehatan', 'fasilitas dan pelayanan kesehatan', 'dokter', 'puskesmas', 'obat', 'penyakit', 'vaksin', 'bpjs kesehatan', 'perawat', 'stunting', 'rumah sakit', 'organisasi profesi tenaga kesehatan', 'malpraktek', 'pasien', 'sehat', 'sakit'],
+        'Kesetaraan Gender dan Sosial Inklusif' => ['gender', 'kesetaraan', 'inklusi', 'organisasi wanita', 'difabel', 'perempuan', 'lgbt', 'waria', 'hak', 'gay', 'anak', 'ketahanan keluarga'],
+        'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat' => ['ketentraman', 'ketertiban', 'perlindungan', 'keamanan', 'keributan', 'masyarakat', 'konflik', 'kerusuhan', 'kriminalitas', 'kekerasan'],
+        'Lingkungan Hidup dan Kehutanan' => ['lingkungan', 'hutan', 'polusi','sampah','air','pencemaran','deforestasi','kehutanan','reboisasi','limbah','banjir','erosi','kerusakan','ekosistem','abrasi','udara','penghijauan','kebakaran','perhutanan sosial','sungai','tanah','lahan','sawit','ulayat','adat'],
+        'Pekerjaan Umum, Perumahan, dan Penataan Ruang' => ['pekerjaan umum', 'infrastruktur', 'jalan','jembatan','bangunan','penataan ruang','pemukiman','gedung','rtrw','bendungan','sertifikat','tanah','shm','rumah','perkebunan','irigasi','ajb','ptsl','hgb','hgu','tora','agraria','shp','sertifikat','psn','mbr','rusun','apartemen','adat','sewa'],
+        'Pembangunan Desa, Daerah Tertinggal, Daerah Perbatasan, dan Transmigrasi' => ['desa','pembangunan','daerah tertinggal','transmigrasi','pedesaan','pengembangan daerah','daerah 3T','dana desa','pembangunan desa'],
+        'Pendidikan, Kepemudaan, Kebudayaan, dan Olahraga' => ['pendidikan','sekolah','guru','murid','sekolah inklusif','kebudayaan','olahraga','universitas','pelajaran','beasiswa','buku','modul','tenaga pendidikan','ujian','jambore','pramuka','ijazah','kurikulum','prestasi siswa','prestasi guru','dosen','penerimaan siswa baru','pemagangan','zonasi'],
+        'Pertanian dan Peternakan' => ['pertanian','peternakan','tanaman','pupuk','petani','ternak','hasil panen','sapi','ayam','bibit','lahan','teknologi pertanian','produktifitas','kesejahteraan petani','nelayan','perkapalan','kesejahteraaan nelayan','kapal ikan','tambak','daging sapi','perkebunan','padi','anak buah kapal','abk','pakan ikan','KUR pertanian','KUR perikanan'],
+        'Politik dan Hukum' => ['politik','hukum','peraturan','pemilu','korupsi','regulasi','pengadilan','keadilan','legislasi','partai politik','putusan pengadilan','mafia hukum','lembaga peradilan','pertanahan','parpol'],
+        'Politisasi ASN' => ['asn','politisasi asn','netralitas asn','kampanye','pegawai negeri','pns','kode etik asn','manajemen asn','pengangkatan p3k','gaji asn','honorer','mutasi','penyalahgunaan wewenang','tes cpns'],
+        'Sosial dan Kesejahteraan' => ['sosial','kesejahteraan','bansos','kesejahteraan sosial','penanggulangan kemiskinan','keluarga miskin','lansia','difabel','kartu lansia','disabilitas','tunggakan spp','tebus ijazah','baznas','miskin','bantuan sosial','pkh','dtks','blt','bpjs'],
+        'Energi dan Sumber Daya Alam' => ['energi','minyak','gas','pertambangan','sumber daya alam','sda','listrik','pembangkit','bbm','pln','ebt','smelter','hilirisasi'],
+        'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan','bullying','pelecehan','lembaga diklat','kampus','sekolah','pendidikan','bully','dosen','mahasiswa','siswa'],
+        'Kependudukan dan KB' => ['penduduk','kependudukan','ktp','nik','keluarga berencana','domisili','data','dukcapil','kartu keluarga','alat kontasepsi','pernikahan'],
+        'Ketenagakerjaan' => ['pekerja','migran','tenaga kerja','buruh','karyawan','phk','upah','gaji','tunjangan','pensiun','jaminan kerja','outsourcing','hubungan industrial','kesempatan kerja','cuti','bpjs ketenagakerjaan','serikat pekerja','lowongan','pengangguran','pecat'],
+        'Netralitas ASN' => ['asn','pns','netralitas','politik','pegawai negeri','pilkada','kampanye'],
+        'Pemulihan Ekonomi Nasional' => ['pemulihan','ekonomi','nasional','program','recovery','dampak pandemi','modal usaha'],
+        'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)' => ['narkoba','p4gn','peredaran','penyalahgunaan','narkotika','obat'],
+        'Mudik' => ['mudik','peniadaan','larangan','lebaran','transportasi','ppkm','tahun baru','mudik gratis','angkutan','lalu lintas','harga tiket','macet','tiket','libur','rest area','cuti','kecelakaan','natal','tol','tuslah','diskon','online'],
+        'Perairan' => ['air','laut','sungai','bendungan','pelabuhan','irigasi','IPAL','keramba jaring apung','ikan','perikanan','budidaya','kualitas air','kja','udang','tambak','ekosistem'],
+        'Perhubungan' => ['transportasi','angkutan','jalan','kendaraan','kereta','bus','pesawat','ojek online','ojek','mobil','motor','kapal','terminal','lrt','mrt','bandar udara','pelabuhan','stasiun','halte','tol','logistik','paket','barang','surat','asuransi','tod','parkir','sertifikasi','psn','tiket'],
+        'Perlindungan Konsumen' => ['konsumen','perlindungan','penipuan','online','jual','ecommerce','bajakan','shopping','belanja','beli','produk','harga'],
+        'Teknologi Informasi dan Komunikasi' => ['teknologi','informasi','komunikasi','internet','digital','aplikasi','telekomunikasi','bts','literasi','hardware','software','data pribadi','data','jaringan','sistem','AI','5G','sambungan','satelit','keamanan','cloud','frekuensi'],
+        'Topik Khusus' => ['khusus','topik','isu tertentu','spesifik','pajak'],
+        'Bantuan Masyarakat' => ['tunggakan sekolah','modal usaha','bantuan','tunggakan spp','proposal','tunggakan','proposal masjid','tebus ijazah','ambil ijazah','gereja','proposal desa'],
+        'Luar Negeri' => ['imigran','kekonsuleran','pengungsi','migran','repatriasi','pencari suaka','tppo','deportan'],
+        'Pariwisata dan Ekonomi Kreatif' => ['visa','turis','turis lokal','turis asing','tiket pesawat','tiket masuk','wisata','akomodasi','hotel','wisatawan','pemandu wisata','souvenir','budaya','tari','performance','konser','musik','ihburan','film','entertainment','penyanyi','penari','pelawak','komedi','lagu','kreatif','okupansi','destinasi','desa wisata','cagar budaya','penulis','lukisan','anyaman','tenun','batik','atraksi','hospitaliti','trip','travel','festival'],
+        'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm','modal usaha','pemberdayaan masyarakat','kur','koperasi','kredit macet','jaminan kur','usaha kecil','usaha mikro','usaha menengah','blacklist bank'],
+        'Industri dan Perdagangan' => ['barang','online','beli','dagang','jual','ekspor','impor','jasa','produsen','distributor','harga','toko','koperasi','pemasok','industri','tekstil','otomotif','konsumen','mesin','gudang','logistik','industri pengolahan','restoran','rumah makan','warung','pabrik','manufaktur','bahan baku','pasar','retail','supermarket','usaha','grosir','harga','bahan pokok','monopoli','kuota ekspor','dumping','e-commerce','bea masuk','profit','komoditi','komoditas','produk'],
+        'Penanggulangan Bencana' => ['gempa bumi','gunung meletus','banjir','tsunami','tanah longsor','relokasi','hunian tetap','hunian sementara','bnpb','rehabilitasi','rekonstruksi','bantuan korban bencana','pengungsi','bencana','bpbd','dana siap pakai','dsp','early warning system','kebakaran hutan dan lahan','pasca bencana','perubahan iklim','dana hibah','erupsi','mitigasi bencana','tanggap darurat','desa tangguh bencana','logistik bantuan','kekeringan','bencana non alam','pra bencana','krisis air'],
+        'Lainnya' => [],
+        // Lengkapi semua kategori dari Excel di sini
+    ];
+
+    public static function getKategoriKataKunci()
+    {
+        return self::$kategoriKataKunci;
+    }
+
+    // Daftar kategori untuk setiap Deputi
+    private static $kategoriDeputi = [
+        'Deputi 1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
+        'Deputi 2' => ['Kesehatan', 'Penanggulangan Bencana', 'Pendidikan, Kepemudaan, Kebudayaan, dan Olahraga', 'Sosial dan Kesejahteraan', 'Ketenagakerjaan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, Daerah Perbatasan, dan Transmigrasi', 'Kependudukan dan KB', 'Agama', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM'],
+        'Deputi 3' => ['Politisasi ASN', 'Netralitas ASN', 'Administrasi Pemerintahan', 'Topik Khusus', 'Luar Negeri'],
+        'Deputi 4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Wawasan Kebangsaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)']
+        // Lengkapi semua kategori dan deputi sesuai data Excel
+    ];
+
+    public static function getKategoriDeputi()
+    {
+        return self::$kategoriDeputi;
+    }
+
     // Fungsi untuk menentukan kategori dan Deputi
     public static function tentukanKategoriDanDeputi($judul)
     {
-        // Daftar kata kunci dan kategori
-        $kategoriKataKunci = [
-            'Agama' => ['agama', 'masjid', 'gereja', 'ibadah', 'puasa', 'haji', 'zakat', 'umat', 'keagamaan'],
-            'Corona Virus' => ['covid', 'corona', 'pandemi', 'vaksin', 'omicron', 'lockdown', 'ppkm', 'varian'],
-            'Ekonomi dan Keuangan' => ['ekonomi', 'keuangan', 'uang', 'investasi', 'bank', 'pinjaman', 'kredit', 'tabungan', 'inflasi', 'pinjol'],
-            'Kesehatan' => ['kesehatan', 'rumah sakit', 'dokter', 'puskesmas', 'obat', 'penyakit', 'vaksinasi', 'bpjs', 'perawatan'],
-            'Kesetaraan Gender dan Sosial Inklusif' => ['gender', 'kesetaraan', 'inklusi', 'wanita', 'difabel', 'perempuan', 'lgbtq', 'kesempatan', 'hak'],
-            'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat' => ['ketentraman', 'tertib', 'perlindungan', 'keamanan', 'keributan', 'masyarakat', 'konflik'],
-            'Lingkungan Hidup dan Kehutanan' => ['lingkungan', 'hutan', 'polusi', 'sampah', 'air', 'pencemaran', 'deforestasi', 'kehutanan', 'reboisasi'],
-            'Pekerjaan Umum dan Penataan Ruang' => ['pekerjaan umum', 'infrastruktur', 'jalan', 'jembatan', 'bangunan', 'penataan ruang', 'pemukiman'],
-            'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi' => ['desa', 'pembangunan', 'daerah tertinggal', 'transmigrasi', 'pedesaan', 'pengembangan daerah'],
-            'Pendidikan dan Kebudayaan' => ['pendidikan', 'sekolah', 'guru', 'murid', 'siswa', 'kebudayaan', 'universitas', 'pelajaran', 'beasiswa'],
-            'Pertanian dan Peternakan' => ['pertanian', 'peternakan', 'tanaman', 'pupuk', 'petani', 'ternak', 'hasil panen', 'sapi', 'ayam'],
-            'Politik dan Hukum' => ['politik', 'hukum', 'peraturan', 'pemilu', 'korupsi', 'regulasi', 'pengadilan', 'keadilan', 'legislasi'],
-            'Politisasi ASN' => ['asn', 'politisasi', 'netralitas', 'kampanye', 'pegawai negeri', 'pns'],
-            'Sosial dan Kesejahteraan' => ['sosial', 'kesejahteraan', 'bansos', 'kesejahteraan sosial', 'program pemerintah', 'keluarga', 'lansia', 'bantuan'],
-            'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
-            'Energi dan SDA' => ['energi', 'minyak', 'gas', 'pertambangan', 'sumber daya alam', 'listrik', 'pembangkit', 'bbm'],
-            'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan', 'bullying', 'pelecehan', 'perundungan', 'kampus', 'sekolah', 'pendidikan'],
-            'Kependudukan' => ['penduduk', 'kependudukan', 'ktp', 'nik', 'keluarga', 'domisili', 'data', 'dukcapil'],
-            'Ketenagakerjaan' => ['pekerja', 'ketenagakerjaan', 'tenaga kerja', 'buruh', 'karyawan', 'phk', 'upah', 'gaji'],
-            'Netralitas ASN' => ['asn', 'netralitas', 'pegawai negeri', 'pilkada', 'kampanye', 'pns', 'politik'],
-            'Pemulihan Ekonomi Nasional' => ['pemulihan', 'ekonomi', 'nasional', 'program', 'recovery', 'dampak pandemi'],
-            'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)' => ['narkoba', 'p4gn', 'peredaran', 'penyalahgunaan', 'narkotika', 'obat'],
-            'Peniadaan Mudik' => ['mudik', 'peniadaan', 'larangan', 'lebaran', 'transportasi', 'ppkm'],
-            'Perairan' => ['air', 'laut', 'sungai', 'bendungan', 'pelabuhan', 'irigasi'],
-            'Perhubungan' => ['transportasi', 'angkutan', 'jalan', 'kendaraan', 'kereta', 'bus', 'pesawat'],
-            'Perlindungan Konsumen' => ['konsumen', 'perlindungan', 'penipuan', 'online', 'jual beli', 'e-commerce'],
-            'Teknologi Informasi dan Komunikasi' => ['teknologi', 'informasi', 'komunikasi', 'internet', 'digital', 'aplikasi', 'telekomunikasi'],
-            'Topik Khusus' => ['khusus', 'topik', 'isu tertentu', 'spesifik'],
-            'Lainnya' => [], // Biarkan kosong jika kategori tidak cocok
-        ];        
+        $judul = strtolower($judul); // Ubah ke huruf kecil
+        $kategoriScores = [];
 
-        // Daftar kategori untuk setiap Deputi
-        $kategoriDeputi = [
-            'deputi_1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan SDA', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
-            'deputi_2' => ['Kesehatan', 'Lingkungan Hidup dan Kehutanan', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Ketenagakerjaan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Kependudukan'],
-            'deputi_3' => ['Politisasi ASN', 'Netralitas ASN', 'SP4N Lapor', 'Administrasi Pemerintahan', 'Topik Khusus'],
-            'deputi_4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)', 'Agama', 'Kekerasan di Satuan Pendidikan', 'Peniadaan Mudik'],
-        ];
-
-        // Tentukan kategori
-        $kategori = null;
-        foreach ($kategoriKataKunci as $key => $keywords) {
+        // Hitung skor untuk setiap kategori
+        foreach (self::getKategoriKataKunci() as $key => $keywords) {
+            $score = 0;
             foreach ($keywords as $keyword) {
-                if (str_contains(strtolower($judul), strtolower($keyword))) {
-                    $kategori = $key;
-                    break 2;
+                if (stripos($judul, $keyword) !== false) {
+                    $score++;
                 }
             }
+            $kategoriScores[$key] = $score;
+        }
+
+        // Tentukan kategori dengan skor tertinggi
+        $kategori = 'Lainnya';
+        $maxScore = max($kategoriScores);
+        if ($maxScore > 0) {
+            $kategori = array_search($maxScore, $kategoriScores);
         }
 
         // Tentukan Deputi berdasarkan kategori
         $deputi = null;
-        if ($kategori) {
-            foreach ($kategoriDeputi as $key => $categories) {
-                if (in_array($kategori, $categories)) {
-                    $deputi = $key;
-                    break;
-                }
+        foreach (self::getKategoriDeputi() as $key => $categories) {
+            if (in_array($kategori, $categories)) {
+                $deputi = $key;
+                break;
             }
         }
 

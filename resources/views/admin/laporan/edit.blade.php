@@ -68,6 +68,27 @@
                     <p class="text-label fw-bold mb-1">Detail Pengaduan:</p>
                     <p>{{ $data->detail }}</p>
                 </div>
+                <div class="col-md-6">
+                    <p class="text-label fw-bold mb-1">Dokumen Pendukung:</p>
+                    @if($data->dokumen_pendukung)
+                        @if($data->sumber_pengaduan === 'whatsapp')
+                            <!-- Jika sumber pengaduan adalah WhatsApp -->
+                            <a href="{{ $data->dokumen_pendukung }}" target="_blank">
+                                Lihat Dokumen
+                            </a>
+                        @elseif($data->sumber_pengaduan === 'tatap muka')
+                            <!-- Jika sumber pengaduan adalah Tatap Muka -->
+                            <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank">
+                                Lihat Dokumen
+                            </a>
+                        @else
+                            <!-- Jika sumber pengaduan tidak diketahui -->
+                            <p>Sumber pengaduan tidak valid</p>
+                        @endif
+                    @else
+                        <p>Tidak ada dokumen pendukung</p>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

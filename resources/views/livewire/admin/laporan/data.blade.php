@@ -1,5 +1,5 @@
 <div>
-    @if (session('success'))
+@if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
@@ -55,6 +55,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Tabel Data -->
     <div class="table-responsive" wire:loading.remove wire:target='search'>
         <table class="table table-borderless table-striped table-hover mt-3">
             <thead class="alert-secondary">
@@ -67,6 +69,8 @@
                     <th>JK</th>
                     <th>Judul Pengaduan</th>
                     <th>Status</th>
+                    <th>Kategori</th>
+                    <th>Disposisi</th>
                     <th>Dikirim</th>
                     <th>Sisa Hari</th>
                     <th>Aksi</th>
@@ -77,12 +81,14 @@
                 <tr>
                     <th scope="row">{{ $index + 1 }}</th>
                     <td>{{ $item->nomor_tiket }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 10) }}</td>
                     <td>{{ $item->nik }}</td>
                     <td>{{ $item->nomor_pengadu }}</td>
                     <td>{{ $item->jenis_kelamin }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->judul, 20) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->judul, 10) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->status, 10) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->kategori, 10) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->disposisi, 10) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
                     <td class="text-nowrap">
@@ -101,17 +107,10 @@
             </tbody>
         </table>
     </div>
-    <div class="border rounded p-5 mb-3" wire:loading.block wire:target='search'>
-		<div class="d-flex justify-content-center mb-4">
-			<div class="spinner-border" role="status">
-			  <span class="visually-hidden">Loading...</span>
-			</div>
-		</div>
-		<p class="fw-bold fs-5 text-center m-0">Loading...</p>
-	</div>
-    <div class="d-flex align-items-center">
+
+    <div class="d-flex align-items-center mt-3">
         <p class="mb-0 border py-1 px-2 rounded">
-            <span class="fw-bold">{{ $data->count() }}</span>
+            <span class="fw-bold">{{ $data->count() }}</span> Data
         </p>
         @if ($data->hasPages())
         <nav class="ms-auto">
