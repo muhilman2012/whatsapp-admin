@@ -127,10 +127,10 @@ class Laporan extends Model
 
     // Daftar kategori untuk setiap Deputi
     private static $kategoriDeputi = [
-        'Deputi 1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
-        'Deputi 2' => ['Kesehatan', 'Penanggulangan Bencana', 'Pendidikan, Kepemudaan, Kebudayaan, dan Olahraga', 'Sosial dan Kesejahteraan', 'Ketenagakerjaan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, Daerah Perbatasan, dan Transmigrasi', 'Kependudukan dan KB', 'Agama', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM'],
-        'Deputi 3' => ['Politisasi ASN', 'Netralitas ASN', 'Administrasi Pemerintahan', 'Topik Khusus', 'Luar Negeri'],
-        'Deputi 4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Wawasan Kebangsaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)']
+        'deputi_1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
+        'deputi_2' => ['Kesehatan', 'Penanggulangan Bencana', 'Pendidikan, Kepemudaan, Kebudayaan, dan Olahraga', 'Sosial dan Kesejahteraan', 'Ketenagakerjaan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, Daerah Perbatasan, dan Transmigrasi', 'Kependudukan dan KB', 'Agama', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM'],
+        'deputi_3' => ['Politisasi ASN', 'Netralitas ASN', 'Administrasi Pemerintahan', 'Topik Khusus', 'Luar Negeri'],
+        'deputi_4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Wawasan Kebangsaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)']
         // Lengkapi semua kategori dan deputi sesuai data Excel
     ];
 
