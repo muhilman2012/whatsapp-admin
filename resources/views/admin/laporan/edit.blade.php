@@ -95,45 +95,54 @@
 
     <!-- Bagian Form Edit -->
     <div class="d-block rounded bg-white shadow p-5">
-        <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post">
+        <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">
             @csrf
             @method('put')
+            <!-- Dropdown Kategori -->
             <div class="mb-3">
                 <label for="kategori" class="form-label fw-bold">Kategori</label>
                 <select name="kategori" id="kategori" class="form-control select2">
                     <option value="" selected>Pilih Kategori</option>
-                    @foreach ($semuaKategori as $item) <!-- Menampilkan semua kategori -->
-                        <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
+                    @foreach ($semuaKategori as $kategori)
+                        <option value="{{ $kategori }}" {{ $data->kategori === $kategori ? 'selected' : '' }}>
+                            {{ $kategori }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
+            <!-- Dropdown Disposisi -->
             <div class="mb-3">
                 <label for="disposisi" class="form-label fw-bold">Disposisi</label>
                 <select name="disposisi" id="disposisi" class="form-control select2">
                     <option value="" selected>Pilih Disposisi</option>
-                    @foreach ($semuaDisposisi as $key => $value) <!-- Menampilkan semua Deputi -->
-                        <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>{{ $value }}</option>
+                    @foreach ($semuaDisposisi as $key => $value)
+                        <option value="{{ $key }}" {{ $data->disposisi === $key ? 'selected' : '' }}>
+                            {{ $value }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
+            <!-- Dropdown Status -->
             <div class="mb-3">
                 <label for="status" class="form-label fw-bold">Status</label>
                 <select name="status" id="status" class="form-control select2">
                     <option value="" selected>Pilih Status</option>
-                    <option value="Proses verifikasi dan telaah" {{ $data->status == 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
-                    <option value="Diteruskan ke instansi terkait" {{ $data->status == 'Diteruskan ke instansi terkait' ? 'selected' : '' }}>Diteruskan ke instansi terkait</option>
-                    <option value="Penanganan selesai" {{ $data->status == 'Penanganan selesai' ? 'selected' : '' }}>Penanganan selesai</option>
-                    <option value="Tidak dapat diproses lebih lanjut" {{ $data->status == 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
+                    <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
+                    <option value="Diteruskan ke instansi terkait" {{ $data->status === 'Diteruskan ke instansi terkait' ? 'selected' : '' }}>Diteruskan ke instansi terkait</option>
+                    <option value="Penanganan selesai" {{ $data->status === 'Penanganan selesai' ? 'selected' : '' }}>Penanganan selesai</option>
+                    <option value="Tidak dapat diproses lebih lanjut" {{ $data->status === 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
                 </select>
             </div>
 
+            <!-- Input Tanggapan -->
             <div class="mb-3">
                 <label for="tanggapan" class="form-label fw-bold">Tanggapan</label>
-                <textarea name="tanggapan" id="tanggapan" rows="3" class="form-control">{{ $data->tanggapan }}</textarea>
+                <textarea name="tanggapan" id="tanggapan" rows="3" class="form-control">{{ old('tanggapan', $data->tanggapan) }}</textarea>
             </div>
 
+            <!-- Tombol Update -->
             <div class="my-3 mx-auto" style="width:200px;">
                 <button type="submit" class="btn btn-primary form-control">Update</button>
             </div>

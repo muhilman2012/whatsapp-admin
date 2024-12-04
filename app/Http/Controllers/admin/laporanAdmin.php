@@ -129,20 +129,8 @@ class laporanAdmin extends Controller
     {
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        $semuaKategori = [
-            'Agama', 'Corona Virus', 'Ekonomi dan Keuangan', 'Kesehatan', 
-            'Kesetaraan Gender dan Sosial Inklusif', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat',
-            'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang',
-            'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan',
-            'Pertanian dan Peternakan', 'Politik dan Hukum', 'Politisasi ASN', 
-            'Sosial dan Kesejahteraan', 'SP4N Lapor', 'Energi dan SDA', 
-            'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Kependudukan',
-            'Ketenagakerjaan', 'Netralitas ASN', 'Pemulihan Ekonomi Nasional',
-            'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)', 
-            'Peniadaan Mudik', 'Perairan', 'Perhubungan', 'Perlindungan Konsumen', 
-            'Teknologi Informasi dan Komunikasi', 'Topik Khusus', 'Lainnya'
-        ];
-
+        // Ambil semua kategori dan disposisi
+        $semuaKategori = array_keys(Laporan::getKategoriKataKunci());
         $semuaDisposisi = [
             'deputi_1' => 'Deputi Dukungan Kebijakan Ekonomi dan Peningkatan Daya Saing',
             'deputi_2' => 'Deputi Dukungan Kebijakan Pembangunan Manusia dan Pemerataan Pembangunan',
@@ -157,11 +145,20 @@ class laporanAdmin extends Controller
     {
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        $result = Laporan::tentukanKategoriDanDeputi($request->judul);
+        // Validasi input
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'kategori' => 'nullable|string|in:' . implode(',', array_keys(Laporan::getKategoriKataKunci())),
+            'disposisi' => 'nullable|string',
+            'status' => 'nullable|string|max:255',
+            'tanggapan' => 'nullable|string',
+        ]);
+
+        // Update data
         $data->update([
             'judul' => $request->judul,
-            'kategori' => $result['kategori'],
-            'disposisi' => $result['deputi'],
+            'kategori' => $request->kategori,
+            'disposisi' => $request->disposisi,
             'status' => $request->status,
             'tanggapan' => $request->tanggapan,
         ]);
