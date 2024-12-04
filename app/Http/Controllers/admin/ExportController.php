@@ -31,6 +31,6 @@ class ExportController extends Controller
             return redirect()->back()->with('error', 'Tidak ada data pada tanggal tersebut.');
         }
 
-        return Excel::download(new LaporanExport($data), 'laporan_' . now()->format('d-m-Y') . '.xlsx');
+        return Excel::download(new LaporanExport($data), 'laporan_' . $tanggal . '.xlsx');
     }
 }

@@ -13,8 +13,12 @@ class Data extends Component
     public $nomor_tiket;
     public $search, $pages;
     public $filterKategori = '';
+    public $sortField = 'created_at'; // Default field untuk sorting
+    public $sortDirection = 'asc'; // Default direction untuk sorting
 
     protected $listeners = ["deleteAction" => "delete"];
+
+    protected $queryString = ['search', 'filterKategori', 'sortField', 'sortDirection'];
 
     public function mount()
     {
@@ -39,6 +43,16 @@ class Data extends Component
             session()->flash('success', 'Data berhasil dihapus!'); // Flash message sukses
         } else {
             session()->flash('error', 'Data tidak ditemukan!'); // Flash message error
+        }
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
         }
     }
 

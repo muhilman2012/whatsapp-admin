@@ -101,12 +101,9 @@
             <!-- Dropdown Kategori -->
             <div class="mb-3">
                 <label for="kategori" class="form-label fw-bold">Kategori</label>
-                <select name="kategori" id="kategori" class="form-control select2">
-                    <option value="" selected>Pilih Kategori</option>
-                    @foreach ($semuaKategori as $kategori)
-                        <option value="{{ $kategori }}" {{ $data->kategori === $kategori ? 'selected' : '' }}>
-                            {{ $kategori }}
-                        </option>
+                <select name="kategori" id="kategori" class="form-control">
+                    @foreach ($semuaKategori as $item)
+                        <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
                     @endforeach
                 </select>
             </div>
@@ -114,12 +111,9 @@
             <!-- Dropdown Disposisi -->
             <div class="mb-3">
                 <label for="disposisi" class="form-label fw-bold">Disposisi</label>
-                <select name="disposisi" id="disposisi" class="form-control select2">
-                    <option value="" selected>Pilih Disposisi</option>
+                <select name="disposisi" id="disposisi" class="form-control">
                     @foreach ($semuaDisposisi as $key => $value)
-                        <option value="{{ $key }}" {{ $data->disposisi === $key ? 'selected' : '' }}>
-                            {{ $value }}
-                        </option>
+                        <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>{{ $value }}</option>
                     @endforeach
                 </select>
             </div>

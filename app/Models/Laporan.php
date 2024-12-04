@@ -50,19 +50,29 @@ class Laporan extends Model
         // Automasi kategori dan disposisi saat data dibuat
         static::creating(function ($laporan) {
             if (!empty($laporan->judul)) {
+                // Tentukan kategori dan disposisi berdasarkan judul
                 $result = self::tentukanKategoriDanDeputi($laporan->judul);
-                $laporan->kategori = $result['kategori'] ?? 'Lainnya'; // Tetapkan kategori default jika tidak ada
-                $laporan->disposisi = $result['deputi'] ?? null; // Tetapkan disposisi ke null jika tidak cocok
+                
+                // Tetapkan kategori, gunakan default jika tidak ada
+                $laporan->kategori = $laporan->kategori ?? $result['kategori'] ?? 'Lainnya';
+                
+                // Tetapkan disposisi, gunakan null jika tidak cocok
+                $laporan->disposisi = $laporan->disposisi ?? $result['deputi'] ?? null;
             }
-        
-            $laporan->deadline = now()->addDays(20)->format('Y-m-d'); // Tetapkan deadline 20 hari
+
+            // Tetapkan deadline default 20 hari dari tanggal dibuat
+            $laporan->deadline = now()->addDays(20)->format('Y-m-d');
         });
-        
+
+        // Automasi kategori dan disposisi saat data diperbarui
         static::updating(function ($laporan) {
             if (!empty($laporan->judul)) {
+                // Tentukan kategori dan disposisi berdasarkan judul
                 $result = self::tentukanKategoriDanDeputi($laporan->judul);
-                $laporan->kategori = $result['kategori'] ?? 'Lainnya'; // Tetapkan kategori default jika tidak ada
-                $laporan->disposisi = $result['deputi'] ?? null; // Tetapkan disposisi ke null jika tidak cocok
+                
+                // Hanya ubah kategori dan disposisi jika kosong atau tidak diubah secara manual
+                $laporan->kategori = $laporan->kategori ?? $result['kategori'] ?? 'Lainnya';
+                $laporan->disposisi = $laporan->disposisi ?? $result['deputi'] ?? null;
             }
         });
     }
@@ -127,10 +137,10 @@ class Laporan extends Model
 
     // Daftar kategori untuk setiap Deputi
     private static $kategoriDeputi = [
-        'deputi_1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
-        'deputi_2' => ['Kesehatan', 'Penanggulangan Bencana', 'Pendidikan, Kepemudaan, Kebudayaan, dan Olahraga', 'Sosial dan Kesejahteraan', 'Ketenagakerjaan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, Daerah Perbatasan, dan Transmigrasi', 'Kependudukan dan KB', 'Agama', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM'],
-        'deputi_3' => ['Politisasi ASN', 'Netralitas ASN', 'Administrasi Pemerintahan', 'Topik Khusus', 'Luar Negeri'],
-        'deputi_4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Wawasan Kebangsaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)']
+        'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum, Perumahan, dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan'],
+        'deputi_2' => ['Kesehatan', 'Penanggulangan Bencana', 'Pendidikan, Kepemudaan, Kebudayaan, dan Olahraga', 'Sosial dan Kesejahteraan', 'Ketenagakerjaan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, Daerah Perbatasan, dan Transmigrasi', 'Kependudukan dan KB', 'Agama', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)'],
+        'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat','Politik dan Hukum', 'Politisasi ASN', 'Manajemen ASN', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Wawasan Kebangsaan', 'Luar Negeri'],
+        'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat']
         // Lengkapi semua kategori dan deputi sesuai data Excel
     ];
 

@@ -143,26 +143,26 @@ class laporanAdmin extends Controller
 
     public function update(Request $request, $nomor_tiket)
     {
+        // dd($request->all()); // Periksa data input
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
         // Validasi input
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'kategori' => 'nullable|string|in:' . implode(',', array_keys(Laporan::getKategoriKataKunci())),
-            'disposisi' => 'nullable|string',
+            'kategori' => 'required|string',
+            'disposisi' => 'required|string',
             'status' => 'nullable|string|max:255',
             'tanggapan' => 'nullable|string',
         ]);
 
         // Update data
         $data->update([
-            'judul' => $request->judul,
             'kategori' => $request->kategori,
             'disposisi' => $request->disposisi,
             'status' => $request->status,
             'tanggapan' => $request->tanggapan,
         ]);
 
+        logger('Data berhasil diperbarui:', $data->toArray());
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
     }
 
