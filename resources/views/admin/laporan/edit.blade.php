@@ -113,7 +113,9 @@
                 <label for="disposisi" class="form-label fw-bold">Disposisi</label>
                 <select name="disposisi" id="disposisi" class="form-control">
                     @foreach ($semuaDisposisi as $key => $value)
-                        <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>{{ $value }}</option>
+                        <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>
+                            {{ $namaDeputi[$key] ?? $value }} <!-- Gunakan nama deputi dari mapping -->
+                        </option>
                     @endforeach
                 </select>
             </div>

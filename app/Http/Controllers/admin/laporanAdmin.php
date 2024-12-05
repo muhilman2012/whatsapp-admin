@@ -131,14 +131,18 @@ class laporanAdmin extends Controller
 
         // Ambil semua kategori dan disposisi
         $semuaKategori = array_keys(Laporan::getKategoriKataKunci());
-        $semuaDisposisi = [
-            'deputi_1' => 'Deputi Dukungan Kebijakan Ekonomi dan Peningkatan Daya Saing',
-            'deputi_2' => 'Deputi Dukungan Kebijakan Pembangunan Manusia dan Pemerataan Pembangunan',
-            'deputi_3' => 'Deputi Dukungan Kebijakan Pemerintahan dan Wawasan Kebangsaan',
-            'deputi_4' => 'Deputi Administrasi',
+        sort($semuaKategori);
+
+        $semuaDisposisi = Laporan::getKategoriDeputi();
+
+        $namaDeputi = [
+            'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
+            'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+            'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
+            'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        return view('admin.laporan.edit', compact('data', 'semuaKategori', 'semuaDisposisi'));
+        return view('admin.laporan.edit', compact('data', 'semuaKategori', 'semuaDisposisi', 'namaDeputi'));
     }
 
     public function update(Request $request, $nomor_tiket)

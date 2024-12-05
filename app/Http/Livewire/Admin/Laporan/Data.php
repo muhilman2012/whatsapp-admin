@@ -60,8 +60,16 @@ class Data extends Component
     {
         $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini
 
+        $namaDeputi = [
+            'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
+            'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+            'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
+            'deputi_4' => 'Deputi Bidang Administrasi',
+        ];
+
         // Ambil kategori dari model Laporan
         $kategori = array_keys(Laporan::getKategoriKataKunci());
+        sort($kategori);
 
         // Query data laporan
         $data = Laporan::query();
@@ -93,6 +101,7 @@ class Data extends Component
         return view('livewire.admin.laporan.data', [
             'data' => $data,
             'kategori' => $kategori, // Kirim daftar kategori ke view
+            'namaDeputi' => $namaDeputi,
         ]);
     }
 }

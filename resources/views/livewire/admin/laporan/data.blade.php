@@ -13,6 +13,7 @@
     <div class="d-flex mb-3 justify-content-between align-items-center">
         <!-- Bagian Export Data -->
         <div class="d-flex">
+            <!-- Export Data Berdasarkan Tanggal -->
             <form action="{{ route('admin.laporan.export.tanggal') }}" method="GET" class="row g-2 align-items-center">
                 <div class="col-auto">
                     <input type="date" name="tanggal" id="tanggal" class="form-control" required>
@@ -21,6 +22,13 @@
                     <button type="submit" class="btn btn-primary">Export Data</button>
                 </div>
             </form>
+
+            <!-- Export All Data -->
+            <div class="ms-2">
+                <form action="{{ route('admin.laporan.export.all') }}" method="GET">
+                    <button type="submit" class="btn btn-success">Export All Data</button>
+                </form>
+            </div>
         </div>
         <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
         <div class="d-flex align-items-center">
@@ -88,7 +96,7 @@
                     <td>{{ \Illuminate\Support\Str::limit($item->judul, 10) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->status, 10) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->kategori, 10) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->disposisi, 10) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($namaDeputi[$item->disposisi] ?? $item->disposisi) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
                     <td class="text-nowrap">

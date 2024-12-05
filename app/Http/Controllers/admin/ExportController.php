@@ -33,4 +33,25 @@ class ExportController extends Controller
 
         return Excel::download(new LaporanExport($data), 'laporan_' . $tanggal . '.xlsx');
     }
+
+    public function exportAll()
+    {
+        $adminRole = auth('admin')->user()->role;
+        $kategoriDeputi = Laporan::getKategoriDeputi();
+
+        // Tentukan kategori sesuai role
+        $kategoriKataKunci = Laporan::getKategoriKataKunci();
+        $kategori = $adminRole === 'admin'
+            ? array_keys($kategoriKataKunci) // Semua kategori untuk admin
+            : ($kategoriDeputi[$adminRole] ?? []); // Kategori sesuai role Deputi
+
+        // Ambil semua data berdasarkan kategori
+        $data = Laporan::whereIn('kategori', $kategori)->get();
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data untuk diekspor.');
+        }
+
+        return Excel::download(new LaporanExport($data), 'laporan_all_data.xlsx');
+    }
 }

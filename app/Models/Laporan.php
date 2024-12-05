@@ -120,7 +120,7 @@ class Laporan extends Model
         'Perlindungan Konsumen' => ['konsumen','perlindungan','penipuan','online','jual','ecommerce','bajakan','shopping','belanja','beli','produk','harga'],
         'Teknologi Informasi dan Komunikasi' => ['teknologi','informasi','komunikasi','internet','digital','aplikasi','telekomunikasi','bts','literasi','hardware','software','data pribadi','data','jaringan','sistem','AI','5G','sambungan','satelit','keamanan','cloud','frekuensi'],
         'Topik Khusus' => ['khusus','topik','isu tertentu','spesifik','pajak'],
-        'Bantuan Masyarakat' => ['tunggakan sekolah','modal usaha','bantuan','tunggakan spp','proposal','tunggakan','proposal masjid','tebus ijazah','ambil ijazah','gereja','proposal desa'],
+        'Bantuan Masyarakat' => ['tunggakan sekolah','modal usaha','bantuan','tunggakan spp','proposal','tunggakan','proposal masjid','tebus ijazah','ambil ijazah','gereja','proposal desa','tunggak','tunggakan','spp'],
         'Luar Negeri' => ['imigran','kekonsuleran','pengungsi','migran','repatriasi','pencari suaka','tppo','deportan'],
         'Pariwisata dan Ekonomi Kreatif' => ['visa','turis','turis lokal','turis asing','tiket pesawat','tiket masuk','wisata','akomodasi','hotel','wisatawan','pemandu wisata','souvenir','budaya','tari','performance','konser','musik','ihburan','film','entertainment','penyanyi','penari','pelawak','komedi','lagu','kreatif','okupansi','destinasi','desa wisata','cagar budaya','penulis','lukisan','anyaman','tenun','batik','atraksi','hospitaliti','trip','travel','festival'],
         'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm','modal usaha','pemberdayaan masyarakat','kur','koperasi','kredit macet','jaminan kur','usaha kecil','usaha mikro','usaha menengah','blacklist bank'],
