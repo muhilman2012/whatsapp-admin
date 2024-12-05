@@ -52,8 +52,17 @@ class indexAdmin extends Controller
         // Frekuensi judul laporan
         $judulFrequencies = $this->getJudulFrequencies($kategori, $admin->role);
 
-        // Laporan per kategori
-        $laporanPerKategori = $this->getLaporanPerKategori($kategori, $admin->role);
+        // Ambil laporan per kategori
+        $laporanPerKategori = Laporan::selectRaw('kategori, COUNT(*) as total')
+        ->whereIn('kategori', $kategori)
+        ->groupBy('kategori')
+        ->orderBy('total', 'desc') // Urutkan berdasarkan jumlah laporan terbanyak
+        ->get();
+
+        // Pisahkan kategori 'Lainnya' dan tempatkan di akhir
+        $laporanPerKategori = $laporanPerKategori->partition(function ($item) {
+            return $item->kategori !== 'Lainnya';
+        })->flatten();
 
         return view('admin.index', [
             'totalLaporan' => $totalLaporan,

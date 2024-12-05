@@ -96,7 +96,7 @@
                     <td>{{ \Illuminate\Support\Str::limit($item->judul, 10) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->status, 10) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->kategori, 10) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($namaDeputi[$item->disposisi] ?? $item->disposisi) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->disposisi, 10) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
                     <td class="text-nowrap">
