@@ -15,6 +15,12 @@ class Data extends Component
     public $filterKategori = '';
     public $sortField = 'created_at'; // Default field untuk sorting
     public $sortDirection = 'asc'; // Default direction untuk sorting
+    public $selectedData = [];
+    public $selectedKategori = null;
+    public $selectedDisposisi = null;
+    public $selectAll = false; // Untuk status checkbox "Select All"
+    public $selected = [];    // Array ID laporan yang dipilih
+
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -103,5 +109,48 @@ class Data extends Component
             'kategori' => $kategori, // Kirim daftar kategori ke view
             'namaDeputi' => $namaDeputi,
         ]);
+    }
+
+    public function updatedSelectAll($value)
+    {
+        if ($value) {
+            // Pilih semua data yang terlihat dalam pagination
+            $this->selected = Laporan::pluck('id')->toArray();
+        } else {
+            // Kosongkan pilihan
+            $this->selected = [];
+        }
+    }
+
+    public function updatedSelected()
+    {
+        // Pastikan "Select All" berubah berdasarkan data yang dipilih
+        $this->selectAll = count($this->selected) === Laporan::count();
+    }
+
+    public function updateKategoriMassal()
+    {
+        if (!empty($this->selected) && !empty($this->selectedKategori)) {
+            Laporan::whereIn('id', $this->selected)
+                ->update(['kategori' => $this->selectedKategori]);
+
+            $this->reset(['selected', 'selectAll', 'selectedKategori']);
+            session()->flash('success', 'Kategori berhasil diperbarui.');
+        } else {
+            session()->flash('error', 'Pilih kategori dan data terlebih dahulu.');
+        }
+    }
+
+    public function updateDisposisiMassal()
+    {
+        if (!empty($this->selected) && !empty($this->selectedDisposisi)) {
+            Laporan::whereIn('id', $this->selected)
+                ->update(['disposisi' => $this->selectedDisposisi]);
+
+            $this->reset(['selected', 'selectAll', 'selectedDisposisi']);
+            session()->flash('success', 'Disposisi berhasil diperbarui.');
+        } else {
+            session()->flash('error', 'Pilih disposisi dan data terlebih dahulu.');
+        }
     }
 }

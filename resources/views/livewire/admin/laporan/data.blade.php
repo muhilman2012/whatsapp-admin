@@ -69,6 +69,9 @@
         <table class="table table-borderless table-striped table-hover mt-3">
             <thead class="alert-secondary">
                 <tr>
+                    <th scope="col">
+                        <input type="checkbox" wire:model="selectAll">
+                    </th>
                     <th scope="col">#</th>
                     <th>Nomor Tiket</th>
                     <th>Nama Lengkap</th>
@@ -83,6 +86,9 @@
             <tbody>
                 @foreach ($data as $index => $item)
                 <tr>
+                    <td>
+                        <input type="checkbox" wire:model="selected" value="{{ $item->id }}">
+                    </td>
                     <th scope="row">{{ $index + 1 }}</th>
                     <td>{{ $item->nomor_tiket }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
@@ -112,6 +118,16 @@
         <p class="mb-0 border py-1 px-2 rounded">
             <span class="fw-bold">{{ $data->count() }}</span> Data
         </p>
+
+        @if ($selected)
+            <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#modalKategori">
+                Update Kategori
+            </button>
+            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
+                Update Disposisi
+            </button>
+        @endif
+
         @if ($data->hasPages())
         <nav class="ms-auto">
             {{ $data->links('admin.layouts.paginations') }}
@@ -136,6 +152,52 @@
                         </div>
                         <button type="submit" class="btn btn-primary">Import</button>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalKategori" tabindex="-1" aria-labelledby="modalKategoriLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalKategoriLabel">Pilih Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <select wire:model="selectedKategori" class="form-control">
+                        <option value="" selected>Pilih Kategori</option>
+                        @foreach ($kategori as $item)
+                            <option value="{{ $item }}">{{ $item }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" wire:click="updateKategoriMassal">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDisposisi" tabindex="-1" aria-labelledby="modalDisposisiLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDisposisiLabel">Pilih Disposisi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <select wire:model="selectedDisposisi" class="form-control">
+                        <option value="" selected>Pilih Disposisi</option>
+                        @foreach ($namaDeputi as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" wire:click="updateDisposisiMassal">Simpan</button>
                 </div>
             </div>
         </div>
