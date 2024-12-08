@@ -84,23 +84,78 @@
                         </div>
                     </div>
                 </div>
-                <!-- Pengadu ??? -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-question fa-3x"></i>
+                            <i class="fa fa-exclamation fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">0</p>
+                                <p class="card-title fs-2 mb-0">{{ $belumTerdisposisi }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Dashboard Tambahan</small>
+                            <small class="text-start fw-bold">Belum Terdisposisi</small>
                         </div>
                     </div>
                 </div>
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm p-3">
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
                         <canvas id="laporanHarianChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="row g-3">
+                        <div class="col-6 pb-2">
+                            <div class="card border-0 p-2 shadow-sm">
+                                <div class="d-flex align-items-center px-2">
+                                    <i class="fas fa-users fa-3x"></i>
+                                    <div class="card-body text-end">
+                                        <p class="card-title fs-2 mb-0">{{ $deputi1 }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white px-1">
+                                    <small class="text-start fw-bold">Deputi 1</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6 pb-2">
+                            <div class="card border-0 p-2 shadow-sm">
+                                <div class="d-flex align-items-center px-2">
+                                    <i class="fas fa-users fa-3x"></i>
+                                    <div class="card-body text-end">
+                                        <p class="card-title fs-2 mb-0">{{ $deputi2 }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white px-1">
+                                    <small class="text-start fw-bold">Deputi 2</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card border-0 p-2 shadow-sm">
+                                <div class="d-flex align-items-center px-2">
+                                    <i class="fas fa-users fa-3x"></i>
+                                    <div class="card-body text-end">
+                                        <p class="card-title fs-2 mb-0">{{ $deputi3 }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white px-1">
+                                    <small class="text-start fw-bold">Deputi 3</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card border-0 p-2 shadow-sm">
+                                <div class="d-flex align-items-center px-2">
+                                    <i class="fas fa-users fa-3x"></i>
+                                    <div class="card-body text-end">
+                                        <p class="card-title fs-2 mb-0">{{ $deputi4 }}</p>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white px-1">
+                                    <small class="text-start fw-bold">Deputi 4</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12">
@@ -149,38 +204,47 @@
 
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('laporanHarianChart').getContext('2d');
-        const laporanHarian = @json($laporanHarian); // Data dari controller
+        const laporanHarian = @json($laporanHarian);
 
-        // Parsing data untuk chart
-        const labels = laporanHarian.map(item => item.tanggal); // Tanggal
-        const data = laporanHarian.map(item => item.total); // Total laporan per hari
+        const labels = laporanHarian.map(item => item.tanggal);
+        const data = laporanHarian.map(item => item.total);
 
         new Chart(ctx, {
-            type: 'line', // Jenis chart
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [{
                     label: 'Laporan Harian',
                     data: data,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: true,
-                    tension: 0.4, // Kurva chart
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
                     legend: { display: true },
+                    tooltip: { enabled: true },
+                    datalabels: { // Menampilkan angka di atas batang
+                        anchor: 'end',
+                        align: 'start',
+                        formatter: (value) => value,
+                        color: '#000',
+                        font: { weight: 'bold' }
+                    }
                 },
                 scales: {
                     x: { title: { display: true, text: 'Tanggal' } },
-                    y: { title: { display: true, text: 'Jumlah Laporan' }, beginAtZero: true },
+                    y: { title: { display: true, text: 'Jumlah Laporan' }, beginAtZero: true }
                 }
-            }
+            },
+            plugins: [ChartDataLabels] // Tambahkan plugin untuk menampilkan data
         });
     });
 </script>

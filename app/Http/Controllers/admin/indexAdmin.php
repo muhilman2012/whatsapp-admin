@@ -39,8 +39,13 @@ class indexAdmin extends Controller
         $perempuanQuery = clone $totalLaporanQuery;
         $perempuan = $perempuanQuery->where('jenis_kelamin', 'P')->count();
 
+        $belumTerdisposisi = Laporan::whereNull('disposisi')->count();
+        $deputi1 = Laporan::where('disposisi', 'deputi_1')->count();
+        $deputi2 = Laporan::where('disposisi', 'deputi_2')->count();
+        $deputi3 = Laporan::where('disposisi', 'deputi_3')->count();
+        $deputi4 = Laporan::where('disposisi', 'deputi_4')->count();
         // Laporan harian (per tanggal)
-        $laporanHarian = $totalLaporanQuery->selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
+        $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
             ->groupBy('tanggal')
             ->orderBy('tanggal', 'ASC')
             ->get();
@@ -68,6 +73,11 @@ class indexAdmin extends Controller
             'totalLaporan' => $totalLaporan,
             'lakiLaki' => $lakiLaki,
             'perempuan' => $perempuan,
+            'belumTerdisposisi' => $belumTerdisposisi,
+            'deputi1' => $deputi1,
+            'deputi2' => $deputi2,
+            'deputi3' => $deputi3,
+            'deputi4' => $deputi4,
             'laporanHarian' => $laporanHarian,
             'provinsiData' => $provinsiData,
             'judulFrequencies' => $judulFrequencies,

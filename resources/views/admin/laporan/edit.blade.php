@@ -125,10 +125,10 @@
                 <label for="status" class="form-label fw-bold">Status</label>
                 <select name="status" id="status" class="form-control select2">
                     <option value="" selected>Pilih Status</option>
-                    <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
-                    <option value="Diteruskan ke instansi terkait" {{ $data->status === 'Diteruskan ke instansi terkait' ? 'selected' : '' }}>Diteruskan ke instansi terkait</option>
-                    <option value="Penanganan selesai" {{ $data->status === 'Penanganan selesai' ? 'selected' : '' }}>Penanganan selesai</option>
-                    <option value="Tidak dapat diproses lebih lanjut" {{ $data->status === 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
+                    <option value="Tidak dapat diproses lebih lanjut (selesai)" {{ $data->status === 'Tidak dapat diproses lebih lanjut (selesai)' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut (selesai)</option>
+                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)" {{ $data->status === 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)' ? 'selected' : '' }}>Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)</option>
+                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)" {{ $data->status === 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)' ? 'selected' : '' }}>Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)</option>
+                    <option value="Proses verifikasi & penelahaan" {{ $data->status === 'Proses verifikasi & penelahaan' ? 'selected' : '' }}>Proses verifikasi & penelahaan</option>
                 </select>
             </div>
 

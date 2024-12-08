@@ -72,11 +72,7 @@
                     <th scope="col">#</th>
                     <th>Nomor Tiket</th>
                     <th>Nama Lengkap</th>
-                    <th>NIK</th>
-                    <th>No Telp</th>
-                    <th>JK</th>
                     <th>Judul Pengaduan</th>
-                    <th>Status</th>
                     <th>Kategori</th>
                     <th>Disposisi</th>
                     <th>Dikirim</th>
@@ -89,13 +85,9 @@
                 <tr>
                     <th scope="row">{{ $index + 1 }}</th>
                     <td>{{ $item->nomor_tiket }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 10) }}</td>
-                    <td>{{ $item->nik }}</td>
-                    <td>{{ $item->nomor_pengadu }}</td>
-                    <td>{{ $item->jenis_kelamin }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->judul, 10) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->status, 10) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->kategori, 10) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->judul, 30) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->kategori, 25) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->disposisi, 10) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
