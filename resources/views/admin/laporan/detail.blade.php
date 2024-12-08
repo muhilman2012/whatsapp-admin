@@ -6,6 +6,9 @@
 
 @section('pages')
 <div class="container-fluid">
+    <div class="d-flex flex-md-row p-3 mb-3">
+        <a href="{{ route('admin.laporan') }}" class="btn btn-secondary">Kembali ke Data Pengaduan</a>
+    </div>
     <div class="d-block rounded bg-white shadow">
         <div class="p-3 border-bottom">
             <p class="fs-4 fw-bold mb-0">Detail Data Pengaduan</p>

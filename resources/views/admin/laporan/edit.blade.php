@@ -21,6 +21,9 @@
     </div>
 @endif
 <div class="container-fluid">
+    <div class="d-flex flex-md-row p-3 mb-3">
+        <a href="{{ route('admin.laporan.detail', $data->nomor_tiket) }}" class="btn btn-secondary">Kembali ke Detail Pengaduan</a>
+    </div>
     <!-- Bagian Data Saat Ini -->
     <div class="d-block rounded bg-white shadow mb-3">
         <div class="p-3 border-bottom">
