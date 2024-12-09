@@ -135,8 +135,9 @@ class Laporan extends Model
         'Industri dan Perdagangan' => ['industri', 'perdagangan', 'ekspor', 'impor', 'barang', 'online', 'beli', 'dagang', 'jual', 'jasa', 'produsen', 'distributor', 'harga', 'toko', 'koperasi', 'pemasok', 'industri', 'tekstil', 'otomotif', 'konsumen', 'mesin', 'gudang', 'logistik', 'industri pengolahan', 'restoran', 'rumah makan', 'warung', 'pabrik', 'manufaktur', 'bahan baku', 'pasar', 'retail', 'supermarket', 'usaha', 'grosir', 'harga', 'bahan pokok', 'monopoli', 'kuota ekspor', 'dumping', 'e-commerce', 'bea masuk', 'profit', 'komoditi', 'komoditas', 'produk'],
         'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air'],
         'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli'],
+        'Lainnya' => [],
     ];
-    
+
     // Daftar kata kunci dan kategori
     private static $kategoriSP4NLapor = [
         'Agama' => ['agama', 'ibadah', 'rumah ibadah', 'masjid', 'gereja', 'penistaan', 'hari besar keagamaan', 'yayasan keagamaan', 'zakat', 'wakaf', 'pesantren', 'haji', 'umroh', 'toleransi', 'santri', 'iman'],
@@ -164,7 +165,7 @@ class Laporan extends Model
         'Mudik' => ['mudik','peniadaan','larangan','lebaran','transportasi','ppkm','tahun baru','mudik gratis','angkutan','lalu lintas','harga tiket','macet','tiket','libur','rest area','cuti','kecelakaan','natal','tol','tuslah','diskon','online'],
         'Perairan' => ['air','laut','sungai','bendungan','pelabuhan','irigasi','IPAL','keramba jaring apung','ikan','perikanan','budidaya','kualitas air','kja','udang','tambak','ekosistem'],
         'Perhubungan' => ['transportasi', 'angkutan', 'jalan', 'kendaraan', 'kereta', 'bus', 'pesawat', 'ojek online', 'ojek', 'mobil', 'motor', 'kapal', 'terminal', 'lrt', 'mrt', 'bandar udara', 'pelabuhan', 'stasiun', 'halte', 'tol', 'logistik', 'paket', 'barang', 'surat', 'asuransi', 'tod', 'parkir', 'sertifikasi', 'psn', 'tiket', 'truck', 'truk'],
-        'Perlindungan Konsumen' => ['konsumen', 'perlindungan', 'penipuan', 'online', 'jual', 'ecommerce', 'bajakan', 'shopping', 'belanja', 'beli', 'produk', 'harga', 'robot', 'trading', 'transfer', 'tipu', 'shop', 'teror', 'afiliasi', 'korban'],
+        'Perlindungan Konsumen' => ['konsumen', 'perlindungan', 'penipuan', 'online', 'jual', 'ecommerce', 'bajakan', 'shopping', 'belanja', 'beli', 'produk', 'harga', 'robot', 'trading', 'transfer', 'tipu', 'shop', 'teror', 'afiliasi', 'korban', 'net89'],
         'Teknologi Informasi dan Komunikasi' => ['teknologi', 'informasi', 'komunikasi', 'internet', 'digital', 'aplikasi', 'telekomunikasi', 'bts', 'literasi', 'hardware', 'software', 'data pribadi', 'data', 'jaringan', 'sistem', 'AI', '5G', '4G', 'sambungan', 'satelit', 'keamanan', 'cloud', 'frekuensi', 'hack'],
         'Topik Khusus' => ['khusus', 'topik', 'isu tertentu', 'spesifik', 'pajak'],
         'Topik Lainnya' => ['lainnya'],
@@ -183,6 +184,7 @@ class Laporan extends Model
         'Industri dan Perdagangan' => ['industri', 'perdagangan', 'ekspor', 'impor', 'barang', 'online', 'beli', 'dagang', 'jual', 'jasa', 'produsen', 'distributor', 'harga', 'toko', 'koperasi', 'pemasok', 'industri', 'tekstil', 'otomotif', 'konsumen', 'mesin', 'gudang', 'logistik', 'industri pengolahan', 'restoran', 'rumah makan', 'warung', 'pabrik', 'manufaktur', 'bahan baku', 'pasar', 'retail', 'supermarket', 'usaha', 'grosir', 'harga', 'bahan pokok', 'monopoli', 'kuota ekspor', 'dumping', 'e-commerce', 'bea masuk', 'profit', 'komoditi', 'komoditas', 'produk'],
         'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air'],
         'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli'],
+        'Lainnya' => [],
     ];
 
     public static function getKategoriSP4NLapor()
