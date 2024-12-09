@@ -20,10 +20,10 @@ class laporanAdmin extends Controller
 
         // Daftar kategori yang sesuai untuk Deputi
         $kategoriDeputi = [
-            'deputi_1' => ['Ekonomi dan Keuangan', 'Pekerjaan Umum dan Penataan Ruang', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen'],
-            'deputi_2' => ['Kesehatan', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Pembangunan Desa, Daerah Tetinggal, dan Transmigrasi', 'Kesetaraan Gender dan Sosial Inklusif', 'Ketenagakerjaan', 'Kependudukan'],
-            'deputi_3' => ['Politisasi ASN', 'Netralitas ASN', 'Administrasi Pemerintahan', 'Dukungan Sistem Pengelolaan', 'SP4N Lapor', 'Topik Khusus'],
-            'deputi_4' => ['Politik dan Hukum', 'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika (P4GN)', 'Lingkungan Hidup dan Kehutanan', 'Agama', 'Kekerasan di Satuan Pendidikan', 'Peniadaan Mudik'],
+            'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan'],
+            'deputi_2' => ['Agama', 'Corona Virus', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Penanggulangan Bencana', 'Ketenagakerjaan', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Daerah Perbatasan', 'Kepemudaan dan Olahraga', 'Keluarga Berencana'],
+            'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat','Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan'],
+            'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
         ];
 
         // Ambil kategori sesuai role
@@ -129,9 +129,9 @@ class laporanAdmin extends Controller
     {
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        // Ambil semua kategori dan disposisi
-        $semuaKategori = array_keys(Laporan::getKategoriKataKunci());
-        sort($semuaKategori);
+        // Ambil kategori menggunakan getter
+        $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor();
+        $kategoriBaru = Laporan::getKategoriBaru();
 
         $semuaDisposisi = Laporan::getKategoriDeputi();
 
@@ -142,7 +142,7 @@ class laporanAdmin extends Controller
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        return view('admin.laporan.edit', compact('data', 'semuaKategori', 'semuaDisposisi', 'namaDeputi'));
+        return view('admin.laporan.edit', compact('data', 'kategoriSP4NLapor', 'kategoriBaru', 'semuaDisposisi', 'namaDeputi'));
     }
 
     public function update(Request $request, $nomor_tiket)

@@ -73,9 +73,9 @@ class Data extends Component
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        // Ambil kategori dari model Laporan
-        $kategori = array_keys(Laporan::getKategoriKataKunci());
-        sort($kategori);
+        // Ambil kategori dari getter
+        $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor(); // SP4N Lapor
+        $kategoriBaru = Laporan::getKategoriBaru(); // Kategori Baru
 
         // Query data laporan
         $data = Laporan::query();
@@ -106,7 +106,8 @@ class Data extends Component
 
         return view('livewire.admin.laporan.data', [
             'data' => $data,
-            'kategori' => $kategori, // Kirim daftar kategori ke view
+            'kategoriSP4NLapor' => $kategoriSP4NLapor,
+            'kategoriBaru' => $kategoriBaru,
             'namaDeputi' => $namaDeputi,
         ]);
     }

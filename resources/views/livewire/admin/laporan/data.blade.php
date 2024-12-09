@@ -46,9 +46,16 @@
             <div class="ms-2">
                 <select wire:model="filterKategori" class="form-select" style="width: 200px;">
                     <option value="" selected>Semua Kategori</option>
-                    @foreach ($kategori as $item)
-                        <option value="{{ $item }}">{{ $item }}</option>
-                    @endforeach
+                    <optgroup label="SP4N Lapor">
+                        @foreach ($kategoriSP4NLapor as $item)
+                            <option value="{{ $item }}">{{ $item }}</option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="Kategori Baru">
+                        @foreach ($kategoriBaru as $item)
+                            <option value="{{ $item }}">{{ $item }}</option>
+                        @endforeach
+                    </optgroup>
                 </select>
             </div>
             <!-- Select Jumlah Halaman -->
@@ -167,9 +174,16 @@
                 <div class="modal-body">
                     <select wire:model="selectedKategori" class="form-control">
                         <option value="" selected>Pilih Kategori</option>
-                        @foreach ($kategori as $item)
-                            <option value="{{ $item }}">{{ $item }}</option>
-                        @endforeach
+                        <optgroup label="SP4N Lapor">
+                            @foreach ($kategoriSP4NLapor as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Kategori Baru">
+                            @foreach ($kategoriBaru as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                            @endforeach
+                        </optgroup>
                     </select>
                 </div>
                 <div class="modal-footer">

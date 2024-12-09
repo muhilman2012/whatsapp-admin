@@ -105,9 +105,16 @@
             <div class="mb-3">
                 <label for="kategori" class="form-label fw-bold">Kategori</label>
                 <select name="kategori" id="kategori" class="form-control">
-                    @foreach ($semuaKategori as $item)
-                        <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
-                    @endforeach
+                    <optgroup label="SP4N Lapor">
+                        @foreach ($kategoriSP4NLapor as $item)
+                            <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
+                        @endforeach
+                    </optgroup>
+                    <optgroup label="Kategori Baru">
+                        @foreach ($kategoriBaru as $item)
+                            <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
+                        @endforeach
+                    </optgroup>
                 </select>
             </div>
 
@@ -131,7 +138,7 @@
                     <option value="Tidak dapat diproses lebih lanjut (selesai)" {{ $data->status === 'Tidak dapat diproses lebih lanjut (selesai)' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut (selesai)</option>
                     <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)" {{ $data->status === 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)' ? 'selected' : '' }}>Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)</option>
                     <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)" {{ $data->status === 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)' ? 'selected' : '' }}>Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)</option>
-                    <option value="Proses verifikasi & penelahaan" {{ $data->status === 'Proses verifikasi & penelahaan' ? 'selected' : '' }}>Proses verifikasi & penelahaan</option>
+                    <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
                 </select>
             </div>
 
