@@ -55,35 +55,38 @@
                     </div>
                 </div>
 
-                <!-- Pengadu Laki-Laki -->
+                <!-- Card Gabungan Laki-Laki dan Perempuan -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-male fa-3x"></i>
+                            <i class="fas fa-users fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $lakiLaki }}</p>
+                                <p class="card-title fs-4 mb-0">Laki-Laki: {{ $lakiLaki }}</p>
+                                <p class="card-title fs-4 mb-0">Perempuan: {{ $perempuan }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Pengadu Laki-laki</small>
+                            <small class="text-start fw-bold">Total Pengadu Berdasarkan Gender</small>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pengadu Perempuan -->
+                <!-- Jumlah Aduan yang Terdisposisi -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-female fa-3x"></i>
+                            <i class="fas fa-check-circle fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $perempuan }}</p>
+                                <p class="card-title fs-2 mb-0">{{ $totalTerdisposisi }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Pengadu Perempuan</small>
+                            <small class="text-start fw-bold">Aduan Terdisposisi</small>
                         </div>
                     </div>
                 </div>
+
+                <!-- Jumlah Aduan yang Belum Terdisposisi -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
@@ -97,67 +100,75 @@
                         </div>
                     </div>
                 </div>
+                <!-- Cards Deputi 1-4 untuk Admin -->
+                @if(auth('admin')->user()->role === 'admin')
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-briefcase fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">{{ $deputi1 }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Deputi 1</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-briefcase fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">{{ $deputi2 }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Deputi 2</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-briefcase fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">{{ $deputi3 }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Deputi 3</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-briefcase fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">{{ $deputi4 }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Deputi 4</small>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 <div class="col-6">
                     <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
                         <canvas id="laporanHarianChart"></canvas>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div class="row g-3">
-                        <div class="col-6 pb-2">
-                            <div class="card border-0 p-2 shadow-sm">
-                                <div class="d-flex align-items-center px-2">
-                                    <i class="fas fa-users fa-3x"></i>
-                                    <div class="card-body text-end">
-                                        <p class="card-title fs-2 mb-0">{{ $deputi1 }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-white px-1">
-                                    <small class="text-start fw-bold">Deputi 1</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6 pb-2">
-                            <div class="card border-0 p-2 shadow-sm">
-                                <div class="d-flex align-items-center px-2">
-                                    <i class="fas fa-users fa-3x"></i>
-                                    <div class="card-body text-end">
-                                        <p class="card-title fs-2 mb-0">{{ $deputi2 }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-white px-1">
-                                    <small class="text-start fw-bold">Deputi 2</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="card border-0 p-2 shadow-sm">
-                                <div class="d-flex align-items-center px-2">
-                                    <i class="fas fa-users fa-3x"></i>
-                                    <div class="card-body text-end">
-                                        <p class="card-title fs-2 mb-0">{{ $deputi3 }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-white px-1">
-                                    <small class="text-start fw-bold">Deputi 3</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="card border-0 p-2 shadow-sm">
-                                <div class="d-flex align-items-center px-2">
-                                    <i class="fas fa-users fa-3x"></i>
-                                    <div class="card-body text-end">
-                                        <p class="card-title fs-2 mb-0">{{ $deputi4 }}</p>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-white px-1">
-                                    <small class="text-start fw-bold">Deputi 4</small>
-                                </div>
-                            </div>
+
+                <!-- Pie Chart Status untuk Deputi -->
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm p-3">
+                            <canvas id="statusPieChart"></canvas>
                         </div>
                     </div>
-                </div>
+
                 <div class="col-12">
                     <div class="card border-0 shadow-sm p-3">
                         <canvas id="kategoriChart"></canvas>
@@ -328,6 +339,44 @@
                 scales: {
                     x: { title: { display: true, text: 'Judul Pengaduan' } },
                     y: { title: { display: true, text: 'Jumlah Pengaduan' }, beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('statusPieChart').getContext('2d');
+        const statusLabels = @json($statusLabels); // Nama status (dari controller)
+        const statusCounts = @json($statusValues); // Jumlah laporan untuk setiap status
+
+        new Chart(ctx, {
+            type: 'pie', // Jenis chart
+            data: {
+                labels: statusLabels, // Label status
+                datasets: [{
+                    label: 'Status Laporan',
+                    data: statusCounts, // Data jumlah laporan
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)', // Warna untuk status 1
+                        'rgba(54, 162, 235, 0.5)', // Warna untuk status 2
+                        'rgba(255, 206, 86, 0.5)', // Warna untuk status 3
+                        'rgba(75, 192, 192, 0.5)'  // Warna untuk status 4
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: { enabled: true }
                 }
             }
         });

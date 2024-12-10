@@ -39,16 +39,49 @@ class indexAdmin extends Controller
         $perempuanQuery = clone $totalLaporanQuery;
         $perempuan = $perempuanQuery->where('jenis_kelamin', 'P')->count();
 
+        // Total laporan yang terdisposisi
+        $totalTerdisposisi = Laporan::whereNotNull('disposisi')->count();
         $belumTerdisposisi = Laporan::whereNull('disposisi')->count();
+
         $deputi1 = Laporan::where('disposisi', 'deputi_1')->count();
         $deputi2 = Laporan::where('disposisi', 'deputi_2')->count();
         $deputi3 = Laporan::where('disposisi', 'deputi_3')->count();
         $deputi4 = Laporan::where('disposisi', 'deputi_4')->count();
-        // Laporan harian (per tanggal)
+
+        // Definisikan status secara eksplisit
+        $allStatuses = [
+            'Tidak dapat diproses lebih lanjut',
+            'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang',
+            'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut',
+            'Proses verifikasi dan telaah'
+        ];
+
+        // Ambil data status berdasarkan role
+        $statusData = Laporan::selectRaw('status, COUNT(*) as total')
+            ->when($admin->role !== 'admin', function ($query) use ($admin) {
+                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan admin
+            })
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
+
+        // Pastikan semua status muncul, meskipun datanya kosong
+        $statusCounts = [];
+        foreach ($allStatuses as $status) {
+            $statusCounts[$status] = $statusData[$status]->total ?? 0;
+        }
+
+        $statusLabels = array_keys($statusCounts); // Ambil nama status
+        $statusValues = array_values($statusCounts); // Ambil jumlah laporan per status
+
+        // Data Laporan Harian
         $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
-            ->groupBy('tanggal')
-            ->orderBy('tanggal', 'ASC')
-            ->get();
+        ->when($admin->role !== 'admin', function ($query) use ($admin) {
+            $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan admin
+        })
+        ->groupBy('tanggal')
+        ->orderBy('tanggal', 'ASC')
+        ->get();
 
         // Data laporan per provinsi
         $provinsiKeywords = $this->getProvinsiKeywords();
@@ -73,6 +106,7 @@ class indexAdmin extends Controller
             'totalLaporan' => $totalLaporan,
             'lakiLaki' => $lakiLaki,
             'perempuan' => $perempuan,
+            'totalTerdisposisi' => $totalTerdisposisi,
             'belumTerdisposisi' => $belumTerdisposisi,
             'deputi1' => $deputi1,
             'deputi2' => $deputi2,
@@ -82,6 +116,8 @@ class indexAdmin extends Controller
             'provinsiData' => $provinsiData,
             'judulFrequencies' => $judulFrequencies,
             'laporanPerKategori' => $laporanPerKategori,
+            'statusLabels' => $statusLabels,
+            'statusValues' => $statusValues,
         ]);
     }
 

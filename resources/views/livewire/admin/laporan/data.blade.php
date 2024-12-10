@@ -99,8 +99,8 @@
                     <th scope="row">{{ $index + 1 }}</th>
                     <td>{{ $item->nomor_tiket }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->judul, 30) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->kategori, 25) }}</td>
+                    <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
+                    <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
                     <td>{{ \Illuminate\Support\Str::limit($item->disposisi, 10) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
