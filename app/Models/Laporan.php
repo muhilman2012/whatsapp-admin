@@ -183,7 +183,7 @@ class Laporan extends Model
         'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm', 'koperasi', 'usaha kecil', 'usaha mikro', 'modal usaha', 'pemberdayaan masyarakat', 'kur', 'kredit macet', 'jaminan kur', 'usaha menengah', 'blacklist bank'],
         'Industri dan Perdagangan' => ['industri', 'perdagangan', 'ekspor', 'impor', 'barang', 'online', 'beli', 'dagang', 'jual', 'jasa', 'produsen', 'distributor', 'harga', 'toko', 'koperasi', 'pemasok', 'industri', 'tekstil', 'otomotif', 'konsumen', 'mesin', 'gudang', 'logistik', 'industri pengolahan', 'restoran', 'rumah makan', 'warung', 'pabrik', 'manufaktur', 'bahan baku', 'pasar', 'retail', 'supermarket', 'usaha', 'grosir', 'harga', 'bahan pokok', 'monopoli', 'kuota ekspor', 'dumping', 'e-commerce', 'bea masuk', 'profit', 'komoditi', 'komoditas', 'produk'],
         'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air'],
-        'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli'], 'tanah', 'bangunan',
+        'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli', 'tanah', 'bangunan'],
         'Lainnya' => [],
     ];
 
