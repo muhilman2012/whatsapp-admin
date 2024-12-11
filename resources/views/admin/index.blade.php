@@ -79,35 +79,6 @@
                     </div>
                 </div>
 
-                <!-- Jumlah Aduan yang Terdisposisi -->
-                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                    <div class="card border-0 p-2 shadow-sm">
-                        <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-check-circle fa-3x"></i>
-                            <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $totalTerdisposisi }}</p>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Aduan Terdisposisi</small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Jumlah Aduan yang Belum Terdisposisi -->
-                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                    <div class="card border-0 p-2 shadow-sm">
-                        <div class="d-flex align-items-center px-2">
-                            <i class="fa fa-exclamation fa-3x"></i>
-                            <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $belumTerdisposisi }}</p>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Belum Terdisposisi</small>
-                        </div>
-                    </div>
-                </div>
                 <!-- Cards Deputi 1-4 untuk Admin -->
                 @if(auth('admin')->user()->role === 'admin')
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
@@ -136,6 +107,36 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Jumlah Aduan yang Terdisposisi -->
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-check-circle fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">{{ $totalTerdisposisi }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Aduan Terdisposisi</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- Jumlah Aduan yang Belum Terdisposisi -->
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fa fa-exclamation fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">{{ $belumTerdisposisi }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Belum Terdisposisi</small>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
@@ -357,16 +358,21 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('statusPieChart').getContext('2d');
-        const statusLabels = @json($statusLabels); // Nama status (dari controller)
-        const statusCounts = @json($statusValues); // Jumlah laporan untuk setiap status
+
+        // Data dari controller
+        const chartData = @json($chartData);
+
+        // Pisahkan label dan nilai
+        const labels = chartData.map(data => data.label); // Ambil label yang sudah diformat
+        const values = chartData.map(data => data.value); // Ambil nilai
 
         new Chart(ctx, {
             type: 'pie', // Jenis chart
             data: {
-                labels: statusLabels, // Label status
+                labels: labels, // Label status singkat + jumlah
                 datasets: [{
                     label: 'Status Laporan',
-                    data: statusCounts, // Data jumlah laporan
+                    data: values, // Data jumlah laporan
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.5)', // Warna untuk status 1
                         'rgba(54, 162, 235, 0.5)', // Warna untuk status 2
@@ -386,14 +392,14 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: true, position: 'top' },
-                    tooltip: { enabled: true }
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true
+                    }
                 }
-                // scales:{
-                //     title:{
-                //         padding: {top: 0, left: 10, right: 10, bottom: 0}
-                //     }
-                // }
             }
         });
     });

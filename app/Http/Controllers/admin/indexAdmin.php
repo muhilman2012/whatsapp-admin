@@ -65,14 +65,28 @@ class indexAdmin extends Controller
             ->get()
             ->keyBy('status');
 
+        // Label singkat untuk status
+        $shortLabels = [
+            'Tidak dapat diproses lebih lanjut' => 'Tidak Diproses',
+            'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' => 'Pemantauan',
+            'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' => 'Tindak Lanjut K/L',
+            'Proses verifikasi dan telaah' => 'Verifikasi'
+        ];
+
         // Pastikan semua status muncul, meskipun datanya kosong
         $statusCounts = [];
         foreach ($allStatuses as $status) {
             $statusCounts[$status] = $statusData[$status]->total ?? 0;
         }
 
-        $statusLabels = array_keys($statusCounts); // Ambil nama status
-        $statusValues = array_values($statusCounts); // Ambil jumlah laporan per status
+        // Format data untuk chart
+        $chartData = [];
+        foreach ($statusCounts as $status => $count) {
+            $chartData[] = [
+                'label' => "{$shortLabels[$status]} - {$count}",
+                'value' => $count
+            ];
+        }
 
         // Data Laporan Harian
         $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
@@ -116,8 +130,7 @@ class indexAdmin extends Controller
             'provinsiData' => $provinsiData,
             'judulFrequencies' => $judulFrequencies,
             'laporanPerKategori' => $laporanPerKategori,
-            'statusLabels' => $statusLabels,
-            'statusValues' => $statusValues,
+            'chartData' => $chartData
         ]);
     }
 
