@@ -107,7 +107,7 @@ class Laporan extends Model
         'Pertanian dan Peternakan' => ['pertanian','peternakan','tanaman','pupuk','petani','ternak','hasil panen','sapi','ayam','bibit','lahan','teknologi pertanian','produktifitas','kesejahteraan petani','nelayan','perkapalan','kesejahteraaan nelayan','kapal ikan','tambak','daging sapi','perkebunan','padi','anak buah kapal','abk','pakan ikan','KUR pertanian','KUR perikanan'],
         'Politik dan Hukum' => ['politik','hukum','peraturan','pemilu','korupsi','regulasi','pengadilan','keadilan','legislasi','partai politik','putusan pengadilan','mafia hukum','lembaga peradilan','pertanahan','parpol', 'peradilan', 'pertanahan', 'plisi', 'polres', 'jaksa', 'penipuan', 'pidana', 'kasus', 'begal', 'pungli', 'kriminal', 'aniaya', 'skck', 'mediasi', 'pungutan', 'perkara', 'polda', 'penindakan', 'polsek', 'curanmor', 'kdrt', 'hilang', 'mata elang', 'adil'],
         'Politisasi ASN' => ['asn','politisasi asn','netralitas asn','kampanye','pegawai negeri','pns','kode etik asn','manajemen asn','pengangkatan p3k','gaji asn','honorer','mutasi','penyalahgunaan wewenang','tes cpns'],
-        'Sosial dan Kesejahteraan' => ['sosial','kesejahteraan','bansos','kesejahteraan sosial','penanggulangan kemiskinan','keluarga miskin','lansia','difabel','kartu lansia','disabilitas','tunggakan spp','tebus ijazah','baznas','miskin','bantuan sosial','pkh','dtks','blt','bpjs', 'makan gratis', 'makan', 'jkn', 'subsidi', 'bpnt'],
+        'Sosial dan Kesejahteraan' => ['sosial','kesejahteraan','bansos','kesejahteraan sosial','penanggulangan kemiskinan','keluarga miskin','lansia','difabel','kartu lansia','disabilitas','tunggakan spp','tebus ijazah','baznas','miskin','bantuan sosial','pkh','dtks','blt','bpjs', 'makan gratis', 'makan', 'jkn', 'subsidi', 'bpnt', 'kjp'],
         'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
         'Energi dan Sumber Daya Alam' => ['energi','minyak','gas','pertambangan','sumber daya alam','sda','listrik','pembangkit','bbm','pln','ebt','smelter','hilirisasi'],
         'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan','bullying','pelecehan','lembaga diklat','kampus','sekolah','pendidikan','bully','dosen','mahasiswa','siswa'],
@@ -153,7 +153,7 @@ class Laporan extends Model
         'Pertanian dan Peternakan' => ['pertanian','peternakan','tanaman','pupuk','petani','ternak','hasil panen','sapi','ayam','bibit','lahan','teknologi pertanian','produktifitas','kesejahteraan petani','nelayan','perkapalan','kesejahteraaan nelayan','kapal ikan','tambak','daging sapi','perkebunan','padi','anak buah kapal','abk','pakan ikan','KUR pertanian','KUR perikanan'],
         'Politik dan Hukum' => ['politik','hukum','peraturan','pemilu','korupsi','regulasi','pengadilan','keadilan','legislasi','partai politik','putusan pengadilan','mafia hukum','lembaga peradilan','pertanahan','parpol', 'peradilan', 'pertanahan', 'plisi', 'polres', 'jaksa', 'penipuan', 'pidana', 'kasus', 'begal', 'pungli', 'kriminal', 'aniaya', 'skck', 'mediasi', 'pungutan', 'perkara', 'polda', 'penindakan', 'polsek', 'curanmor', 'kdrt', 'hilang', 'mata elang', 'adil'],
         'Politisasi ASN' => ['asn','politisasi asn','netralitas asn','kampanye','pegawai negeri','pns','kode etik asn','manajemen asn','pengangkatan p3k','gaji asn','honorer','mutasi','penyalahgunaan wewenang','tes cpns'],
-        'Sosial dan Kesejahteraan' => ['sosial','kesejahteraan','bansos','kesejahteraan sosial','penanggulangan kemiskinan','keluarga miskin','lansia','difabel','kartu lansia','disabilitas','tunggakan spp','tebus ijazah','baznas','miskin','bantuan sosial','pkh','dtks','blt','bpjs', 'makan gratis', 'makan', 'jkn', 'subsidi', 'bpnt'],
+        'Sosial dan Kesejahteraan' => ['sosial','kesejahteraan','bansos','kesejahteraan sosial','penanggulangan kemiskinan','keluarga miskin','lansia','difabel','kartu lansia','disabilitas','tunggakan spp','tebus ijazah','baznas','miskin','bantuan sosial','pkh','dtks','blt','bpjs', 'makan gratis', 'makan', 'jkn', 'subsidi', 'bpnt', 'kjp'],
         'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
         'Energi dan Sumber Daya Alam' => ['energi','minyak','gas','pertambangan','sumber daya alam','sda','listrik','pembangkit','bbm','pln','ebt','smelter','hilirisasi'],
         'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan','bullying','pelecehan','lembaga diklat','kampus','sekolah','pendidikan','bully','dosen','mahasiswa','siswa'],
@@ -256,5 +256,17 @@ class Laporan extends Model
     public function scopeByDeputi($query, $role)
     {
         return $query->where('disposisi', $role);
+    }
+
+    public function assignment()
+    {
+        // Menggunakan hasMany karena satu laporan bisa memiliki banyak assignment
+        return $this->hasMany(Assignment::class, 'laporan_id');
+    }
+
+    public function assignedTo()
+    {
+        // Anda bisa menggunakan relasi hasMany untuk mendapatkan daftar analis yang ditugaskan ke laporan
+        return $this->hasManyThrough(admins::class, Assignment::class, 'laporan_id', 'id_admins', 'id', 'analis_id');
     }
 }

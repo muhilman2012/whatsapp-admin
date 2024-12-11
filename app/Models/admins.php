@@ -51,4 +51,14 @@ class admins extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class, 'assigned_to');
+    }
+
+    public function laporans()
+    {
+        return $this->belongsToMany(Laporan::class, 'assignments', 'assigned_to', 'laporan_id');
+    }
 }

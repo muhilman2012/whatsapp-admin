@@ -21,9 +21,6 @@
     </div>
 @endif
 <div class="container-fluid">
-    <div class="d-flex flex-md-row p-3 mb-3">
-        <a href="{{ route('admin.laporan.detail', $data->nomor_tiket) }}" class="btn btn-secondary">Kembali ke Detail Pengaduan</a>
-    </div>
     <!-- Bagian Data Saat Ini -->
     <div class="d-block rounded bg-white shadow mb-3">
         <div class="p-3 border-bottom">
@@ -135,9 +132,9 @@
                 <label for="status" class="form-label fw-bold">Status</label>
                 <select name="status" id="status" class="form-control select2">
                     <option value="" selected>Pilih Status</option>
-                    <option value="Tidak dapat diproses lebih lanjut (selesai)" {{ $data->status === 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
-                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang" {{ $data->status === 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' ? 'selected' : '' }}>Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang (monitoring K/L)</option>
-                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut" {{ $data->status === 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' ? 'selected' : '' }}>Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut (Tindak Lanjut K/L)</option>
+                    <option value="Tidak dapat diproses lebih lanjut" {{ $data->status === 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
+                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang" {{ $data->status === 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' ? 'selected' : '' }}>Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang</option>
+                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut" {{ $data->status === 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' ? 'selected' : '' }}>Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut</option>
                     <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
                 </select>
             </div>
@@ -145,12 +142,25 @@
             <!-- Input Tanggapan -->
             <div class="mb-3">
                 <label for="tanggapan" class="form-label fw-bold">Tanggapan</label>
-                <textarea name="tanggapan" id="tanggapan" rows="3" class="form-control">{{ old('tanggapan', $data->tanggapan) }}</textarea>
+                <textarea name="tanggapan" id="tanggapan" rows="6" class="form-control">{{ old('tanggapan', $data->tanggapan) }}</textarea>
             </div>
 
-            <!-- Tombol Update -->
-            <div class="my-3 mx-auto" style="width:200px;">
-                <button type="submit" class="btn btn-primary form-control">Update</button>
+            <div class="d-flex justify-content-between align-items-center my-3">
+                <!-- Tombol Kembali ke Detail Pengaduan -->
+                <div>
+                    <a href="{{ route('admin.laporan.detail', $data->nomor_tiket) }}" class="btn btn-secondary me-2">
+                        Kembali ke Detail Pengaduan
+                    </a>
+                    <a href="{{ route('admin.laporan') }}" class="btn btn-secondary">
+                        Kembali ke Data Pengaduan
+                    </a>
+                </div>
+                <!-- Tombol Update -->
+                <div>
+                    <button type="submit" class="btn btn-primary form-control">
+                        Update Pengaduan
+                    </button>
+                </div>
             </div>
         </form>
     </div>

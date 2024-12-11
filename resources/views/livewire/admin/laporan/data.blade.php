@@ -32,19 +32,28 @@
         </div>
         <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
         <div class="d-flex align-items-center">
+            @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+            <div class="ms-2">
+                <select wire:model="filterAssignment" class="form-select">
+                    <option value="">-- Semua Data --</option>
+                    <option value="unassigned">Belum Ter-assign</option>
+                    <option value="assigned">Sudah Ter-assign</option>
+                </select>
+            </div>
+            @endif
             <!-- Tombol Import -->
             @if (auth('admin')->user()->role === 'admin')
-                <div class="ms-2">
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
-                </div>
+            <div class="ms-2">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
+            </div>
             @endif
             <!-- Input Cari -->
             <div>
-                <input wire:model="search" type="text" class="form-control" placeholder="Cari...">
+                <input wire:model="search" type="text" class="form-control ms-2" placeholder="Cari...">
             </div>
             <!-- Select Kategori -->
             <div class="ms-2">
-                <select wire:model="filterKategori" class="form-select" style="width: 200px;">
+                <select wire:model="filterKategori" class="form-select ms-2" style="width: 200px;">
                     <option value="" selected>Semua Kategori</option>
                     <optgroup label="SP4N Lapor">
                         @foreach ($kategoriSP4NLapor as $item)
@@ -133,6 +142,11 @@
             <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
                 Update Disposisi
             </button>
+        @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+            <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#assignModal">
+                Assign to Analis
+            </button>
+        @endif
         @endif
 
         @if ($data->hasPages())
@@ -214,6 +228,32 @@
                     <button type="button" class="btn btn-primary" wire:click="updateDisposisiMassal">Simpan</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <form wire:submit.prevent="assignToAnalis">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="assignModalLabel">Assign ke Analis</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <select wire:model="selectedAnalis" class="form-control">
+                            <option value="">Pilih Analis</option>
+                            @foreach($analisList as $analis)
+                                <option value="{{ $analis->id_admins }}">{{ $analis->username }}</option>
+                            @endforeach
+                        </select>
+                        <textarea wire:model.defer="assignNotes" class="form-control mt-3" placeholder="Catatan untuk analis"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Assign</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 

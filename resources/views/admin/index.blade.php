@@ -27,6 +27,14 @@
         .kategori-card .d-flex {
             height: 100%;
         }
+
+        .pie-container{
+            position: relative;
+            height: 420px !important;
+            width: 420px !important;
+        }
+
+        
     </style>
 @endsection
 
@@ -61,8 +69,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-users fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-4 mb-0">Laki-Laki: {{ $lakiLaki }}</p>
-                                <p class="card-title fs-4 mb-0">Perempuan: {{ $perempuan }}</p>
+                                <p class="card-title mb-0">Laki-Laki: {{ $lakiLaki }}</p>
+                                <p class="card-title mb-0">Perempuan: {{ $perempuan }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -163,11 +171,13 @@
                 </div>
 
                 <!-- Pie Chart Status untuk Deputi -->
-                    <div class="col-6">
-                        <div class="card border-0 shadow-sm p-3">
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm p-3 align-items-center">
+                        <div class="pie-container">
                             <canvas id="statusPieChart"></canvas>
                         </div>
                     </div>
+                </div>
 
                 <div class="col-12">
                     <div class="card border-0 shadow-sm p-3">
@@ -374,10 +384,16 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: true, position: 'top' },
                     tooltip: { enabled: true }
                 }
+                // scales:{
+                //     title:{
+                //         padding: {top: 0, left: 10, right: 10, bottom: 0}
+                //     }
+                // }
             }
         });
     });

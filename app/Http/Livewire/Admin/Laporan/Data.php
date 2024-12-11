@@ -3,6 +3,8 @@
 namespace App\Http\Livewire\Admin\Laporan;
 
 use App\Models\Laporan;
+use App\Models\admins;
+use App\Models\Assignment;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -20,6 +22,9 @@ class Data extends Component
     public $selectedDisposisi = null;
     public $selectAll = false; // Untuk status checkbox "Select All"
     public $selected = [];    // Array ID laporan yang dipilih
+    public $selectedAnalis = null; // ID Analis yang dipilih
+    public $assignNotes; // Catatan untuk analis
+    public $filterAssignment = ''; // Properti untuk menyimpan filter
 
 
     protected $listeners = ["deleteAction" => "delete"];
@@ -77,12 +82,27 @@ class Data extends Component
         $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor(); // SP4N Lapor
         $kategoriBaru = Laporan::getKategoriBaru(); // Kategori Baru
 
-        // Query data laporan
-        $data = Laporan::query();
+        // Ambil daftar analis
+        $analisList = admins::where('role', 'analis')->get(['id_admins', 'username']);
 
-        // Filter berdasarkan role pengguna (admin atau deputi)
-        if ($user->role !== 'admin') {
-            $data->where('disposisi', $user->role); // Filter berdasarkan disposisi
+        // Query data laporan
+        $data = Laporan::with(['assignment.assignedTo', 'assignment.assignedBy']);
+
+        if ($user->role === 'analis') {
+            $data->whereHas('assignment', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins); // Pastikan laporan ditugaskan kepada analis yang login
+            });
+        }
+        
+        // Filter berdasarkan role pengguna
+        if ($user->role === 'analis') {
+            // Hanya ambil laporan yang ditugaskan ke analis yang sedang login
+            $data->whereHas('assignment', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins);
+            });
+        } elseif ($user->role !== 'admin') {
+            // Jika bukan admin, filter berdasarkan disposisi
+            $data->where('disposisi', $user->role);
         }
 
         // Pencarian berdasarkan kolom tertentu
@@ -101,6 +121,13 @@ class Data extends Component
             $data->where('kategori', $this->filterKategori);
         }
 
+        // Filter berdasarkan status assignment
+        if ($this->filterAssignment === 'unassigned') {
+            $data->doesntHave('assignment'); // Data belum ter-assign
+        } elseif ($this->filterAssignment === 'assigned') {
+            $data->has('assignment'); // Data sudah ter-assign
+        }
+
         // Paginate data
         $data = $data->orderBy('created_at', 'desc')->paginate($this->pages);
 
@@ -109,6 +136,7 @@ class Data extends Component
             'kategoriSP4NLapor' => $kategoriSP4NLapor,
             'kategoriBaru' => $kategoriBaru,
             'namaDeputi' => $namaDeputi,
+            'analisList' => $analisList,
         ]);
     }
 
@@ -152,6 +180,31 @@ class Data extends Component
             session()->flash('success', 'Disposisi berhasil diperbarui.');
         } else {
             session()->flash('error', 'Pilih disposisi dan data terlebih dahulu.');
+        }
+    }
+
+    public function assignToAnalis()
+    {
+        if (!empty($this->selected) && !empty($this->selectedAnalis)) {
+            $this->validate([
+                'selectedAnalis' => 'required|exists:admins,id_admins',
+                'assignNotes' => 'nullable|string|max:255',
+            ]);
+
+            foreach ($this->selected as $laporanId) {
+                Assignment::create([
+                    'laporan_id' => $laporanId,
+                    'analis_id' => $this->selectedAnalis,
+                    'notes' => $this->assignNotes, // Boleh kosong
+                    'assigned_by' => auth('admin')->user()->id_admins,
+                ]);
+            }
+
+            session()->flash('success', 'Laporan berhasil di-assign ke analis.');
+            $this->reset(['selected', 'selectedAnalis', 'assignNotes', 'selectAll']);
+            $this->dispatchBrowserEvent('closeModal', ['modalId' => 'assignToAnalisModal']);
+        } else {
+            session()->flash('error', 'Pilih analis dan data terlebih dahulu.');
         }
     }
 }
