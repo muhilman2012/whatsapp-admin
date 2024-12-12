@@ -83,7 +83,7 @@ class indexAdmin extends Controller
         $chartData = [];
         foreach ($statusCounts as $status => $count) {
             $chartData[] = [
-                'label' => "{$shortLabels[$status]} - {$count}",
+                'label' => "{$shortLabels[$status]} = {$count}",
                 'value' => $count
             ];
         }
