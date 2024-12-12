@@ -4,6 +4,7 @@
 <title>LaporMasWapres! - Edit Data Pengaduan</title>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 @endsection
 
 @section('pages')
@@ -191,6 +192,24 @@
         </div>
     </div>
 </div>
+<!-- Modal Konfirmasi -->
+<div class="modal fade" id="konfirmasiModal" tabindex="-1" aria-labelledby="konfirmasiModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="konfirmasiModalLabel">Konfirmasi Perubahan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin sudah merubah Status Pengaduan?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" id="confirmUpdateButton" class="btn btn-primary">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -200,5 +219,24 @@
     });
 </script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const formEditLaporan = document.getElementById('formEditLaporan');
+        const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiModal'));
+
+        // Tangkap event submit form
+        formEditLaporan.addEventListener('submit', function (e) {
+            e.preventDefault(); // Hentikan proses submit default
+            modalKonfirmasi.show(); // Tampilkan modal konfirmasi
+        });
+
+        // Tombol di modal untuk melanjutkan update
+        document.getElementById('confirmUpdateButton').addEventListener('click', function () {
+            modalKonfirmasi.hide(); // Tutup modal
+            formEditLaporan.submit(); // Submit ulang form
+        });
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection
