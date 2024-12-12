@@ -3,6 +3,7 @@
 // admins controllers
 use App\Http\Controllers\admin\indexAdmin;
 use App\Http\Controllers\admin\laporanAdmin;
+use App\Http\Controllers\admin\laporanAnalisController;
 use App\Http\Controllers\admin\profileAdmin;
 use App\Http\Controllers\admin\ExportController;
 use App\Http\Controllers\admin\ImportController;
