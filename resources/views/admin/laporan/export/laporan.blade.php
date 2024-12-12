@@ -15,6 +15,7 @@
             <th>Detail</th>
             <th>Kategori</th>
             <th>Status</th>
+            <th>Tanggapan</th>
         </tr>
     </thead>
     <tbody>
@@ -34,6 +35,7 @@
                 <td>{{ $laporan->detail }}</td>
                 <td>{{ $laporan->kategori }}</td>
                 <td>{{ $laporan->status }}</td>
+                <td>{{ $laporan->tanggapan }}</td>
             </tr>
         @endforeach
     </tbody>
