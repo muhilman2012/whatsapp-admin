@@ -53,6 +53,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
         Route::get('/admin/export/tanggal', [ExportController::class, 'exportByDate'])->name('admin.laporan.export.tanggal');
         Route::get('/admin/export-all', [ExportController::class, 'exportAll'])->name('admin.laporan.export.all');
+        Route::get('/admin/export/pdf', [ExportController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
+        Route::get('/admin/export/tanggal/pdf', [ExportController::class, 'exportByDatePdf'])->name('admin.laporan.export.tanggal.pdf');
         Route::post('/admin/laporan/import', [ImportController::class, 'import'])->name('admin.laporan.import');
     });
 

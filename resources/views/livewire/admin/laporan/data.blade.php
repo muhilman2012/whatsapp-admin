@@ -19,15 +19,41 @@
                     <input type="date" name="tanggal" id="tanggal" class="form-control" required>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Export Data</button>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Export Data
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="exportDateDropdown">
+                            <li>
+                                <button type="submit" class="dropdown-item" formaction="{{ route('admin.laporan.export.tanggal') }}">Export to Excel</button>
+                            </li>
+                            <li>
+                                <button type="submit" class="dropdown-item" formaction="{{ route('admin.laporan.export.tanggal.pdf') }}">Export to PDF</button>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </form>
 
-            <!-- Export All Data -->
+            <!-- Bagian Export All Data -->
             <div class="ms-2">
-                <form action="{{ route('admin.laporan.export.all') }}" method="GET">
-                    <button type="submit" class="btn btn-success">Export All Data</button>
-                </form>
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export All Data
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                        <li>
+                            <form action="{{ route('admin.laporan.export.all') }}" method="GET">
+                                <button type="submit" class="dropdown-item">Export to Excel</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form action="{{ route('admin.laporan.export.pdf') }}" method="GET">
+                                <button type="submit" class="dropdown-item">Export to PDF</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
