@@ -20,15 +20,17 @@
                 </div>
                 <div class="col-auto">
                     <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDateDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                             Export Data
                         </button>
-                        <ul class="dropdown-menu" aria-labelledby="exportDateDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
                             <li>
                                 <button type="submit" class="dropdown-item" formaction="{{ route('admin.laporan.export.tanggal') }}">Export to Excel</button>
                             </li>
                             <li>
-                                <button type="submit" class="dropdown-item" formaction="{{ route('admin.laporan.export.tanggal.pdf') }}">Export to PDF</button>
+                                <button type="button" class="dropdown-item export-pdf-btn" data-url="{{ route('admin.laporan.export.tanggal.pdf') }}">
+                                    Export to PDF
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -302,6 +304,89 @@
                     }
                 });
         })
+    </script>
+
+    <script>
+        // Check for the status of the export and trigger the download once the file is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for a message indicating that the export is complete
+            setInterval(async () => {
+                const response = await fetch('/admin/check-export-status'); // URL to check if the export is complete
+                const data = await response.json();
+
+                if (data.status === 'complete') {
+                    // If the export is complete, trigger the download
+                    const link = document.createElement('a');
+                    link.href = data.download_url; // URL to download the file
+                    link.download = data.file_name;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    // Optionally, show a message to the user
+                    alert('File berhasil diunduh!');
+                }
+            }, 5000); // Check every 5 seconds
+        });
+    </script>
+    <script>
+        // JavaScript untuk Export PDF dengan proses Asinkron
+        document.querySelectorAll('.export-pdf-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                const dateInput = document.querySelector('#tanggal');
+                const selectedDate = dateInput.value;
+
+                if (!selectedDate) {
+                    alert('Tanggal harus dipilih!');
+                    return;
+                }
+
+                const url = button.getAttribute('data-url');
+                
+                // Kirim permintaan ekspor PDF
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({ tanggal: selectedDate })
+                    });
+
+                    if (response.ok) {
+                        alert('Proses ekspor PDF sedang berjalan. File akan diunduh otomatis saat selesai.');
+                        
+                        const fileName = 'laporan_tanggal_' + selectedDate + '.pdf'; // Menentukan nama file
+
+                        // Polling untuk cek apakah file sudah siap
+                        const interval = setInterval(async () => {
+                            const checkResponse = await fetch(`/admin/check-export-status?file_name=${fileName}`);
+                            const status = await checkResponse.json();
+
+                            if (status.ready) {
+                                clearInterval(interval);
+
+                                // Auto-download file jika sudah siap
+                                const link = document.createElement('a');
+                                link.href = status.download_url;
+                                link.download = fileName;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+
+                                alert('File berhasil diunduh!');
+                            }
+                        }, 5000); // Periksa setiap 5 detik
+                    } else {
+                        alert('Terjadi kesalahan saat mengirim permintaan ekspor.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat melakukan ekspor PDF.');
+                }
+            });
+        });
     </script>
 
     @if(session()->has('success'))

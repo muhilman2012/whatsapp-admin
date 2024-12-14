@@ -147,8 +147,13 @@ class laporanAdmin extends Controller
 
     public function update(Request $request, $nomor_tiket)
     {
-        // dd($request->all()); // Periksa data input
-        $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+        // Ambil data laporan berdasarkan nomor tiket
+        $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->first();
+
+        // Jika laporan tidak ditemukan
+        if (!$laporan) {
+            return redirect()->back()->with('error', 'Laporan tidak ditemukan!');
+        }
 
         // Validasi input
         $request->validate([
@@ -158,16 +163,43 @@ class laporanAdmin extends Controller
             'tanggapan' => 'nullable|string',
         ]);
 
-        // Update data
-        $data->update([
+        // Update data laporan
+        $laporan->update([
             'kategori' => $request->kategori,
             'disposisi' => $request->disposisi,
             'status' => $request->status,
             'tanggapan' => $request->tanggapan,
         ]);
 
-        logger('Data berhasil diperbarui:', $data->toArray());
+        // Log keberhasilan
+        logger('Data berhasil diperbarui:', $laporan->toArray());
+
+        // Redirect ke halaman detail dengan pesan sukses
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
+    }
+
+    public function storeAnalis(Request $request, $nomor_tiket)
+    {
+        // dd($request->all());
+        $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Validasi input
+        $request->validate([
+            'lembar_kerja_analis' => 'required|string',
+        ]);
+
+        // Simpan lembar kerja analis
+        $laporan->update([
+            'lembar_kerja_analis' => $request->lembar_kerja_analis,
+            'status_analisis' => 'Pending', // Set status analisis menjadi Pending
+        ]);
+
+        // Log keberhasilan
+        logger('Lembar Kerja Analis:', [
+            'lembar_kerja_analis' => $request->lembar_kerja_analis,
+        ]);
+
+        return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Lembar Kerja Analis berhasil disimpan.');
     }
 
     public function updateNama(Request $request, $nomor_tiket)
@@ -267,5 +299,20 @@ class laporanAdmin extends Controller
 
         // Download file PDF
         return $pdf->download('Bukti_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
+    }
+
+    public function approval(Request $request, $nomorTiket)
+    {
+        $laporan = Laporan::where('nomor_tiket', $nomorTiket)->firstOrFail();
+
+        if ($request->approval_action === 'approved') {
+            $laporan->status_analisis = 'Approved';
+        } elseif ($request->approval_action === 'rejected') {
+            $laporan->status_analisis = 'Rejected';
+        }
+
+        $laporan->save();
+
+        return redirect()->route('admin.laporan.detail', $nomorTiket)->with('success', 'Status analisis berhasil diperbarui!');
     }
 }

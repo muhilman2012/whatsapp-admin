@@ -11,8 +11,11 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithStyles;
 
-class LaporanExport implements WithMapping, ShouldAutoSize, WithColumnFormatting, WithHeadings, FromView
+class LaporanExport implements FromView, WithStyles, WithColumnWidths
 {
     protected $startDate;
     protected $endDate;
@@ -60,22 +63,59 @@ class LaporanExport implements WithMapping, ShouldAutoSize, WithColumnFormatting
         ];
     }
 
-    public function map($laporan): array
+    public function styles(Worksheet $sheet)
+    {
+        // Style untuk header tabel
+        $sheet->getStyle('A1:O1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'color' => ['argb' => 'FFFFFF'], // Warna teks putih
+            ],
+            'fill' => [
+                'fillType' => 'solid',
+                'startColor' => ['argb' => '538DD5'], // Latar belakang biru
+            ],
+            'alignment' => [
+                'horizontal' => 'center', // Pusatkan teks header
+                'vertical' => 'center',
+            ],
+        ]);
+
+        // Style border untuk semua tabel
+        $highestRow = $sheet->getHighestRow();
+        $sheet->getStyle('A1:O' . $highestRow)->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => 'thin',
+                    'color' => ['argb' => '000000'], // Warna border hitam
+                ],
+            ],
+        ]);
+
+        // Tinggi baris default
+        $sheet->getDefaultRowDimension()->setRowHeight(20);
+
+        return $sheet;
+    }
+
+    public function columnWidths(): array
     {
         return [
-            $laporan->created_at ? \Carbon\Carbon::parse($laporan->created_at)->format('d-m-Y') : '-',
-            $laporan->nomor_tiket,
-            $laporan->nama_lengkap,
-            "'".$laporan->nik,
-            "'".$laporan->nomor_pengadu,
-            $laporan->email,
-            $laporan->jenis_kelamin,
-            $laporan->alamat_lengkap,
-            $laporan->tanggal_kejadian ? \Carbon\Carbon::parse($laporan->tanggal_kejadian)->format('d-m-Y') : '-',
-            $laporan->lokasi,
-            $laporan->judul,
-            $laporan->detail,
-            $laporan->dokumen_pendukung
+            'A' => 15, // Nomor Tiket
+            'B' => 20, // Tanggal Pengaduan
+            'C' => 25, // Nama Lengkap
+            'D' => 18, // NIK
+            'E' => 18, // Nomor Pengadu
+            'F' => 30, // Email
+            'G' => 10, // Jenis Kelamin
+            'H' => 40, // Alamat Lengkap
+            'I' => 20, // Tanggal Kejadian
+            'J' => 30, // Lokasi
+            'K' => 35, // Judul
+            'L' => 50, // Detail
+            'M' => 20, // Kategori
+            'N' => 15, // Status
+            'O' => 50, // Tanggapan
         ];
     }
 
@@ -83,13 +123,5 @@ class LaporanExport implements WithMapping, ShouldAutoSize, WithColumnFormatting
     {
         $event->sheet->getStyle('D')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
         $event->sheet->getStyle('E')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
-    }
-
-    public function columnFormats(): array
-    {
-        return [
-            'D' => NumberFormat::FORMAT_TEXT, // Format kolom C (NIK) sebagai teks
-            'E' => NumberFormat::FORMAT_TEXT, // Format kolom C (NIK) sebagai teks
-        ];
     }
 }

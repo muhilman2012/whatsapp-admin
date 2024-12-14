@@ -8,6 +8,8 @@ use App\Models\Laporan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Jobs\ExportPdfJob;
+use Illuminate\Support\Facades\Storage;
 
 class ExportController extends Controller
 {
@@ -58,36 +60,29 @@ class ExportController extends Controller
 
     public function exportPdf()
     {
+        // Retrieve the current admin role and categories they have access to
         $adminRole = auth('admin')->user()->role;
         $kategoriDeputi = Laporan::getKategoriDeputi();
-
         $kategoriKataKunci = Laporan::getKategoriKataKunci();
         $kategori = $adminRole === 'admin'
-            ? array_keys($kategoriKataKunci)
-            : ($kategoriDeputi[$adminRole] ?? []);
+            ? array_keys($kategoriKataKunci) // All categories for admin
+            : ($kategoriDeputi[$adminRole] ?? []); // Categories according to the deputy's role
 
+        // Retrieve all data for the selected categories
         $data = Laporan::whereIn('kategori', $kategori)->get();
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data untuk diekspor.');
         }
 
-        $tanggalExport = now()->format('d-m-Y');
-        $jumlahPengaduan = $data->count();
+        // Generate the file name for the export
+        $fileName = 'rekap_lapor_' . now()->format('d-m-Y') . '.pdf';
 
-        $pdf = PDF::loadView('admin.laporan.export.pdf', [
-            'laporans' => $data,
-            'tanggal' => $tanggalExport,
-            'jumlahPengaduan' => $jumlahPengaduan,
-            ])->setPaper('a4', 'landscape')
-            ->setOptions([
-                'margin-left' => '5mm',
-                'margin-right' => '5mm',
-                'margin-top' => '5mm',
-                'margin-bottom' => '5mm',
-            ]);
+        // Dispatch the export job to the queue
+        ExportPdfJob::dispatch($data, $fileName);
 
-        return $pdf->download('rekap_lapor_' . $tanggalExport . '.pdf');
+        // Redirect the user with a message indicating that the export is in progress
+        return redirect()->back()->with('message', 'Proses ekspor PDF sedang berjalan. File akan diunduh otomatis saat selesai.');
     }
 
     public function exportByDatePdf(Request $request)
@@ -116,17 +111,29 @@ class ExportController extends Controller
             return redirect()->back()->with('error', 'Tidak ada data pada tanggal tersebut.');
         }
 
-        // Data untuk header
-        $tanggalExport = \Carbon\Carbon::parse($tanggal)->format('d-m-Y');
-        $jumlahPengaduan = $data->count();
+        // Tentukan nama file
+        $formattedDate = \Carbon\Carbon::parse($tanggal)->format('d-m-Y');
+        $fileName = 'laporan_tanggal_' . $formattedDate . '.pdf';
 
-        // Generate PDF
-        $pdf = PDF::loadView('admin.laporan.export.pdf', [
-            'laporans' => $data,
-            'tanggal' => $tanggalExport,
-            'jumlahPengaduan' => $jumlahPengaduan,
-        ])->setPaper('a4', 'landscape');
+        // Dispatch job
+        ExportPdfJob::dispatch($data, $fileName);
 
-        return $pdf->download('laporan_tanggal_' . $tanggalExport . '.pdf');
+        // Redirect kembali ke halaman sebelumnya dengan pesan
+        return redirect()->back()->with('message', 'Proses ekspor PDF sedang berjalan. File akan diunduh otomatis ketika selesai.');
+    }
+
+    public function checkExportStatus(Request $request)
+    {
+        $fileName = $request->file_name;
+        $filePath = 'exports/' . $fileName;
+
+        if (\Illuminate\Support\Facades\Storage::exists($filePath)) {
+            return response()->json([
+                'ready' => true,
+                'download_url' => url('storage/' . $filePath),
+            ]);
+        }
+
+        return response()->json(['ready' => false]);
     }
 }

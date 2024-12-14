@@ -38,5 +38,12 @@
                 <td>{{ $laporan->tanggapan }}</td>
             </tr>
         @endforeach
+
+        <!-- Tabel Kosong -->
+        @for ($i = 0; $i < 5; $i++)
+            <tr>
+                <td colspan="15">&nbsp;</td>
+            </tr>
+        @endfor
     </tbody>
 </table>

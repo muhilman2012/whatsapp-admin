@@ -30,6 +30,9 @@ class Laporan extends Model
         'kategori',
         'disposisi',
         'sumber_pengaduan',
+        'lembar_kerja_analis',
+        'created_at',
+        'updated_at',
     ];
 
     // public $timestamps = false;  Nonaktifkan timestamps otomatis

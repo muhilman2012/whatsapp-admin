@@ -94,6 +94,28 @@
         </div>
     </div>
 
+    <div class="d-block rounded bg-white shadow mb-3 p-5">
+    @if (auth()->user()->role === 'analis')
+        <form action="{{ route('admin.laporan.analis.store', $data->nomor_tiket) }}" method="post">
+            @csrf
+            <!-- Status Analisis -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Status Analisis</label>
+                <p>{{ $data->status_analisis }}</p>
+            </div>
+            <!-- Input Lembar Kerja Analis -->
+            <div class="mb-3">
+                <label for="lembar_kerja_analis" class="form-label fw-bold">Lembar Kerja Analis</label>
+                <textarea name="lembar_kerja_analis" id="lembar_kerja_analis" rows="6" class="form-control">{{ old('lembar_kerja_analis', $data->lembar_kerja_analis) }}</textarea>
+            </div>
+
+            <!-- Tombol Submit -->
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Simpan Lembar Kerja</button>
+            </div>
+        </form>
+    @endif
+    </div>
     <!-- Bagian Form Edit -->
     <div class="d-block rounded bg-white shadow p-5">
         <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">
@@ -142,7 +164,7 @@
 
             <!-- Input Tanggapan -->
             <div class="mb-3">
-                <label for="tanggapan" class="form-label fw-bold">Tanggapan</label>
+                <label for="tanggapan" class="form-label fw-bold">Tanggapan <small>(Tanggapan ini dapat dilihat oleh Pengadu)</small></label>
                 <textarea name="tanggapan" id="tanggapan" rows="6" class="form-control">{{ old('tanggapan', $data->tanggapan) }}</textarea>
             </div>
 

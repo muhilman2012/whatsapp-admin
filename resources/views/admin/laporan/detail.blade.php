@@ -70,12 +70,29 @@
                     @endif
                 </div>
                 <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Status:</p>
+                    <p class="text-label fw-bold mb-1">Status Laporan:</p>
                     <p>{{ $data->status }}</p>
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Tanggapan:</p>
                     <p>{{ $data->tanggapan ?? 'Belum ada tanggapan' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="text-label fw-bold mb-1">Status Analisis:</p>
+                    <p>{{ $data->status_analisis }}</p>
+
+                    @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
+                        <form action="{{ route('admin.laporan.approval', $data->nomor_tiket) }}" method="post" class="d-inline">
+                            @csrf
+                            @method('put')
+                            <button type="submit" name="approval_action" value="approved" class="btn btn-success">Setujui Analisis</button>
+                            <button type="submit" name="approval_action" value="rejected" class="btn btn-danger">Revisi Analisis</button>
+                        </form>
+                    @endif
+                </div>
+                <div class="col-md-6">
+                    <p class="text-label fw-bold mb-1">Analisis dari JF:</p>
+                    <p>{{ $data->lembar_kerja_analis ?? 'Belum ada analisis' }}</p>
                 </div>
             </div>
             <a href="{{ route('admin.laporan') }}" class="btn btn-secondary mt-3">Kembali ke Data Pengaduan</a>

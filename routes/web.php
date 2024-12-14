@@ -40,9 +40,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/dashboard/laporan/{nomor_tiket}', [laporanAdmin::class, 'show'])->name('admin.laporan.detail');
         Route::get('/dashboard/laporan/edit/{nomor_tiket}', [laporanAdmin::class, 'edit'])->name('admin.laporan.edit');
         Route::put('/dashboard/laporan/update/{nomor_tiket}', [laporanAdmin::class, 'update'])->name('admin.laporan.update');
+        Route::post('/dashboard/laporan/update/{nomor_tiket}/analis', [laporanAdmin::class, 'storeAnalis'])->name('admin.laporan.analis.store');
         Route::post('/dashboard/laporan/upload/editor', [laporanAdmin::class, 'editor'])->name('admin.laporan.upload.editor');
         Route::put('/admin/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');
         Route::get('/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
+        Route::put('/laporan/{nomorTiket}/approval', [laporanAdmin::class, 'approval'])->name('admin.laporan.approval');
 
         // Assign to Analis
         Route::post('/dashboard/laporan/assign', [laporanAdmin::class, 'assignToAnalis'])->name('admin.laporan.assign');
@@ -55,7 +57,23 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/admin/export-all', [ExportController::class, 'exportAll'])->name('admin.laporan.export.all');
         Route::get('/admin/export/pdf', [ExportController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
         Route::get('/admin/export/tanggal/pdf', [ExportController::class, 'exportByDatePdf'])->name('admin.laporan.export.tanggal.pdf');
+        Route::get('/admin/export/kategori', [ExportController::class, 'exportByKategori'])->name('admin.laporan.export.kategori');
         Route::post('/admin/laporan/import', [ImportController::class, 'import'])->name('admin.laporan.import');
+        Route::get('/admin/check-export-status', function () {
+            $fileName = 'rekap_lapor_' . now()->format('d-m-Y') . '.pdf'; // File name format
+        
+            $filePath = storage_path('app/public/exports/' . $fileName);
+        
+            if (file_exists($filePath)) {
+                return response()->json([
+                    'status' => 'complete',
+                    'download_url' => url('storage/exports/' . $fileName),
+                    'file_name' => $fileName,
+                ]);
+            }
+        
+            return response()->json(['status' => 'in_progress']);
+        });
     });
 
     // Logout
