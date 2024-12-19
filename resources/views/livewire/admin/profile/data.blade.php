@@ -51,7 +51,7 @@
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input wire:model='username' type="text" class="form-control disabled" id="username" disabled>
+                            <input wire:model='username' type="text" class="form-control" id="username" @if ($edit==false) disabled @endif>
                         </div>
                         <div class="mb-3">
                             <label for="jabatan" class="form-label">Jabatan</label>
@@ -60,8 +60,8 @@
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label for="nama" class="form-label">Nama Lengkap</label>
-                            <input wire:model='nama' type="text" id="nama" class="form-control" @if ($edit==false) disabled @endif>
+                            <label for="email" class="form-label">Email</label>
+                            <input wire:model='email' type="text" id="email" class="form-control" @if ($edit==false) disabled @endif>
                         </div>
                         <div class="mb-3">
                             <label for="unit" class="form-label">Unit</label>
