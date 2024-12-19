@@ -74,6 +74,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         
             return response()->json(['status' => 'in_progress']);
         });
+        Route::get('/admin/export-filtered/excel', [ExportController::class, 'exportFilteredData'])->name('admin.laporan.export.filtered.excel');
+        Route::get('/admin/export-filtered/pdf', [ExportController::class, 'exportFilteredPdf'])->name('admin.laporan.export.filtered.pdf');
     });
 
     // Logout

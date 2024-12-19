@@ -41,7 +41,7 @@
                         <li><button wire:click='edit' class="dropdown-item" href="#">Edit</button></li>
                         @else
                         <li><button wire:click='save' class="dropdown-item" href="#">Simpan Perubahan</button></li>
-                        <li><button wire:click='cancle' class="dropdown-item" href="#">Batalkan Perubahan</button></li>
+                        <li><button wire:click='cancel' class="dropdown-item" href="#">Batalkan Perubahan</button></li>
                         @endif
                     </ul>
                 </div>
@@ -51,34 +51,27 @@
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input wire:model='username' type="text" class="form-control" @if ($edit==false) disabled
-                                @endif>
+                            <input wire:model='username' type="text" class="form-control disabled" id="username" disabled>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input wire:model='email' type="email" id="emial" class="form-control disabled" disabled>
+                            <label for="jabatan" class="form-label">Jabatan</label>
+                            <input wire:model='jabatan' type="text" id="jabatan" class="form-control" @if ($edit==false) disabled @endif>
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label for="phone" class="form-label">Phone</label>
-                            <div class="input-group">
-                                <span class="btn border border-right-0" id="basic-addon1">+62</span>
-                                <input wire:model='phone' type="text" id="phone" class="form-control"
-                                    placeholder="phone" @if ($edit==false) disabled @endif>
-                            </div>
+                            <label for="nama" class="form-label">Nama Lengkap</label>
+                            <input wire:model='nama' type="text" id="nama" class="form-control" @if ($edit==false) disabled @endif>
                         </div>
                         <div class="mb-3">
-                            <label for="born" class="form-label">Born</label>
-                            <input wire:model='born' type="date" id="born" class="form-control" @if ($edit==false)
-                                disabled @endif>
+                            <label for="unit" class="form-label">Unit</label>
+                            <input wire:model='unit' type="text" id="unit" class="form-control" @if ($edit==false) disabled @endif>
                         </div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="address" class="form-label">Alamat</label>
-                    <textarea wire:model='address' name="address" id="address" class="form-control" rows="3"
-                        @if($edit==false) disabled @endif></textarea>
+                    <label for="deputi" class="form-label">Deputi</label>
+                    <input wire:model='deputi' type="text" id="deputi" class="form-control" @if ($edit==false) disabled @endif>
                 </div>
             </div>
         </div>

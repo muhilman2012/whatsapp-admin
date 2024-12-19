@@ -24,6 +24,7 @@ class admins extends Authenticatable
      */
     protected $fillable = [
         'username',
+        'nama',
         'email',
         'password',
         'phone',
@@ -32,6 +33,9 @@ class admins extends Authenticatable
         'avatar',
         'address',
         'role',
+        'jabatan',
+        'deputi',
+        'unit',
         'created_at',
         'updated_at',
     ];

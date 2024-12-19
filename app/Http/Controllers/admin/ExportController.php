@@ -136,4 +136,110 @@ class ExportController extends Controller
 
         return response()->json(['ready' => false]);
     }
+
+    public function exportFilteredData(Request $request)
+    {
+        // Ambil user yang sedang login
+        $user = auth()->guard('admin')->user();
+
+        // Query data berdasarkan filter
+        $data = Laporan::query();
+
+        // Filter berdasarkan role pengguna
+        if ($user->role === 'analis') {
+            $data->whereHas('assignment', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins);
+            });
+        } elseif ($user->role !== 'admin') {
+            $data->where(function ($query) use ($user) {
+                $query->where('disposisi', $user->role)
+                    ->orWhere('disposisi_terbaru', $user->role);
+            });
+        }
+
+        // Filter berdasarkan kategori
+        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
+            $data->where('kategori', $request->filterKategori);
+        }
+
+        // Filter berdasarkan status
+        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
+            $data->where('status', $request->filterStatus);
+        }
+
+        // Filter berdasarkan pencarian
+        if ($request->has('search') && !empty($request->search)) {
+            $data->where(function ($query) use ($request) {
+                $query->where('nomor_tiket', 'like', '%' . $request->search . '%')
+                    ->orWhere('nama_lengkap', 'like', '%' . $request->search . '%')
+                    ->orWhere('nik', 'like', '%' . $request->search . '%')
+                    ->orWhere('status', 'like', '%' . $request->search . '%')
+                    ->orWhere('judul', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $data = $data->get();
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
+        }
+
+        return Excel::download(new LaporanExport($data), 'laporan_filtered.xlsx');
+    }
+
+    public function exportFilteredPdf(Request $request)
+    {
+        // Ambil user yang sedang login
+        $user = auth()->guard('admin')->user();
+
+        // Query data berdasarkan filter
+        $data = Laporan::query();
+
+        // Filter berdasarkan role pengguna
+        if ($user->role === 'analis') {
+            $data->whereHas('assignment', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins);
+            });
+        } elseif ($user->role !== 'admin') {
+            $data->where(function ($query) use ($user) {
+                $query->where('disposisi', $user->role)
+                    ->orWhere('disposisi_terbaru', $user->role);
+            });
+        }
+
+        // Filter berdasarkan kategori
+        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
+            $data->where('kategori', $request->filterKategori);
+        }
+
+        // Filter berdasarkan status
+        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
+            $data->where('status', $request->filterStatus);
+        }
+
+        // Filter berdasarkan pencarian
+        if ($request->has('search') && !empty($request->search)) {
+            $data->where(function ($query) use ($request) {
+                $query->where('nomor_tiket', 'like', '%' . $request->search . '%')
+                    ->orWhere('nama_lengkap', 'like', '%' . $request->search . '%')
+                    ->orWhere('nik', 'like', '%' . $request->search . '%')
+                    ->orWhere('status', 'like', '%' . $request->search . '%')
+                    ->orWhere('judul', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $data = $data->get();
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
+        }
+
+        // Tentukan nama file
+        $fileName = 'laporan_filtered_' . now()->format('d-m-Y') . '.pdf';
+
+        // Dispatch job untuk membuat PDF
+        ExportPdfJob::dispatch($data, $fileName);
+
+        return redirect()->back()->with('message', 'Proses ekspor PDF sedang berjalan. File akan diunduh otomatis ketika selesai.');
+    }
 }

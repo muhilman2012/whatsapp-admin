@@ -233,4 +233,54 @@ class Data extends Component
         session()->flash('success', 'Pelimpahan berhasil dilakukan.');
         $this->dispatchBrowserEvent('closeModal', ['modalId' => 'pelimpahanModal']);
     }
+
+    public function getFilteredData()
+    {
+        $user = auth()->guard('admin')->user();
+
+        $data = Laporan::query()
+            ->with(['assignment.assignedTo', 'assignment.assignedBy']);
+
+        // Filter berdasarkan role pengguna
+        if ($user->role === 'analis') {
+            $data->whereHas('assignment', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins);
+            });
+        } elseif ($user->role !== 'admin') {
+            $data->where(function ($query) use ($user) {
+                $query->where('disposisi', $user->role)
+                    ->orWhere('disposisi_terbaru', $user->role);
+            });
+        }
+
+        // Pencarian berdasarkan kolom tertentu
+        if (!empty($this->search)) {
+            $data->where(function ($query) {
+                $query->where('nomor_tiket', 'like', '%' . $this->search . '%')
+                    ->orWhere('nama_lengkap', 'like', '%' . $this->search . '%')
+                    ->orWhere('nik', 'like', '%' . $this->search . '%')
+                    ->orWhere('status', 'like', '%' . $this->search . '%')
+                    ->orWhere('judul', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Filter berdasarkan kategori
+        if (!empty($this->filterKategori)) {
+            $data->where('kategori', $this->filterKategori);
+        }
+
+        // Filter berdasarkan status
+        if (!empty($this->filterStatus)) {
+            $data->where('status', $this->filterStatus);
+        }
+
+        // Filter berdasarkan status assignment
+        if ($this->filterAssignment === 'unassigned') {
+            $data->doesntHave('assignment');
+        } elseif ($this->filterAssignment === 'assigned') {
+            $data->has('assignment');
+        }
+
+        return $data->orderBy($this->sortField, $this->sortDirection)->get();
+    }
 }

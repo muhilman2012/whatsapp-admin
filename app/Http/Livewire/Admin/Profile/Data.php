@@ -9,7 +9,7 @@ use Livewire\WithFileUploads;
 class Data extends Component
 {
     use WithFileUploads;
-    public $id_admins, $username, $email, $phone, $born, $address, $avatar;
+    public $id_admins, $nama, $role, $jabatan, $deputi, $unit, $username, $email,  $avatar;
     public $images;
     public $edit = false;
 
@@ -27,10 +27,15 @@ class Data extends Component
     {
         $this->id_admins = auth('admin')->user()->id_admins;
         $this->username = auth('admin')->user()->username;
+        $this->nama = auth('admin')->user()->nama;
         $this->email = auth('admin')->user()->email;
         $this->phone = auth('admin')->user()->phone;
         $this->born = auth('admin')->user()->born;
         $this->address = auth('admin')->user()->address;
+        $this->role = auth('admin')->user()->role;
+        $this->jabatan = auth('admin')->user()->jabatan;
+        $this->deputi = auth('admin')->user()->deputi;
+        $this->unit = auth('admin')->user()->unit;
         $this->avatar = auth('admin')->user()->avatar;
     }
 
@@ -39,13 +44,18 @@ class Data extends Component
         $this->edit = true;
     }
 
-    public function cancle()
+    public function cancel()
     {
         $this->username = auth('admin')->user()->username;
+        $this->nama = auth('admin')->user()->nama;
         $this->email = auth('admin')->user()->email;
         $this->phone = auth('admin')->user()->phone;
         $this->born = auth('admin')->user()->born;
         $this->address = auth('admin')->user()->address;
+        $this->role = auth('admin')->user()->role;
+        $this->jabatan = auth('admin')->user()->jabatan;
+        $this->deputi = auth('admin')->user()->deputi;
+        $this->unit = auth('admin')->user()->unit;
         $this->avatar = auth('admin')->user()->avatar;
         $this->edit = false;
     }
@@ -55,16 +65,21 @@ class Data extends Component
         $this->validate();
         $data = admins::find($this->id_admins);
         $data->username = $this->username;
+        $data->nama = $this->nama;
         $data->phone = $this->phone;
         $data->born = $this->born;
         $data->address = $this->address;
+        $data->role = $this->role;
+        $data->jabatan = $this->jabatan;
+        $data->deputi = $this->deputi;
+        $data->unit = $this->unit;
         $data->avatar = $this->avatar;
         if ($data->save()) {
             $this->edit = false;
-            $this->dispatchBrowserEvent('success', 'Data berhasil diperbaharui!');
+            $this->dispatchBrowserEvent('success', 'Data berhasil diperbarui!');
         } else {
             $this->edit = false;
-            $this->dispatchBrowserEvent('errors', 'Database Error, data Gagal terupdate!!!');
+            $this->dispatchBrowserEvent('errors', 'Database Error, data Gagal terupdate!');
         }
     }
 

@@ -37,20 +37,25 @@
                 </div>
             </form>
 
-            <!-- Bagian Export All Data -->
             <div class="ms-2">
                 <div class="dropdown">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        Export All Data
+                    <button class="btn btn-success dropdown-toggle" type="button" id="exportFilteredDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export Filtered Data
                     </button>
-                    <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+                    <ul class="dropdown-menu" aria-labelledby="exportFilteredDropdown">
                         <li>
-                            <form action="{{ route('admin.laporan.export.all') }}" method="GET">
+                            <form action="{{ route('admin.laporan.export.filtered.excel') }}" method="GET">
+                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
+                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
+                                <input type="hidden" name="search" value="{{ $search }}">
                                 <button type="submit" class="dropdown-item">Export to Excel</button>
                             </form>
                         </li>
                         <li>
-                            <form action="{{ route('admin.laporan.export.pdf') }}" method="GET">
+                            <form action="{{ route('admin.laporan.export.filtered.pdf') }}" method="GET">
+                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
+                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
+                                <input type="hidden" name="search" value="{{ $search }}">
                                 <button type="submit" class="dropdown-item">Export to PDF</button>
                             </form>
                         </li>

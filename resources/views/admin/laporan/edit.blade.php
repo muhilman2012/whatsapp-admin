@@ -155,7 +155,7 @@
                 <label for="status" class="form-label fw-bold">Status</label>
                 <select name="status" id="status" class="form-control select2">
                     <option value="" selected>Pilih Status</option>
-                    <option value="Tidak dapat diproses lebih lanjut" {{ $data->status === 'Tidak dapat diproses lebih lanjut' ? 'selected' : '' }}>Tidak dapat diproses lebih lanjut</option>
+                    <option value="Belum dapat diproses lebih lanjut" {{ $data->status === 'Belum dapat diproses lebih lanjut' ? 'selected' : '' }}>Belum dapat diproses lebih lanjut</option>
                     <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang" {{ $data->status === 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' ? 'selected' : '' }}>Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang</option>
                     <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut" {{ $data->status === 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' ? 'selected' : '' }}>Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut</option>
                     <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
