@@ -66,6 +66,7 @@ class Data extends Component
         $data = admins::find($this->id_admins);
         $data->username = $this->username;
         $data->nama = $this->nama;
+        $data->email = $this->email;
         $data->phone = $this->phone;
         $data->born = $this->born;
         $data->address = $this->address;
