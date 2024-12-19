@@ -171,12 +171,7 @@
             <div class="d-flex justify-content-between align-items-center my-3">
                 <!-- Tombol Kembali ke Detail Pengaduan -->
                 <div>
-                    <a href="{{ route('admin.laporan.detail', $data->nomor_tiket) }}" class="btn btn-secondary me-2">
-                        Kembali ke Detail Pengaduan
-                    </a>
-                    <a href="{{ route('admin.laporan') }}" class="btn btn-secondary">
-                        Kembali ke Data Pengaduan
-                    </a>
+                    <button class="btn btn-secondary form-control" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
                 </div>
                 <!-- Tombol Update -->
                 <div>

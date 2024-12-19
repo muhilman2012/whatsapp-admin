@@ -95,7 +95,7 @@
                     <p>{{ $data->lembar_kerja_analis ?? 'Belum ada analisis' }}</p>
                 </div>
             </div>
-            <a href="{{ route('admin.laporan') }}" class="btn btn-secondary mt-3">Kembali ke Data Pengaduan</a>
+            <button class="btn btn-secondary mt-3" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
             <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Update Pengaduan</a>
         </div>
     </div>

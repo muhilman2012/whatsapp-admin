@@ -54,7 +54,7 @@
                                     height="64px">
                                 @endif
                                 <div class="d-block mt-1">
-                                    <p class="fw-bold m-0 lh-1">{{auth('admin')->user()->username}}</p>
+                                    <p class="fw-bold m-0 lh-1">{{auth('admin')->user()->nama}}</p>
                                     <small>{{auth('admin')->user()->email}}</small>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
                         alt="{{auth('admin')->user()->username}}" class="slider-img-user mb-2" width="64px"
                         height="64px">
                     @endif
-                    <p class="fw-bold mb-0 lh-1 text-white">{{auth('admin')->user()->username}}</p>
+                    <p class="fw-bold mb-0 lh-1 text-white">{{auth('admin')->user()->nama}}</p>
                     <small class="text-white">{{auth('admin')->user()->email}}</small>
                 </div>
             </div>
@@ -96,8 +96,7 @@
                         <i class="fas fa-user box-icon" aria-hidden="true"></i>Profile
                     </a>
                     <hr class="soft my-1 text-white">
-                    <a class="nav-link collapsed" href="#laporan" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#laporan">
+                    <a class="nav-link collapse" href="#laporan" type="button" data-bs-toggle="collapse" data-bs-target="#laporan">
                         <i class="fas fa-newspaper box-icon"></i>Kelola Pengaduan
                         <span class="indications">
                             <i class="fas fa-angle-up fa-sm fa-fw"></i>
@@ -146,7 +145,6 @@
     <script src="{{ asset('/assets/owl/owl.carousel.min.js') }}"></script>
     @livewireScripts
     @yield('script')
-
     @if(session()->has('success'))
     <script>
         Swal.fire({

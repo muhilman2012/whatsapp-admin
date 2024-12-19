@@ -43,7 +43,7 @@
         <div class="d-flex flex-column flex-md-row bg-white p-3 mb-3">
             <div>
                 <p class="fs-4 fw-bold mb-0">Dashboard LaporMasWapres!</p>
-                <p class="mb-0">Halo, {{auth('admin')->user()->username}} </p>
+                <p class="mb-0">Halo, {{auth('admin')->user()->nama}} </p>
             </div>
         </div>
         <div class="d-block mb-3">
