@@ -66,7 +66,7 @@ class indexAdmin extends Controller
 
         // Definisikan status secara eksplisit
         $allStatuses = [
-            'Tidak dapat diproses lebih lanjut',
+            'Belum dapat diproses lebih lanjut',
             'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang',
             'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut',
             'Proses verifikasi dan telaah'
@@ -83,7 +83,7 @@ class indexAdmin extends Controller
 
         // Label singkat untuk status
         $shortLabels = [
-            'Tidak dapat diproses lebih lanjut' => 'Tidak Diproses',
+            'Belum dapat diproses lebih lanjut' => 'Tidak Diproses',
             'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' => 'Pemantauan',
             'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' => 'Tindak Lanjut K/L',
             'Proses verifikasi dan telaah' => 'Verifikasi'
