@@ -31,6 +31,9 @@ class admins extends Authenticatable
         'country',
         'avatar',
         'address',
+        'role',
+        'created_at',
+        'updated_at',
     ];
 
     /**

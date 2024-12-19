@@ -22,15 +22,44 @@ class laporanAdmin extends Controller
         $kategoriDeputi = [
             'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan'],
             'deputi_2' => ['Agama', 'Corona Virus', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Penanggulangan Bencana', 'Ketenagakerjaan', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Daerah Perbatasan', 'Kepemudaan dan Olahraga', 'Keluarga Berencana'],
-            'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat','Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan', 'Pelayanan Publik', 'TNI/Polri'],
+            'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan', 'Pelayanan Publik', 'TNI/Polri'],
             'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
         ];
 
-        // Ambil kategori sesuai role
+        // Ambil kategori sesuai role pengguna
         $kategori = $kategoriDeputi[$userRole] ?? [];
 
-        // Query data
+        // Ambil parameter `type` untuk menentukan jenis laporan
+        $type = $request->query('type', 'all'); // Default ke `all`
+        $validTypes = ['all', 'pelimpahan', 'pending', 'rejected', 'approved'];
+
+        if (!in_array($type, $validTypes)) {
+            abort(404, 'Halaman tidak ditemukan.');
+        }
+
+        // Judul halaman berdasarkan `type`
+        $pageTitle = match ($type) {
+            'pelimpahan' => 'Laporan Pelimpahan',
+            'pending' => 'Laporan Pending',
+            'rejected' => 'Laporan Rejected',
+            'approved' => 'Laporan Approved',
+            'all' => 'Semua Data Laporan',
+        };
+
+        // Query data berdasarkan tipe laporan
         $data = Laporan::query()
+            ->when($type === 'pelimpahan', function ($query) {
+                $query->whereNotNull('disposisi_terbaru'); // Pelimpahan
+            })
+            ->when($type === 'pending', function ($query) {
+                $query->where('status_analisis', 'Pending'); // Rejected
+            })
+            ->when($type === 'rejected', function ($query) {
+                $query->where('status_analisis', 'Rejected'); // Rejected
+            })
+            ->when($type === 'approved', function ($query) {
+                $query->where('status_analisis', 'Approved'); // Approved
+            })
             ->when($request->filterKategori, function ($query) use ($request) {
                 $query->where('kategori', $request->filterKategori);
             })
@@ -43,11 +72,13 @@ class laporanAdmin extends Controller
                         ->orWhere('judul', 'like', '%' . $request->search . '%');
                 });
             })
-            ->whereIn('kategori', $kategori) // Filter kategori berdasarkan Deputi
+            ->when($type === 'all' && $userRole !== 'admin', function ($query) use ($kategori) {
+                $query->whereIn('kategori', $kategori); // Semua data sesuai role deputi
+            })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('admin.laporan.data', compact('data', 'kategori'));
+        return view('admin.laporan.data', compact('data', 'kategori', 'type', 'pageTitle'));
     }
 
     public function create()

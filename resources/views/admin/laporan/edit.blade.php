@@ -94,8 +94,8 @@
         </div>
     </div>
 
-    <div class="d-block rounded bg-white shadow mb-3 p-5">
     @if (auth()->user()->role === 'analis')
+    <div class="d-block rounded bg-white shadow mb-3 p-5">
         <form action="{{ route('admin.laporan.analis.store', $data->nomor_tiket) }}" method="post">
             @csrf
             <!-- Status Analisis -->
@@ -114,8 +114,8 @@
                 <button type="submit" class="btn btn-success">Simpan Lembar Kerja</button>
             </div>
         </form>
-    @endif
     </div>
+    @endif
     <!-- Bagian Form Edit -->
     <div class="d-block rounded bg-white shadow p-5">
         <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">

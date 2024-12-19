@@ -25,7 +25,7 @@ class Data extends Component
     public $selectedAnalis = null; // ID Analis yang dipilih
     public $assignNotes; // Catatan untuk analis
     public $filterAssignment = ''; // Properti untuk menyimpan filter
-
+    public $filterStatus = ''; // Untuk filter status
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -102,7 +102,10 @@ class Data extends Component
             });
         } elseif ($user->role !== 'admin') {
             // Jika bukan admin, filter berdasarkan disposisi
-            $data->where('disposisi', $user->role);
+            $data->where(function ($query) use ($user) {
+                $query->where('disposisi', $user->role)
+                      ->orWhere('disposisi_terbaru', $user->role);
+            });
         }
 
         // Pencarian berdasarkan kolom tertentu
@@ -119,6 +122,11 @@ class Data extends Component
         // Filter berdasarkan kategori yang dipilih
         if (!empty($this->filterKategori)) {
             $data->where('kategori', $this->filterKategori);
+        }
+
+        // Filter berdasarkan status
+        if (!empty($this->filterStatus)) {
+            $data->where('status', $this->filterStatus);
         }
 
         // Filter berdasarkan status assignment
@@ -206,5 +214,23 @@ class Data extends Component
         } else {
             session()->flash('error', 'Pilih analis dan data terlebih dahulu.');
         }
+    }
+
+    // Logika untuk pelimpahan data
+    public function pelimpahan()
+    {
+        if (empty($this->selected) || empty($this->selectedDisposisi)) {
+            session()->flash('error', 'Pilih data dan disposisi baru terlebih dahulu.');
+            return;
+        }
+
+        Laporan::whereIn('id', $this->selected)->update([
+            'disposisi_terbaru' => $this->selectedDisposisi,
+            'disposisi' => null, // Hilangkan dari disposisi sebelumnya
+        ]);
+
+        $this->reset(['selected', 'selectedDisposisi']);
+        session()->flash('success', 'Pelimpahan berhasil dilakukan.');
+        $this->dispatchBrowserEvent('closeModal', ['modalId' => 'pelimpahanModal']);
     }
 }

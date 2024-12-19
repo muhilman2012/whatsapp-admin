@@ -54,7 +54,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $totalLaporan }}</p>
+                                <p class="card-title mb-0">Whatsapp: {{ $whatsapp }}</p>
+                                <p class="card-title mb-0">Tatap Muka: {{ $tatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -107,7 +108,9 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
+                @if(auth('admin')->user()->role === 'admin')
                 <!-- Jumlah Aduan yang Terdisposisi -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
@@ -163,8 +166,8 @@
                         </div>
                     </div>
                 </div>
-                @endif
 
+                <!-- Bar Chart Laporan Harian -->
                 <div class="col-6">
                     <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
                         <canvas id="laporanHarianChart"></canvas>
@@ -185,6 +188,62 @@
                         <canvas id="kategoriChart"></canvas>
                     </div>
                 </div>
+                @endif
+
+                @if (in_array(auth('admin')->user()->role, ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                <!-- Jumlah Aduan yang Terdisposisi -->
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-check-circle fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">0</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Terdisposisi</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- Jumlah Aduan yang Belum Terdisposisi -->
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fa fa-exclamation fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title fs-2 mb-0">0</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Belum Terdisposisi</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bar Chart Laporan Harian -->
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
+                        <canvas id="laporanHarianChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pie Chart Status untuk Deputi -->
+                <div class="col-6">
+                    <div class="card border-0 shadow-sm p-3 align-items-center">
+                        <div class="pie-container">
+                            <canvas id="statusPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm p-3">
+                        <canvas id="kategoriChart"></canvas>
+                    </div>
+                </div>
+                @endif
+
+                @if(auth('admin')->user()->role === 'admin')
                 <div class="col-6">
                     <!-- Chart Provinsi -->
                     <div class="card border-0 shadow-sm p-3 mb-3">
@@ -197,6 +256,9 @@
                         <canvas id="judulChart"></canvas>
                     </div>
                 </div>
+                @endif
+
+                @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                 <div class="col-12">
                     <div class="card border-0 shadow-sm p-3">
                         <p class="fs-4 fw-bold mb-0">Jumlah Laporan Berdasarkan Kategori</p>
@@ -219,6 +281,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

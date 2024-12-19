@@ -1,5 +1,5 @@
 <div>
-@if (session('success'))
+    @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
@@ -60,6 +60,16 @@
         </div>
         <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
         <div class="d-flex align-items-center">
+            <!-- Filter Status -->
+            <div class="ms-2">
+                <select wire:model="filterStatus" class="form-select">
+                    <option value="">-- Semua Status --</option>
+                    <option value="Tidak dapat diproses lebih lanjut">Tidak Diproses</option>
+                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang">Pemantauan</option>
+                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
+                    <option value="Proses verifikasi dan telaah">Verifikasi</option>
+                </select>
+            </div>
             @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
             <div class="ms-2">
                 <select wire:model="filterAssignment" class="form-select">
@@ -138,7 +148,7 @@
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->disposisi, 10) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($item->disposisi_terbaru ?? $item->disposisi, 10) }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
                     <td class="text-nowrap">
@@ -173,6 +183,9 @@
         @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#assignModal">
                 Assign to Analis
+            </button>
+            <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#pelimpahanModal">
+                Limpahkan
             </button>
         @endif
         @endif
@@ -279,6 +292,31 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-primary">Assign</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pelimpahanModal" tabindex="-1" aria-labelledby="pelimpahanModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <form wire:submit.prevent="pelimpahan">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="pelimpahanModalLabel">Pelimpahan Data</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <select wire:model="selectedDisposisi" class="form-control">
+                            <option value="">Pilih Deputi Baru</option>
+                            @foreach ($namaDeputi as $key => $value)
+                                <option value="{{ $key }}">{{ $value }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Pelimpahan</button>
                     </div>
                 </div>
             </form>

@@ -20,4 +20,9 @@ class Assignment extends Model
         // Menghubungkan dengan tabel admins menggunakan kolom 'assigned_by'
         return $this->belongsTo(admins::class, 'assigned_by');
     }
+
+    public function laporan()
+    {
+        return $this->belongsTo(Laporan::class, 'laporan_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
+use App\Models\Assignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,10 +28,25 @@ class indexAdmin extends Controller
 
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
-        if ($admin->role !== 'admin') {
-            $totalLaporanQuery->whereIn('kategori', $kategori)->where('disposisi', $admin->role);
+        // Jika pengguna adalah admin, hitung semua laporan
+        if ($admin->role === 'admin') {
+            $totalLaporan = $totalLaporanQuery->count();
+        } elseif ($admin->role === 'analis') {
+            // Jika pengguna adalah analis, hitung laporan yang di-assign ke mereka
+            $totalLaporan = $totalLaporanQuery->whereHas('assignment', function ($query) use ($admin) {
+                $query->where('analis_id', $admin->id_admins); // Filter berdasarkan analis yang login
+            })->count();
+        } else {
+            // Jika pengguna adalah deputi atau role lainnya
+            $totalLaporan = $totalLaporanQuery->where('disposisi', $admin->role)->count();
         }
-        $totalLaporan = $totalLaporanQuery->count();
+
+        //Hitung laporan whatsapp dan tatap muka
+        $whatsappQuery = clone $totalLaporanQuery;
+        $whatsapp = $whatsappQuery->where('sumber_pengaduan', 'whatsapp')->count();
+
+        $tatapMukaQuery = clone $totalLaporanQuery;
+        $tatapMuka = $tatapMukaQuery->where('sumber_pengaduan', 'tatap muka')->count();
 
         // Hitung laporan laki-laki dan perempuan
         $lakiLakiQuery = clone $totalLaporanQuery;
@@ -118,6 +134,8 @@ class indexAdmin extends Controller
 
         return view('admin.index', [
             'totalLaporan' => $totalLaporan,
+            'whatsapp' => $whatsapp,
+            'tatapMuka' => $tatapMuka,
             'lakiLaki' => $lakiLaki,
             'perempuan' => $perempuan,
             'totalTerdisposisi' => $totalTerdisposisi,

@@ -98,17 +98,29 @@
                     <hr class="soft my-1 text-white">
                     <a class="nav-link collapsed" href="#laporan" type="button" data-bs-toggle="collapse"
                         data-bs-target="#laporan">
-                        <i class="fas fa-newspaper box-icon"></i>Laporan Pengaduan
+                        <i class="fas fa-newspaper box-icon"></i>Kelola Pengaduan
                         <span class="indications">
                             <i class="fas fa-angle-up fa-sm fa-fw"></i>
                         </span>
                     </a>
                     <div id="laporan" class="accordion-collapse collapse" data-bs-parent="#nav-accordion">
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan') }}">
-                            <i class="fas fa-newspaper box-icon text-center"></i>Data Pengaduan
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'all']) }}">
+                            <i class="fas fa-newspaper box-icon text-center"></i>Semua Pengaduan
                         </a>
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan.create') }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Form Pengaduan
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Input Pengaduan
+                        </a>
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
+                        </a>
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Laporan Pending
+                        </a>
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'rejected']) }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Laporan Revised
+                        </a>
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'approved']) }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Laporan Approved
                         </a>
                     </div>
                     <hr class="soft my-1 text-white">
