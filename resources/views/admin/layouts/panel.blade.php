@@ -54,7 +54,7 @@
                                     height="64px">
                                 @endif
                                 <div class="d-block mt-1">
-                                    <p class="fw-bold m-0 lh-1">{{auth('admin')->user()->nama}}</p>
+                                    <p class="fw-bold m-0 lh-1">{{auth('admin')->user()->username}}</p>
                                     <small>{{auth('admin')->user()->email}}</small>
                                 </div>
                             </div>
