@@ -83,7 +83,7 @@
                         alt="{{auth('admin')->user()->username}}" class="slider-img-user mb-2" width="64px"
                         height="64px">
                     @endif
-                    <p class="fw-bold mb-0 lh-1 text-white">{{auth('admin')->user()->nama}}</p>
+                    <p class="fw-bold mb-0 lh-1 text-white">{{auth('admin')->user()->username}}</p>
                     <small class="text-white">{{auth('admin')->user()->email}}</small>
                 </div>
             </div>
