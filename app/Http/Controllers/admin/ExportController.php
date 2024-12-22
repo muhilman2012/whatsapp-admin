@@ -122,21 +122,6 @@ class ExportController extends Controller
         return redirect()->back()->with('message', 'Proses ekspor PDF sedang berjalan. File akan diunduh otomatis ketika selesai.');
     }
 
-    public function checkExportStatus(Request $request)
-    {
-        $fileName = $request->file_name;
-        $filePath = 'exports/' . $fileName;
-
-        if (\Illuminate\Support\Facades\Storage::exists($filePath)) {
-            return response()->json([
-                'ready' => true,
-                'download_url' => url('storage/' . $filePath),
-            ]);
-        }
-
-        return response()->json(['ready' => false]);
-    }
-
     public function exportFilteredData(Request $request)
     {
         // Ambil user yang sedang login
@@ -178,13 +163,43 @@ class ExportController extends Controller
             });
         }
 
+        // Filter berdasarkan assignment
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            if ($request->filterAssignment === 'unassigned') {
+                $data->doesntHave('assignment');
+            } elseif ($request->filterAssignment === 'assigned') {
+                $data->has('assignment');
+            }
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $data->whereDate('created_at', $request->tanggal);
+        }
+
         $data = $data->get();
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
         }
 
-        return Excel::download(new LaporanExport($data), 'laporan_filtered.xlsx');
+        // Tentukan nama file berdasarkan kriteria filter
+        $fileName = 'laporan_all';
+        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
+            $fileName .= '_by_kategori_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterKategori));
+        }
+        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
+            $fileName .= '_by_status_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterStatus));
+        }
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            $fileName .= '_by_assignment_' . str_replace(['/', '\\'], '_', $request->filterAssignment);
+        }
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+        }
+        $fileName .= '.xlsx';
+
+        return Excel::download(new LaporanExport($data), $fileName);
     }
 
     public function exportFilteredPdf(Request $request)
@@ -228,18 +243,65 @@ class ExportController extends Controller
             });
         }
 
+        // Filter berdasarkan assignment
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            if ($request->filterAssignment === 'unassigned') {
+                $data->doesntHave('assignment');
+            } elseif ($request->filterAssignment === 'assigned') {
+                $data->has('assignment');
+            }
+        }
+
+        // Filter berdasarkan tanggal
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $data->whereDate('created_at', $request->tanggal);
+        }
+
         $data = $data->get();
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
         }
 
-        // Tentukan nama file
-        $fileName = 'laporan_filtered_' . now()->format('d-m-Y') . '.pdf';
+        // Tentukan nama file berdasarkan kriteria filter
+        $fileName = 'laporan_all';
+        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
+            $fileName .= '_by_kategori_' . str_replace(['/', '\\', ' '], '_', $request->filterKategori);
+        }
+        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
+            $fileName .= '_by_status_' . str_replace(['/', '\\', ' '], '_', $request->filterStatus);
+        }
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            $fileName .= '_by_assignment_' . str_replace(['/', '\\', ' '], '_', $request->filterAssignment);
+        }
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+        }
+        $fileName .= '.pdf';
 
-        // Dispatch job untuk membuat PDF
-        ExportPdfJob::dispatch($data, $fileName);
+        // Create the PDF from the data
+        $pdf = Pdf::loadView('admin.laporan.export.pdf', [
+            'laporans' => $data,
+            'tanggal' => now()->format('d-m-Y'),
+            'jumlahPengaduan' => $data->count(),
+        ])->setPaper('a4', 'landscape');
 
-        return redirect()->back()->with('message', 'Proses ekspor PDF sedang berjalan. File akan diunduh otomatis ketika selesai.');
+        // Return the PDF as a download response
+        return $pdf->download($fileName);
+    }
+
+    public function checkExportStatus(Request $request)
+    {
+        $fileName = $request->file_name;
+        $filePath = 'public/exports/' . $fileName;
+
+        if (\Illuminate\Support\Facades\Storage::exists($filePath)) {
+            return response()->json([
+                'ready' => true,
+                'download_url' => url('storage/exports/' . $fileName),
+            ]);
+        }
+
+        return response()->json(['ready' => false]);
     }
 }

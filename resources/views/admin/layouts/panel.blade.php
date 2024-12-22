@@ -106,20 +106,27 @@
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'all']) }}">
                             <i class="fas fa-newspaper box-icon text-center"></i>Semua Pengaduan
                         </a>
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan.create') }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Input Pengaduan
-                        </a>
+                        @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
                         </a>
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Laporan Pending
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Terdisposisi
                         </a>
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Review Tanggapan
+                        </a>
+                        @endif
+                        @if (in_array(auth('admin')->user()->role, ['admin', 'analis']))
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Buat Tanggapan
+                        </a>
+                        @endif
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'rejected']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Laporan Revised
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Revisi Tanggapan
                         </a>
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'approved']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Laporan Approved
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan.create') }}">
+                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Input Pengaduan
                         </a>
                     </div>
                     <hr class="soft my-1 text-white">

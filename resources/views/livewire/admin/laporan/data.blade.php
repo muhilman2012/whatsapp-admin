@@ -1,7 +1,14 @@
 <div>
+    <!-- Pesan Flash -->
+    @if (session('message'))
+        <div class="alert alert-info">
+            {!! session('message') !!}
+        </div>
+    @endif
+
     @if (session('success'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            {!! session('success') !!}
         </div>
     @endif
 
@@ -11,85 +18,8 @@
         </div>
     @endif
     <div class="d-flex mb-3 justify-content-between align-items-center">
-        <!-- Bagian Export Data -->
-        <div class="d-flex">
-            <!-- Export Data Berdasarkan Tanggal -->
-            <form action="{{ route('admin.laporan.export.tanggal') }}" method="GET" class="row g-2 align-items-center">
-                <div class="col-auto">
-                    <input type="date" name="tanggal" id="tanggal" class="form-control" required>
-                </div>
-                <div class="col-auto">
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            Export Data
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
-                            <li>
-                                <button type="submit" class="dropdown-item" formaction="{{ route('admin.laporan.export.tanggal') }}">Export to Excel</button>
-                            </li>
-                            <li>
-                                <button type="button" class="dropdown-item export-pdf-btn" data-url="{{ route('admin.laporan.export.tanggal.pdf') }}">
-                                    Export to PDF
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </form>
-
-            <div class="ms-2">
-                <div class="dropdown">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="exportFilteredDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        Export Filtered Data
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="exportFilteredDropdown">
-                        <li>
-                            <form action="{{ route('admin.laporan.export.filtered.excel') }}" method="GET">
-                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
-                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
-                                <input type="hidden" name="search" value="{{ $search }}">
-                                <button type="submit" class="dropdown-item">Export to Excel</button>
-                            </form>
-                        </li>
-                        <li>
-                            <form action="{{ route('admin.laporan.export.filtered.pdf') }}" method="GET">
-                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
-                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
-                                <input type="hidden" name="search" value="{{ $search }}">
-                                <button type="submit" class="dropdown-item">Export to PDF</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
         <!-- Bagian Cari, Filter Kategori, dan Pengaturan Halaman -->
         <div class="d-flex align-items-center">
-            <!-- Filter Status -->
-            <div class="ms-2">
-                <select wire:model="filterStatus" class="form-select">
-                    <option value="">-- Semua Status --</option>
-                    <option value="Belum dapat diproses lebih lanjut">Tidak Diproses</option>
-                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang">Pemantauan</option>
-                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
-                    <option value="Proses verifikasi dan telaah">Verifikasi</option>
-                </select>
-            </div>
-            @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
-            <div class="ms-2">
-                <select wire:model="filterAssignment" class="form-select">
-                    <option value="">-- Semua Data --</option>
-                    <option value="unassigned">Belum Ter-assign</option>
-                    <option value="assigned">Sudah Ter-assign</option>
-                </select>
-            </div>
-            @endif
-            <!-- Tombol Import -->
-            @if (auth('admin')->user()->role === 'admin')
-            <div class="ms-2">
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
-            </div>
-            @endif
             <!-- Input Cari -->
             <div>
                 <input wire:model="search" type="text" class="form-control ms-2" placeholder="Cari...">
@@ -110,6 +40,60 @@
                     </optgroup>
                 </select>
             </div>
+            <!-- Filter Status -->
+            <div class="ms-2">
+                <select wire:model="filterStatus" class="form-select">
+                    <option value="">-- Semua Status --</option>
+                    <option value="Belum dapat diproses lebih lanjut">Tidak Diproses</option>
+                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang">Pemantauan</option>
+                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
+                    <option value="Proses verifikasi dan telaah">Verifikasi</option>
+                </select>
+            </div>
+            @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+            <!-- Filter Assignment -->
+            <div class="ms-2">
+                <select wire:model="filterAssignment" class="form-select">
+                    <option value="">-- Semua Data --</option>
+                    <option value="unassigned">Belum Ter-assign</option>
+                    <option value="assigned">Sudah Ter-assign</option>
+                </select>
+            </div>
+            @endif
+            <!-- Input Tanggal -->
+            <div class="col-auto ms-2">
+                <input wire:model="tanggal" type="date" name="tanggal" id="tanggal" class="form-control" required>
+            </div>
+            <!-- Export Filtered Data -->
+            <div class="ms-2">
+                <div class="dropdown">
+                    <button class="btn btn-success dropdown-toggle" type="button" id="exportFilteredDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Export Filtered Data
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="exportFilteredDropdown">
+                        <li>
+                            <form action="{{ route('admin.laporan.export.filtered.excel') }}" method="GET">
+                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
+                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
+                                <input type="hidden" name="search" value="{{ $search }}">
+                                <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
+                                <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                                <button type="submit" class="dropdown-item">Export to Excel</button>
+                            </form>
+                        </li>
+                        <li>
+                            <form action="{{ route('admin.laporan.export.filtered.pdf') }}" method="GET">
+                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
+                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
+                                <input type="hidden" name="search" value="{{ $search }}">
+                                <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
+                                <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                                <button type="submit" class="dropdown-item">Export to PDF</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
             <!-- Select Jumlah Halaman -->
             <div class="ms-2">
                 <select wire:model="pages" class="form-select">
@@ -120,6 +104,12 @@
                     <option value="99999999999">All</option>
                 </select>
             </div>
+            <!-- Tombol Import -->
+            @if (auth('admin')->user()->role === 'admin')
+            <div class="ms-2">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
+            </div>
+            @endif
         </div>
     </div>
 
@@ -163,9 +153,11 @@
                         <a href="{{ route('admin.laporan.edit', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-pencil-alt fa-sm fa-fw"></i>
                         </a>
+                        @if (auth('admin')->user()->role === 'admin')
                         <button wire:click="removed({{ $item->nomor_tiket }})" type="button" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-trash fa-sm fa-fw"></i>
                         </button>
+                        @endif
                     </td>
                 </tr>
                 @endforeach
@@ -349,27 +341,34 @@
         })
     </script>
 
+    <!-- Script untuk memeriksa status export PDF -->
     <script>
-        // Check for the status of the export and trigger the download once the file is ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Listen for a message indicating that the export is complete
-            setInterval(async () => {
-                const response = await fetch('/admin/check-export-status'); // URL to check if the export is complete
-                const data = await response.json();
+            const checkExportStatus = () => {
+                fetch('{{ route('admin.laporan.checkExportStatus') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        file_name: '{{ session('fileName') }}'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ready) {
+                        window.location.href = data.download_url;
+                    } else {
+                        setTimeout(checkExportStatus, 5000); // Cek setiap 5 detik
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            };
 
-                if (data.status === 'complete') {
-                    // If the export is complete, trigger the download
-                    const link = document.createElement('a');
-                    link.href = data.download_url; // URL to download the file
-                    link.download = data.file_name;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    // Optionally, show a message to the user
-                    alert('File berhasil diunduh!');
-                }
-            }, 5000); // Check every 5 seconds
+            <?php if (session('message') && strpos(session('message'), 'Proses ekspor PDF sedang berjalan') !== false): ?>
+                checkExportStatus();
+            <?php endif; ?>
         });
     </script>
     <script>

@@ -3,12 +3,12 @@
 namespace App\Jobs;
 
 use App\Models\Laporan;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 
 class ExportPdfJob implements ShouldQueue
@@ -38,7 +38,7 @@ class ExportPdfJob implements ShouldQueue
     public function handle()
     {
         // Create the PDF from the data
-        $pdf = PDF::loadView('admin.laporan.export.pdf', [
+        $pdf = Pdf::loadView('admin.laporan.export.pdf', [
             'laporans' => $this->data,
             'tanggal' => now()->format('d-m-Y'),
             'jumlahPengaduan' => $this->data->count(),

@@ -52,30 +52,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
 
     // Export/Import untuk Admin, Deputi, dan Asdep
     Route::group(['middleware' => 'role.access:admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep'], function () {
-        Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
-        Route::get('/admin/export/tanggal', [ExportController::class, 'exportByDate'])->name('admin.laporan.export.tanggal');
-        Route::get('/admin/export-all', [ExportController::class, 'exportAll'])->name('admin.laporan.export.all');
-        Route::get('/admin/export/pdf', [ExportController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
-        Route::get('/admin/export/tanggal/pdf', [ExportController::class, 'exportByDatePdf'])->name('admin.laporan.export.tanggal.pdf');
-        Route::get('/admin/export/kategori', [ExportController::class, 'exportByKategori'])->name('admin.laporan.export.kategori');
         Route::post('/admin/laporan/import', [ImportController::class, 'import'])->name('admin.laporan.import');
-        Route::get('/admin/check-export-status', function () {
-            $fileName = 'rekap_lapor_' . now()->format('d-m-Y') . '.pdf'; // File name format
-        
-            $filePath = storage_path('app/public/exports/' . $fileName);
-        
-            if (file_exists($filePath)) {
-                return response()->json([
-                    'status' => 'complete',
-                    'download_url' => url('storage/exports/' . $fileName),
-                    'file_name' => $fileName,
-                ]);
-            }
-        
-            return response()->json(['status' => 'in_progress']);
-        });
-        Route::get('/admin/export-filtered/excel', [ExportController::class, 'exportFilteredData'])->name('admin.laporan.export.filtered.excel');
-        Route::get('/admin/export-filtered/pdf', [ExportController::class, 'exportFilteredPdf'])->name('admin.laporan.export.filtered.pdf');
+        Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
+        Route::get('admin/laporan/export/tanggal', [ExportController::class, 'exportByDate'])->name('admin.laporan.export.tanggal');
+        Route::get('admin/laporan/export/all', [ExportController::class, 'exportAll'])->name('admin.laporan.export.all');
+        Route::get('admin/laporan/export/pdf', [ExportController::class, 'exportPdf'])->name('admin.laporan.export.pdf');
+        Route::get('admin/laporan/export/tanggal/pdf', [ExportController::class, 'exportByDatePdf'])->name('admin.laporan.export.tanggal.pdf');
+        Route::post('admin/laporan/checkExportStatus', [ExportController::class, 'checkExportStatus'])->name('admin.laporan.checkExportStatus');
+        Route::get('admin/laporan/export/filtered/excel', [ExportController::class, 'exportFilteredData'])->name('admin.laporan.export.filtered.excel');
+        Route::get('admin/laporan/export/filtered/pdf', [ExportController::class, 'exportFilteredPdf'])->name('admin.laporan.export.filtered.pdf');
     });
 
     // Logout

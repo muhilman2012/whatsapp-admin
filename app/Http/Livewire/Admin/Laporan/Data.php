@@ -26,6 +26,7 @@ class Data extends Component
     public $assignNotes; // Catatan untuk analis
     public $filterAssignment = ''; // Properti untuk menyimpan filter
     public $filterStatus = ''; // Untuk filter status
+    public $tanggal; // Properti untuk menyimpan tanggal yang dipilih
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -136,8 +137,13 @@ class Data extends Component
             $data->has('assignment'); // Data sudah ter-assign
         }
 
+        // Filter berdasarkan tanggal
+        if (!empty($this->tanggal)) {
+            $data->whereDate('created_at', $this->tanggal);
+        }
+
         // Paginate data
-        $data = $data->orderBy('created_at', 'desc')->paginate($this->pages);
+        $data = $data->orderBy($this->sortField, $this->sortDirection)->paginate($this->pages);
 
         return view('livewire.admin.laporan.data', [
             'data' => $data,
