@@ -7,6 +7,8 @@ use App\Http\Controllers\admin\laporanAnalisController;
 use App\Http\Controllers\admin\profileAdmin;
 use App\Http\Controllers\admin\ExportController;
 use App\Http\Controllers\admin\ImportController;
+use App\Http\Controllers\admin\UserManagementController;
+
 
 use App\Http\Controllers\auth\authAdmin;
 
@@ -63,6 +65,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('admin/laporan/export/filtered/pdf', [ExportController::class, 'exportFilteredPdf'])->name('admin.laporan.export.filtered.pdf');
     });
 
+    Route::get('/dashboard/user-management', [UserManagementController::class, 'index'])->name('admin.user_management.index');
+    Route::get('/dashboard/user-management/create', [UserManagementController::class, 'create'])->name('admin.user_management.create');
+    Route::post('/dashboard/user-management/store', [UserManagementController::class, 'store'])->name('admin.user_management.store');
+    Route::get('/dashboard/user-management/edit/{id_admins}', [UserManagementController::class, 'edit'])->name('admin.user_management.edit');
+    Route::put('/dashboard/user-management/update/{id_admins}', [UserManagementController::class, 'update'])->name('admin.user_management.update');
+    Route::delete('/dashboard/user-management/{id_admins}', [UserManagementController::class, 'destroy'])->name('admin.user_management.destroy');
     // Logout
     Route::get('/logout', [indexAdmin::class, 'logout'])->name('admin.logout');
 });

@@ -131,8 +131,8 @@
                     </div>
                     @if (auth('admin')->user()->role === 'admin')
                     <hr class="soft my-1 text-white">
-                    <a class="nav-link px-3" href="">
-                        <i class="fas fa-user box-icon" aria-hidden="true"></i>Tambah User
+                    <a class="nav-link px-3" href="{{ route('admin.user_management.index') }}">
+                        <i class="fa fa-users box-icon" aria-hidden="true"></i>Manajemen User
                     </a>
                     @endif
                     <hr class="soft my-1 text-white">
