@@ -50,8 +50,8 @@
                 <div class="row">
                     <div class="col-12 col-md-6">
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input wire:model='username' type="text" class="form-control" id="username" @if ($edit==false) disabled @endif>
+                            <label for="nama" class="form-label">Nama Lengkap</label>
+                            <input wire:model='nama' type="text" class="form-control" id="nama" @if ($edit==false) disabled @endif>
                         </div>
                         <div class="mb-3">
                             <label for="jabatan" class="form-label">Jabatan</label>
