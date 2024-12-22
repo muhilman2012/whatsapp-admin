@@ -129,6 +129,12 @@
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Input Pengaduan
                         </a>
                     </div>
+                    @if (auth('admin')->user()->role === 'admin')
+                    <hr class="soft my-1 text-white">
+                    <a class="nav-link px-3" href="">
+                        <i class="fas fa-user box-icon" aria-hidden="true"></i>Tambah User
+                    </a>
+                    @endif
                     <hr class="soft my-1 text-white">
                     <a class="btnLogout nav-link px-3" href="#">
                         <i class="fas fa-sign-out-alt box-icon"></i>Logout
