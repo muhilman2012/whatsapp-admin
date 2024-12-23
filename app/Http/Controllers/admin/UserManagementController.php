@@ -34,7 +34,7 @@ class UserManagementController extends Controller
             'unit' => 'required|string',
         ]);
 
-        Admins::create([
+        admins::create([
             'username' => $request->nama,
             'nama' => $request->nama,
             'email' => $request->email,
@@ -51,6 +51,7 @@ class UserManagementController extends Controller
 
         return redirect()->route('admin.user_management.index')->with('success', 'User berhasil ditambahkan dengan password default: SETwapres@2024#');
     }
+
     public function edit($id_admins)
     {
         $user = admins::findOrFail($id_admins);
@@ -63,11 +64,9 @@ class UserManagementController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email,' . $user->id_admins,
+            'email' => 'required|email|unique:admins,email,' . $user->id_admins . ',id_admins',
             'phone' => 'nullable|string|max:15',
-            'born' => 'nullable|date',
-            'address' => 'nullable|string',
-            'role' => 'required|in:deputi_1,deputi_2,deputi_3,deputi_4,analis',
+            'role' => 'required|in:superadmin,admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
             'jabatan' => 'required|string|max:255',
             'deputi' => 'required|string',
             'unit' => 'required|string',
@@ -77,8 +76,6 @@ class UserManagementController extends Controller
             'nama' => $request->nama,
             'email' => $request->email,
             'phone' => $request->phone,
-            'born' => $request->born,
-            'address' => $request->address,
             'role' => $request->role,
             'jabatan' => $request->jabatan,
             'deputi' => $request->deputi,

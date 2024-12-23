@@ -10,8 +10,8 @@
 
     <div class="d-flex mb-3 justify-content-between align-items-center">
         <div class="d-flex">
-            <!-- <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addUserModal">Tambah User</button> -->
-            <a href="{{ route('admin.user_management.create') }}" class="btn btn-primary ms-2">Tambah User</a>
+            <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addUserModal">Tambah User</button>
+            <!-- <a href="{{ route('admin.user_management.create') }}" class="btn btn-primary ms-2">Tambah User</a> -->
         </div>
         <div class="d-flex align-items-center">
             <div class="d-flex ms-2">
@@ -53,9 +53,9 @@
                     <td>{{ $item->jabatan }}</td>
                     <td>{{ $item->unit }}</td>
                     <td class="text-nowrap">
-                        <!-- <a href="{{ route('admin.user_management.edit', $item->id_admins) }}" class="btn btn-outline-secondary btn-sm">
+                        <a href="{{ route('admin.user_management.edit', $item->id_admins) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-pencil-alt fa-sm fa-fw"></i>
-                        </a> -->
+                        </a>
                         <button wire:click="removed({{ $item->id_admins }})" type="button" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-trash fa-sm fa-fw"></i>
                         </button>
@@ -100,6 +100,8 @@
                             <label for="role" class="form-label">Role</label>
                             <select class="form-select" id="role" wire:model="role" required>
                                 <option>-- Pilih Role --</option>
+                                <option value="superadmin">Super Admin</option>
+                                <option value="admin">Admin</option>
                                 <option value="deputi_1">Deputi 1</option>
                                 <option value="deputi_2">Deputi 2</option>
                                 <option value="deputi_3">Deputi 3</option>
@@ -113,8 +115,9 @@
                         </div>
                         <div class="mb-3">
                             <label for="deputi" class="form-label">Deputi</label>
-                            <select class="form-select" id="deputi" name="deputi" required>
+                            <select class="form-select" id="deputi" name="deputi" wire:model="deputi" required>
                                 <option>-- Pilih Deputi --</option>
+                                <option value="Admin">Admin</option>
                                 <option value="Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital">Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital</option>
                                 <option value="Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan Dan Pembangunan Sumber Daya Manusia">Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan Dan Pembangunan Sumber Daya Manusia</option>
                                 <option value="Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan">Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan</option>
@@ -123,8 +126,9 @@
                         </div>
                         <div class="mb-3">
                             <label for="unit" class="form-label">Unit</label>
-                            <select class="form-select" id="unit" name="unit" required>
+                            <select class="form-select" id="unit" name="unit" wire:model="unit" required>
                                 <option>-- Pilih Unit --</option>
+                                <option value="Admin">Admin</option>
                                 <option value="Asisten Deputi Ekonomi dan Keuangan">Asisten Deputi Ekonomi dan Keuangan</option>
                                 <option value="Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam">Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam</option>
                                 <option value="Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif">Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif</option>
@@ -185,7 +189,7 @@
             title: 'Good Jobs!',
             text: '{{ session()->get("success") }}',
             showConfirmButton: false,
-            timer: 2500
+            timer: 5000
         })
         location.reload();
     </script>
@@ -196,7 +200,7 @@
             title: 'Opps...!',
             text: '{{ session()->get("error") }}',
             showConfirmButton: false,
-            timer: 2500
+            timer: 5000
         })
     </script>
     @endif

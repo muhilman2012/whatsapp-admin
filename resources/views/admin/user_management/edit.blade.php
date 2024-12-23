@@ -22,6 +22,9 @@
         <div class="mb-3">
             <label for="role" class="form-label">Role</label>
             <select class="form-select" id="role" name="role" required>
+                <option value="-- Pilih Role --" {{ $user->role == '-- Pilih Role --' ? 'selected' : '' }}>-- Pilih Role --</option>
+                <option value="superadmin" {{ $user->role == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                 <option value="deputi_1" {{ $user->role == 'deputi_1' ? 'selected' : '' }}>Deputi 1</option>
                 <option value="deputi_2" {{ $user->role == 'deputi_2' ? 'selected' : '' }}>Deputi 2</option>
                 <option value="deputi_3" {{ $user->role == 'deputi_3' ? 'selected' : '' }}>Deputi 3</option>
@@ -36,6 +39,8 @@
         <div class="mb-3">
             <label for="deputi" class="form-label">Deputi</label>
             <select class="form-select" id="deputi" name="deputi" required>
+                <option selected disabled>-- Pilih Deputi --</option>
+                <option value="Admin" {{ $user->deputi == 'Admin' ? 'selected' : '' }}>Admin</option>
                 <option value="Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital" {{ $user->deputi == 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital' ? 'selected' : '' }}>Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital</option>
                 <option value="Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan Dan Pembangunan Sumber Daya Manusia" {{ $user->deputi == 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan Dan Pembangunan Sumber Daya Manusia' ? 'selected' : '' }}>Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan Dan Pembangunan Sumber Daya Manusia</option>
                 <option value="Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan" {{ $user->deputi == 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan' ? 'selected' : '' }}>Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan</option>
@@ -45,6 +50,8 @@
         <div class="mb-3">
             <label for="unit" class="form-label">Unit</label>
             <select class="form-select" id="unit" name="unit" required>
+                <option selected disabled>-- Pilih Unit --</option>
+                <option value="Admin" {{ $user->deputi == 'Admin' ? 'selected' : '' }}>Admin</option>
                 <option value="Asisten Deputi Ekonomi dan Keuangan" {{ $user->unit == 'Asisten Deputi Ekonomi dan Keuangan' ? 'selected' : '' }}>Asisten Deputi Ekonomi dan Keuangan</option>
                 <option value="Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam" {{ $user->unit == 'Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam' ? 'selected' : '' }}>Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam</option>
                 <option value="Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif" {{ $user->unit == 'Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif' ? 'selected' : '' }}>Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif</option>

@@ -45,33 +45,42 @@ class Data extends Component
 
     public function addUser()
     {
-        $this->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email',
-            'role' => 'required|in:deputi_1,deputi_2,deputi_3,deputi_4,analis',
-            'jabatan' => 'required|string|max:255',
-            'deputi' => 'required|string',
-            'unit' => 'required|string',
-        ]);
+        try {
+            $this->validate([
+                'nama' => 'required|string|max:255',
+                'email' => 'required|email|unique:admins,email',
+                'role' => 'required|in:superadmin,admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
+                'jabatan' => 'nullable|string|max:255',
+                'deputi' => 'nullable|string',
+                'unit' => 'nullable|string',
+            ],
+            [
+                'email.unique' => 'Email sudah digunakan. Harap gunakan email lain.',
+                'email.required' => 'Email wajib diisi.',
+                'email.email' => 'Format email tidak valid.',
+                'nama.required' => 'Nama wajib diisi.',
+                'role.required' => 'Role wajib dipilih.',
+            ]);
 
-        admins::create([
-            'username' => $this->nama,
-            'nama' => $this->nama,
-            'email' => $this->email,
-            'password' => Hash::make('SETwapres@2024#'), // Password default
-            'phone' => '081234567890',
-            'born' => '2024-11-11',
-            'avatar' => 'sample-images.png',
-            'address' => 'Jl. Kebon Sirih 14, Jakarta',
-            'role' => $this->role,
-            'jabatan' => $this->jabatan,
-            'deputi' => $this->deputi,
-            'unit' => $this->unit,
-        ]);
+            admins::create([
+                'username' => $this->nama,
+                'nama' => $this->nama,
+                'email' => $this->email,
+                'password' => Hash::make('SETwapres@2024#'), // Password default
+                'avatar' => 'sample-images.png',
+                'address' => 'Jl. Kebon Sirih 14, Jakarta', // Default jika kosong
+                'role' => $this->role,
+                'jabatan' => $this->jabatan,
+                'deputi' => $this->deputi,
+                'unit' => $this->unit,
+            ]);
 
-        session()->flash('success', 'User berhasil ditambahkan dengan password default: SETwapres@2024#');
-        $this->reset(['nama', 'email', 'role', 'jabatan', 'deputi', 'unit']); // Reset form
-        $this->dispatchBrowserEvent('closeModal'); // Tutup modal
+            session()->flash('success', 'User berhasil ditambahkan dengan password default: SETwapres@2024#');
+            $this->reset(['nama', 'email', 'role', 'jabatan', 'deputi', 'unit']); // Reset form
+            $this->dispatchBrowserEvent('closeModal'); // Tutup modal
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function render()
