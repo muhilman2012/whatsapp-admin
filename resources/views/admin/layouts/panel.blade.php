@@ -106,7 +106,7 @@
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'all']) }}">
                             <i class="fas fa-newspaper box-icon text-center"></i>Semua Pengaduan
                         </a>
-                        @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
                         </a>
@@ -117,7 +117,7 @@
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Review Tanggapan
                         </a>
                         @endif
-                        @if (in_array(auth('admin')->user()->role, ['admin', 'analis']))
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'analis']))
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Buat Tanggapan
                         </a>
@@ -129,7 +129,7 @@
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Input Pengaduan
                         </a>
                     </div>
-                    @if (auth('admin')->user()->role === 'admin')
+                    @if (auth('admin')->user()->role === 'superadmin')
                     <hr class="soft my-1 text-white">
                     <a class="nav-link px-3" href="{{ route('admin.user_management.index') }}">
                         <i class="fa fa-users box-icon" aria-hidden="true"></i>Manajemen User

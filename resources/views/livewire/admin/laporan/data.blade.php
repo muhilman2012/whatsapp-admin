@@ -43,18 +43,18 @@
             <!-- Filter Status -->
             <div class="ms-2">
                 <select wire:model="filterStatus" class="form-select">
-                    <option value="">-- Semua Status --</option>
+                    <option value="">Semua Status</option>
                     <option value="Belum dapat diproses lebih lanjut">Tidak Diproses</option>
                     <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang">Pemantauan</option>
                     <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
                     <option value="Proses verifikasi dan telaah">Verifikasi</option>
                 </select>
             </div>
-            @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+            @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
             <!-- Filter Assignment -->
             <div class="ms-2">
                 <select wire:model="filterAssignment" class="form-select">
-                    <option value="">-- Semua Data --</option>
+                    <option value="">Semua Data</option>
                     <option value="unassigned">Belum Ter-assign</option>
                     <option value="assigned">Sudah Ter-assign</option>
                 </select>
@@ -105,7 +105,7 @@
                 </select>
             </div>
             <!-- Tombol Import -->
-            @if (auth('admin')->user()->role === 'admin')
+            @if (auth('admin')->user()->role === 'superadmin')
             <div class="ms-2">
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
             </div>
@@ -153,7 +153,7 @@
                         <a href="{{ route('admin.laporan.edit', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-pencil-alt fa-sm fa-fw"></i>
                         </a>
-                        @if (auth('admin')->user()->role === 'admin')
+                        @if (auth('admin')->user()->role === 'superadmin')
                         <button wire:click="removed({{ $item->nomor_tiket }})" type="button" class="btn btn-outline-danger btn-sm">
                             <i class="fas fa-trash fa-sm fa-fw"></i>
                         </button>
@@ -177,7 +177,7 @@
             <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
                 Update Disposisi
             </button>
-        @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+        @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#assignModal">
                 Assign to Analis
             </button>
@@ -278,7 +278,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <select wire:model="selectedAnalis" class="form-control">
+                        <select wire:model="selectedAnalis" class="form-control" required>
                             <option value="">Pilih Analis</option>
                             @foreach($analisList as $analis)
                                 <option value="{{ $analis->id_admins }}">{{ $analis->username }}</option>

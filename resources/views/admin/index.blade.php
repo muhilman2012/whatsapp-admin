@@ -81,7 +81,7 @@
                 </div>
 
                 <!-- Cards Deputi 1-4 untuk Admin -->
-                @if(auth('admin')->user()->role === 'admin')
+                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
@@ -110,7 +110,7 @@
                 </div>
                 @endif
 
-                @if(auth('admin')->user()->role === 'admin')
+                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
                 <!-- Jumlah Aduan yang Terdisposisi -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
@@ -243,7 +243,7 @@
                 </div>
                 @endif
 
-                @if(auth('admin')->user()->role === 'admin')
+                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
                 <div class="col-6">
                     <!-- Chart Provinsi -->
                     <div class="card border-0 shadow-sm p-3 mb-3">
@@ -258,7 +258,7 @@
                 </div>
                 @endif
 
-                @if (in_array(auth('admin')->user()->role, ['admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                 <div class="col-12">
                     <div class="card border-0 shadow-sm p-3">
                         <p class="fs-4 fw-bold mb-0">Jumlah Laporan Berdasarkan Kategori</p>

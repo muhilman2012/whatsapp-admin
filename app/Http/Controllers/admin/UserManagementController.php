@@ -65,22 +65,27 @@ class UserManagementController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email,' . $user->id_admins . ',id_admins',
-            'phone' => 'nullable|string|max:15',
-            'role' => 'required|in:superadmin,admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
-            'jabatan' => 'required|string|max:255',
-            'deputi' => 'required|string',
-            'unit' => 'required|string',
+            'role' => 'required|in:admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
+            'jabatan' => 'nullable|string|max:255', // Ubah menjadi nullable
+            'deputi' => 'nullable|string', // Ubah menjadi nullable
+            'unit' => 'nullable|string', // Ubah menjadi nullable
+            'password' => 'nullable|string|min:6|confirmed', // Validasi password
         ]);
 
-        $user->update([
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'role' => $request->role,
-            'jabatan' => $request->jabatan,
-            'deputi' => $request->deputi,
-            'unit' => $request->unit,
-        ]);
+        // Update data pengguna
+        $user->nama = $request->nama;
+        $user->email = $request->email;
+        $user->role = $request->role;
+        $user->jabatan = $request->jabatan; // Jabatan bisa kosong
+        $user->deputi = $request->deputi; // Deputi bisa kosong
+        $user->unit = $request->unit; // Unit bisa kosong
+
+        // Jika password diisi, update password
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save(); // Simpan perubahan
 
         return redirect()->route('admin.user_management.index')->with('success', 'User berhasil diperbarui.');
     }

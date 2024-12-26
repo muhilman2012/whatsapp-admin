@@ -26,8 +26,10 @@ class laporanAdmin extends Controller
             'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
         ];
 
-        // Ambil kategori sesuai role pengguna
-        $kategori = $kategoriDeputi[$userRole] ?? [];
+         // Ambil kategori sesuai role pengguna
+        $kategori = in_array($userRole, ['superadmin', 'admin']) 
+            ? array_keys($kategoriDeputi) // Semua kategori untuk superadmin dan admin
+            : ($kategoriDeputi[$userRole] ?? []); // Kategori sesuai role Deputi
 
         // Ambil parameter `type` untuk menentukan jenis laporan
         $type = $request->query('type', 'all'); // Default ke `all`
@@ -52,7 +54,7 @@ class laporanAdmin extends Controller
                 $query->whereNotNull('disposisi_terbaru'); // Pelimpahan
             })
             ->when($type === 'pending', function ($query) {
-                $query->where('status_analisis', 'Pending'); // Rejected
+                $query->where('status_analisis', 'Pending'); // Pending
             })
             ->when($type === 'rejected', function ($query) {
                 $query->where('status_analisis', 'Rejected'); // Rejected
@@ -72,7 +74,7 @@ class laporanAdmin extends Controller
                         ->orWhere('judul', 'like', '%' . $request->search . '%');
                 });
             })
-            ->when($type === 'all' && $userRole !== 'admin', function ($query) use ($kategori) {
+            ->when($type === 'all' && !in_array($userRole, ['superadmin', 'admin']), function ($query) use ($kategori) {
                 $query->whereIn('kategori', $kategori); // Semua data sesuai role deputi
             })
             ->orderBy('created_at', 'desc')

@@ -23,6 +23,8 @@ class Data extends Component
     public $selectAll = false; // Untuk status checkbox "Select All"
     public $selected = [];    // Array ID laporan yang dipilih
     public $selectedAnalis = null; // ID Analis yang dipilih
+    public $selectedDeputi; // Properti untuk menyimpan deputi yang 
+    public $analisList = []; // Daftar analis yang akan ditampilkan
     public $assignNotes; // Catatan untuk analis
     public $filterAssignment = ''; // Properti untuk menyimpan filter
     public $filterStatus = ''; // Untuk filter status
@@ -38,6 +40,9 @@ class Data extends Component
 
         // Terima filter kategori dari URL
         $this->filterKategori = request()->get('filterKategori', '');
+
+        // Ambil analis berdasarkan kedeputian pengguna yang sedang login
+        $this->loadAnalisByDeputi();
     }
 
     public function removed($nomor_tiket)
@@ -89,23 +94,20 @@ class Data extends Component
         // Query data laporan
         $data = Laporan::with(['assignment.assignedTo', 'assignment.assignedBy']);
 
-        if ($user->role === 'analis') {
-            $data->whereHas('assignment', function ($query) use ($user) {
-                $query->where('analis_id', $user->id_admins); // Pastikan laporan ditugaskan kepada analis yang login
-            });
-        }
-        
         // Filter berdasarkan role pengguna
         if ($user->role === 'analis') {
             // Hanya ambil laporan yang ditugaskan ke analis yang sedang login
             $data->whereHas('assignment', function ($query) use ($user) {
                 $query->where('analis_id', $user->id_admins);
             });
-        } elseif ($user->role !== 'admin') {
-            // Jika bukan admin, filter berdasarkan disposisi
+        } elseif (in_array($user->role, ['admin', 'superadmin'])) {
+            // Jika pengguna adalah admin atau superadmin, tidak ada filter tambahan
+            // Anda bisa menambahkan logika lain jika diperlukan
+        } else {
+            // Jika bukan admin atau superadmin, filter berdasarkan disposisi
             $data->where(function ($query) use ($user) {
                 $query->where('disposisi', $user->role)
-                      ->orWhere('disposisi_terbaru', $user->role);
+                    ->orWhere('disposisi_terbaru', $user->role);
             });
         }
 
@@ -199,27 +201,28 @@ class Data extends Component
 
     public function assignToAnalis()
     {
-        if (!empty($this->selected) && !empty($this->selectedAnalis)) {
-            $this->validate([
-                'selectedAnalis' => 'required|exists:admins,id_admins',
-                'assignNotes' => 'nullable|string|max:255',
-            ]);
-
-            foreach ($this->selected as $laporanId) {
-                Assignment::create([
-                    'laporan_id' => $laporanId,
-                    'analis_id' => $this->selectedAnalis,
-                    'notes' => $this->assignNotes, // Boleh kosong
-                    'assigned_by' => auth('admin')->user()->id_admins,
-                ]);
-            }
-
-            session()->flash('success', 'Laporan berhasil di-assign ke analis.');
-            $this->reset(['selected', 'selectedAnalis', 'assignNotes', 'selectAll']);
-            $this->dispatchBrowserEvent('closeModal', ['modalId' => 'assignToAnalisModal']);
-        } else {
+        if (empty($this->selected) || empty($this->selectedAnalis)) {
             session()->flash('error', 'Pilih analis dan data terlebih dahulu.');
+            return;
         }
+
+        $this->validate([
+            'selectedAnalis' => 'required|exists:admins,id_admins',
+            'assignNotes' => 'nullable|string|max:255', // Catatan tidak wajib
+        ]);
+
+        foreach ($this->selected as $laporanId) {
+            Assignment::create([
+                'laporan_id' => $laporanId,
+                'analis_id' => $this->selectedAnalis,
+                'notes' => $this->assignNotes, // Boleh kosong
+                'assigned_by' => auth('admin')->user()->id_admins,
+            ]);
+        }
+
+        session()->flash('success', 'Laporan berhasil di-assign ke analis.');
+        $this->reset(['selected', 'selectedAnalis', 'assignNotes', 'selectAll']);
+        $this->dispatchBrowserEvent('closeModal', ['modalId' => 'assignModal']);
     }
 
     // Logika untuk pelimpahan data
@@ -288,5 +291,28 @@ class Data extends Component
         }
 
         return $data->orderBy($this->sortField, $this->sortDirection)->get();
+    }
+
+    public function loadAnalisByDeputi()
+    {
+        $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini
+
+        // Ambil analis berdasarkan kedeputian pengguna
+        $this->analisList = admins::where('role', 'analis')
+            ->where('deputi', $user->role) // Filter berdasarkan kedeputian
+            ->get(['id_admins', 'username']);
+    }
+
+    public function updatedSelectedDeputi($value)
+    {
+        // Ambil analis berdasarkan deputi yang dipilih
+        $this->analisList = $this->getAnalisByDeputi($value);
+    }
+
+    public function getAnalisByDeputi($deputi)
+    {
+        return admins::where('role', 'analis')
+            ->where('deputi', $deputi) // Filter berdasarkan kedeputian
+            ->get(['id_admins', 'username']);
     }
 }

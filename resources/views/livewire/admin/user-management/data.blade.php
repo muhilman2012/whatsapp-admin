@@ -11,7 +11,6 @@
     <div class="d-flex mb-3 justify-content-between align-items-center">
         <div class="d-flex">
             <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addUserModal">Tambah User</button>
-            <!-- <a href="{{ route('admin.user_management.create') }}" class="btn btn-primary ms-2">Tambah User</a> -->
         </div>
         <div class="d-flex align-items-center">
             <div class="d-flex ms-2">

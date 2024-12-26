@@ -20,6 +20,14 @@
             <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}" required>
         </div>
         <div class="mb-3">
+        <label for="password" class="form-label">Password (Kosongkan jika tidak ingin mengubah)</label>
+            <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <div class="mb-3">
+            <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
+            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
+        </div>
+        <div class="mb-3">
             <label for="role" class="form-label">Role</label>
             <select class="form-select" id="role" name="role" required>
                 <option value="-- Pilih Role --" {{ $user->role == '-- Pilih Role --' ? 'selected' : '' }}>-- Pilih Role --</option>

@@ -35,7 +35,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
     Route::get('/dashboard/profile', [profileAdmin::class, 'index'])->name('admin.profile');
 
     // Laporan Routing untuk Admin, Deputi, dan Asdep
-    Route::group(['middleware' => 'role.access:admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep|analis'], function () {
+    Route::group(['middleware' => 'role.access:superadmin|admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep|analis'], function () {
         Route::get('/dashboard/laporan/create', [laporanAdmin::class, 'create'])->name('admin.laporan.create');
         Route::post('/dashboard/laporan/store', [laporanAdmin::class, 'store'])->name('admin.laporan.store');
         Route::get('/dashboard/laporan', [laporanAdmin::class, 'index'])->name('admin.laporan');
@@ -53,7 +53,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
     });
 
     // Export/Import untuk Admin, Deputi, dan Asdep
-    Route::group(['middleware' => 'role.access:admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep'], function () {
+    Route::group(['middleware' => 'role.access:superadmin|admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep'], function () {
         Route::post('/admin/laporan/import', [ImportController::class, 'import'])->name('admin.laporan.import');
         Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
         Route::get('admin/laporan/export/tanggal', [ExportController::class, 'exportByDate'])->name('admin.laporan.export.tanggal');

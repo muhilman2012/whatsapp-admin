@@ -22,14 +22,17 @@ class indexAdmin extends Controller
 
         // Tentukan kategori yang bisa diakses menggunakan getter
         $kategoriKataKunci = Laporan::getKategoriKataKunci();
-        $kategori = $admin->role === 'admin'
-            ? array_keys($kategoriKataKunci) // Semua kategori untuk admin
+        
+        // Modifikasi logika untuk menentukan kategori berdasarkan role
+        $kategori = in_array($admin->role, ['superadmin', 'admin'])
+            ? array_keys($kategoriKataKunci) // Semua kategori untuk superadmin dan admin
             : ($kategoriDeputi[$admin->role] ?? []); // Kategori sesuai role Deputi
 
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
-        // Jika pengguna adalah admin, hitung semua laporan
-        if ($admin->role === 'admin') {
+        
+        // Jika pengguna adalah superadmin atau admin, hitung semua laporan
+        if (in_array($admin->role, ['superadmin', 'admin'])) {
             $totalLaporan = $totalLaporanQuery->count();
         } elseif ($admin->role === 'analis') {
             // Jika pengguna adalah analis, hitung laporan yang di-assign ke mereka
@@ -41,7 +44,7 @@ class indexAdmin extends Controller
             $totalLaporan = $totalLaporanQuery->where('disposisi', $admin->role)->count();
         }
 
-        //Hitung laporan whatsapp dan tatap muka
+        // Hitung laporan whatsapp dan tatap muka
         $whatsappQuery = clone $totalLaporanQuery;
         $whatsapp = $whatsappQuery->where('sumber_pengaduan', 'whatsapp')->count();
 
@@ -74,8 +77,8 @@ class indexAdmin extends Controller
 
         // Ambil data status berdasarkan role
         $statusData = Laporan::selectRaw('status, COUNT(*) as total')
-            ->when($admin->role !== 'admin', function ($query) use ($admin) {
-                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan admin
+            ->when(!in_array($admin->role, ['superadmin', 'admin']), function ($query) use ($admin) {
+                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin atau admin
             })
             ->groupBy('status')
             ->get()
@@ -106,8 +109,8 @@ class indexAdmin extends Controller
 
         // Data Laporan Harian
         $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
-        ->when($admin->role !== 'admin', function ($query) use ($admin) {
-            $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan admin
+        ->when(!in_array($admin->role, ['superadmin', 'admin']), function ($query) use ($admin) {
+            $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin atau admin
         })
         ->groupBy('tanggal')
         ->orderBy('tanggal', 'ASC')
@@ -173,7 +176,8 @@ class indexAdmin extends Controller
             ELSE 'Lainnya' END as provinsi, COUNT(*) as total
         ");
 
-        if (!empty($kategori) && $role !== 'admin') {
+        // Memperbolehkan akses untuk superadmin dan admin
+        if (!empty($kategori) && !in_array($role, ['superadmin', 'admin'])) {
             $query->whereIn('kategori', $kategori)->where('disposisi', $role);
         }
 
@@ -187,7 +191,8 @@ class indexAdmin extends Controller
             ->orderBy('total', 'desc')
             ->take(5);
 
-        if (!empty($kategori) && $role !== 'admin') {
+        // Memperbolehkan akses untuk superadmin dan admin
+        if (!empty($kategori) && !in_array($role, ['superadmin', 'admin'])) {
             $query->whereIn('kategori', $kategori)->where('disposisi', $role);
         }
 
@@ -198,7 +203,8 @@ class indexAdmin extends Controller
     {
         $query = Laporan::selectRaw('kategori, COUNT(*) as total');
 
-        if (!empty($kategori) && $role !== 'admin') {
+        // Memperbolehkan akses untuk superadmin dan admin
+        if (!empty($kategori) && !in_array($role, ['superadmin', 'admin'])) {
             $query->whereIn('kategori', $kategori)->where('disposisi', $role);
         }
 
