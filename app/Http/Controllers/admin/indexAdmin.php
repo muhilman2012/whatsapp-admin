@@ -30,7 +30,7 @@ class indexAdmin extends Controller
 
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
-        
+
         // Jika pengguna adalah superadmin atau admin, hitung semua laporan
         if (in_array($admin->role, ['superadmin', 'admin'])) {
             $totalLaporan = $totalLaporanQuery->count();
@@ -41,7 +41,10 @@ class indexAdmin extends Controller
             })->count();
         } else {
             // Jika pengguna adalah deputi atau role lainnya
-            $totalLaporan = $totalLaporanQuery->where('disposisi', $admin->role)->count();
+            $totalLaporan = $totalLaporanQuery->where(function ($query) use ($admin) {
+                $query->where('disposisi', $admin->role)
+                    ->orWhere('disposisi_terbaru', $admin->role); // Tambahkan kondisi untuk disposisi_terbaru
+            })->count();
         }
 
         // Hitung laporan whatsapp dan tatap muka

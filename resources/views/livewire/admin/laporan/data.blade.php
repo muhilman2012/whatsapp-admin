@@ -104,6 +104,13 @@
                     <option value="99999999999">All</option>
                 </select>
             </div>
+            <!-- Select Urutan -->
+            <div class="ms-2">
+                <select wire:model="sortDirection" class="form-select">
+                    <option value="desc">Terbaru</option>
+                    <option value="asc">Terlama</option>
+                </select>
+            </div>
             <!-- Tombol Import -->
             @if (auth('admin')->user()->role === 'superadmin')
             <div class="ms-2">

@@ -28,7 +28,7 @@ class UserManagementController extends Controller
             'phone' => 'nullable|string|max:15',
             'born' => 'nullable|date',
             'address' => 'nullable|string',
-            'role' => 'required|in:deputi_1,deputi_2,deputi_3,deputi_4,analis',
+            'role' => 'required|in:admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
             'jabatan' => 'required|string|max:255',
             'deputi' => 'required|string',
             'unit' => 'required|string',
@@ -65,7 +65,7 @@ class UserManagementController extends Controller
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:admins,email,' . $user->id_admins . ',id_admins',
-            'role' => 'required|in:admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
+            'role' => 'required|in:superadmin,admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
             'jabatan' => 'nullable|string|max:255', // Ubah menjadi nullable
             'deputi' => 'nullable|string', // Ubah menjadi nullable
             'unit' => 'nullable|string', // Ubah menjadi nullable
