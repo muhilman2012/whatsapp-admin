@@ -41,7 +41,7 @@ class Data extends Component
         // Terima filter kategori dari URL
         $this->filterKategori = request()->get('filterKategori', '');
 
-        // Ambil analis berdasarkan kedeputian pengguna yang sedang login
+        // Muat data analis berdasarkan role pengguna
         $this->loadAnalisByDeputi();
     }
 
@@ -295,12 +295,26 @@ class Data extends Component
 
     public function loadAnalisByDeputi()
     {
-        $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini
+        $user = auth()->guard('admin')->user(); // Ambil data pengguna yang sedang login
 
-        // Ambil analis berdasarkan kedeputian pengguna
-        $this->analisList = admins::where('role', 'analis')
-            ->where('deputi', $user->role) // Filter berdasarkan kedeputian
-            ->get(['id_admins', 'username']);
+        if ($user->role === 'admin' || $user->role === 'superadmin') {
+            // Admin dan Superadmin dapat melihat semua data analis, diurutkan berdasarkan username (A-Z)
+            $this->analisList = admins::where('role', 'analis')
+                ->orderBy('username', 'asc') // Urutkan berdasarkan abjad
+                ->get(['id_admins', 'username', 'deputi']);
+        } else {
+            // Role deputi hanya dapat melihat analis dengan deputi yang sesuai
+            $deputiName = self::$deputiMapping[$user->role] ?? null;
+
+            if ($deputiName) {
+                $this->analisList = admins::where('role', 'analis')
+                    ->where('deputi', $deputiName) // Filter berdasarkan nama deputi
+                    ->orderBy('username', 'asc') // Urutkan berdasarkan abjad
+                    ->get(['id_admins', 'username', 'deputi']);
+            } else {
+                $this->analisList = collect(); // Jika tidak cocok, kosongkan data
+            }
+        }
     }
 
     public function updatedSelectedDeputi($value)
@@ -315,4 +329,11 @@ class Data extends Component
             ->where('deputi', $deputi) // Filter berdasarkan kedeputian
             ->get(['id_admins', 'username']);
     }
+
+    private static $deputiMapping = [
+        'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
+        'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+        'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
+        'deputi_4' => 'Deputi Bidang Administrasi',
+    ];    
 }

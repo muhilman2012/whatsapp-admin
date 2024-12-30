@@ -276,29 +276,39 @@
         </div>
     </div>
 
+    <!-- Modal Assign to Analis -->
     <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog">
-            <form wire:submit.prevent="assignToAnalis">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="assignModalLabel">Assign ke Analis</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <select wire:model="selectedAnalis" class="form-control" required>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignModalLabel">Assign to Analis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- List Analis -->
+                    <div class="mb-3">
+                        <label for="selectedAnalis" class="form-label">Pilih Analis</label>
+                        <select wire:model="selectedAnalis" class="form-select" id="selectedAnalis">
                             <option value="">Pilih Analis</option>
                             @foreach($analisList as $analis)
-                                <option value="{{ $analis->id_admins }}">{{ $analis->username }}</option>
+                                <option value="{{ $analis->id_admins }}">
+                                    {{ $analis->username }}
+                                </option>
                             @endforeach
                         </select>
-                        <textarea wire:model.defer="assignNotes" class="form-control mt-3" placeholder="Catatan untuk analis"></textarea>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Assign</button>
+
+                    <!-- Catatan -->
+                    <div class="mb-3">
+                        <label for="assignNotes" class="form-label">Catatan</label>
+                        <textarea wire:model="assignNotes" class="form-control" id="assignNotes" rows="3"></textarea>
                     </div>
                 </div>
-            </form>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" wire:click="assignToAnalis" class="btn btn-primary">Assign</button>
+                </div>
+            </div>
         </div>
     </div>
 
