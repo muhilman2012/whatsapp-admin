@@ -157,19 +157,9 @@
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
                     <td>
-                        @if (auth('admin')->user()->role === 'superadmin' || auth('admin')->user()->role === 'admin')
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                             <!-- Menampilkan nama deputi -->
-                            {{ $item->disposisi_terbaru ?? $item->disposisi ?? 'Belum ada disposisi ke deputi' }}
-                        @elseif (str_starts_with(auth('admin')->user()->role, 'deputi_'))
-                            <!-- Menampilkan nama analis yang menangani -->
-                            @php
-                                $assignment = $item->assignment->where('laporan_id', $item->id)->first();
-                            @endphp
-                            @if ($assignment && $assignment->analis)
-                                {{ $assignment->analis->nama ?? 'Nama analis tidak ditemukan' }}
-                            @else
-                                <span class="text-danger">Belum diteruskan ke analis</span>
-                            @endif
+                            {{ $item->disposisi_terbaru ?? $item->disposisi ?? 'Belum terdisposisi' }}
                         @elseif (auth('admin')->user()->role === 'analis')
                             <!-- Menampilkan nama deputi yang memberikan tugas -->
                             @php
