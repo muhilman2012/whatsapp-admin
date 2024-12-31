@@ -133,7 +133,13 @@
                     <th>Nama Lengkap</th>
                     <th>Judul Pengaduan</th>
                     <th>Kategori</th>
-                    <th>Disposisi</th>
+                    <th>
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
+                            Disposisi
+                        @elseif (auth('admin')->user()->role === 'analis')
+                            Disposisi dari
+                        @endif
+                    </th>
                     <th>Dikirim</th>
                     <th>Sisa Hari</th>
                     <th>Aksi</th>
@@ -150,7 +156,28 @@
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
-                    <td>{{ \Illuminate\Support\Str::limit($item->disposisi_terbaru ?? $item->disposisi, 10) }}</td>
+                    <td>
+                        @if (auth('admin')->user()->role === 'superadmin' || auth('admin')->user()->role === 'admin')
+                            <!-- Menampilkan nama deputi -->
+                            {{ $item->disposisi_terbaru ?? $item->disposisi ?? 'Belum ada disposisi ke deputi' }}
+                        @elseif (str_starts_with(auth('admin')->user()->role, 'deputi_'))
+                            <!-- Menampilkan nama analis yang menangani -->
+                            @php
+                                $assignment = $item->assignment->where('laporan_id', $item->id)->first();
+                            @endphp
+                            @if ($assignment && $assignment->analis)
+                                {{ $assignment->analis->nama ?? 'Nama analis tidak ditemukan' }}
+                            @else
+                                <span class="text-danger">Belum diteruskan ke analis</span>
+                            @endif
+                        @elseif (auth('admin')->user()->role === 'analis')
+                            <!-- Menampilkan nama deputi yang memberikan tugas -->
+                            @php
+                                $assignedBy = $item->assignment->where('laporan_id', $item->id)->first();
+                            @endphp
+                            {{ $assignedBy->assignedBy->nama ?? 'Tidak diketahui' }}
+                        @endif
+                    </td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td>{{ $item->sisa_hari }}</td>
                     <td class="text-nowrap">

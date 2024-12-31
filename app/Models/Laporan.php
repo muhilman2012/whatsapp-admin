@@ -269,7 +269,7 @@ class Laporan extends Model
     public function assignment()
     {
         // Menggunakan hasMany karena satu laporan bisa memiliki banyak assignment
-        return $this->hasOne(Assignment::class, 'laporan_id');
+        return $this->hasMany(Assignment::class, 'laporan_id');
     }
 
     public function assignedTo()
