@@ -37,6 +37,7 @@
                 <option value="deputi_2" {{ $user->role == 'deputi_2' ? 'selected' : '' }}>Deputi 2</option>
                 <option value="deputi_3" {{ $user->role == 'deputi_3' ? 'selected' : '' }}>Deputi 3</option>
                 <option value="deputi_4" {{ $user->role == 'deputi_4' ? 'selected' : '' }}>Deputi 4</option>
+                <option value="asdep" {{ $user->role == 'asdep' ? 'selected' : '' }}>Asdep / Karo</option>
                 <option value="analis" {{ $user->role == 'analis' ? 'selected' : '' }}>Analis</option>
             </select>
         </div>

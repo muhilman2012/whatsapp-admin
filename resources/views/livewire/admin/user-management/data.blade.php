@@ -105,6 +105,7 @@
                                 <option value="deputi_2">Deputi 2</option>
                                 <option value="deputi_3">Deputi 3</option>
                                 <option value="deputi_4">Deputi 4</option>
+                                <option value="asdep">Asdep</option>
                                 <option value="analis">Analis</option>
                             </select>
                         </div>

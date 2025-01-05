@@ -191,17 +191,17 @@
                 @endif
 
                 @if (in_array(auth('admin')->user()->role, ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
-                <!-- Jumlah Aduan yang Terdisposisi -->
+                <!-- Jumlah Aduan yang Terdisposisi ke Analis -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-check-circle fa-3x"></i>
+                            <i class="fas fa-user-check fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">0</p>
+                                <p class="card-title fs-2 mb-0">{{ $totalAssignedToAnalis }}</p> <!-- Menampilkan jumlah terdisposisi ke analis -->
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Terdisposisi</small>
+                            <small class="text-start fw-bold">Terdisposisi ke Analis</small>
                         </div>
                     </div>
                 </div>
@@ -211,7 +211,7 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fa fa-exclamation fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">0</p>
+                                <p class="card-title fs-2 mb-0">{{ $totalNotAssigned }}</p> <!-- Menampilkan jumlah belum terdisposisi -->
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">

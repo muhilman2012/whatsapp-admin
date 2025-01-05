@@ -49,7 +49,7 @@ class Data extends Component
             $this->validate([
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email|unique:admins,email',
-                'role' => 'required|in:superadmin,admin,deputi_1,deputi_2,deputi_3,deputi_4,analis',
+                'role' => 'required|in:superadmin,admin,deputi_1,deputi_2,deputi_3,deputi_4,asdep,analis',
                 'jabatan' => 'nullable|string|max:255',
                 'deputi' => 'nullable|string',
                 'unit' => 'nullable|string',

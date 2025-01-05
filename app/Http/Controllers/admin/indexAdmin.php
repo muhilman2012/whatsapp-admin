@@ -26,7 +26,7 @@ class indexAdmin extends Controller
         // Modifikasi logika untuk menentukan kategori berdasarkan role
         $kategori = in_array($admin->role, ['superadmin', 'admin'])
             ? array_keys($kategoriKataKunci) // Semua kategori untuk superadmin dan admin
-            : ($kategoriDeputi[$admin->role] ?? []); // Kategori sesuai role Deputi
+            : ($admin->role === 'asdep' ? Laporan::getKategoriByUnit($admin->unit) : ($kategoriDeputi[$admin->role] ?? [])); // Kategori sesuai role Deputi atau asdep
 
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
@@ -39,6 +39,10 @@ class indexAdmin extends Controller
             $totalLaporan = $totalLaporanQuery->whereHas('assignment', function ($query) use ($admin) {
                 $query->where('analis_id', $admin->id_admins); // Filter berdasarkan analis yang login
             })->count();
+        } elseif ($admin->role === 'asdep') {
+            // Jika pengguna adalah asdep, hitung laporan berdasarkan kategori unit
+            $kategoriByUnit = Laporan::getKategoriByUnit($admin->unit);
+            $totalLaporan = $totalLaporanQuery->whereIn('kategori', $kategoriByUnit)->count();
         } else {
             // Jika pengguna adalah deputi atau role lainnya
             $totalLaporan = $totalLaporanQuery->where(function ($query) use ($admin) {
@@ -65,10 +69,65 @@ class indexAdmin extends Controller
         $totalTerdisposisi = Laporan::whereNotNull('disposisi')->count();
         $belumTerdisposisi = Laporan::whereNull('disposisi')->count();
 
-        $deputi1 = Laporan::where('disposisi', 'deputi_1')->count();
-        $deputi2 = Laporan::where('disposisi', 'deputi_2')->count();
-        $deputi3 = Laporan::where('disposisi', 'deputi_3')->count();
-        $deputi4 = Laporan::where('disposisi', 'deputi_4')->count();
+        $deputi1 = Laporan::where(function ($query) {
+            $query->where('disposisi', 'deputi_1')
+                  ->orWhere('disposisi_terbaru', 'deputi_1');
+        })->count();
+        
+        $deputi2 = Laporan::where(function ($query) {
+            $query->where('disposisi', 'deputi_2')
+                  ->orWhere('disposisi_terbaru', 'deputi_2');
+        })->count();
+        
+        $deputi3 = Laporan::where(function ($query) {
+            $query->where('disposisi', 'deputi_3')
+                  ->orWhere('disposisi_terbaru', 'deputi_3');
+        })->count();
+        
+        $deputi4 = Laporan::where(function ($query) {
+            $query->where('disposisi', 'deputi_4')
+                  ->orWhere('disposisi_terbaru', 'deputi_4');
+        })->count();
+        
+        // Total laporan yang terassign ke analis
+        $totalAssignedToAnalis = $totalLaporanQuery->whereIn('id', function ($query) use ($admin) {
+            $query->select('laporan_id')
+                ->from('assignments')
+                ->when($admin->role === 'asdep', function ($subQuery) use ($admin) {
+                    $subQuery->whereIn('laporan_id', function ($innerQuery) use ($admin) {
+                        $innerQuery->select('id')
+                            ->from('laporans')
+                            ->whereIn('kategori', Laporan::getKategoriByUnit($admin->unit));
+                    });
+                })
+                ->when($admin->role !== 'asdep' && $admin->role !== 'superadmin' && $admin->role !== 'admin', function ($subQuery) use ($admin) {
+                    $subQuery->whereIn('laporan_id', function ($innerQuery) use ($admin) {
+                        $innerQuery->select('id')
+                            ->from('laporans')
+                            ->where('disposisi', $admin->role);
+                    });
+                });
+        })->count();
+
+        // Total laporan yang belum di-assign
+        $totalNotAssigned = $totalLaporanQuery->whereNotIn('id', function ($query) use ($admin) {
+            $query->select('laporan_id')
+                ->from('assignments')
+                ->when($admin->role === 'asdep', function ($subQuery) use ($admin) {
+                    $subQuery->whereIn('laporan_id', function ($innerQuery) use ($admin) {
+                        $innerQuery->select('id')
+                            ->from('laporans')
+                            ->whereIn('kategori', Laporan::getKategoriByUnit($admin->unit));
+                    });
+                })
+                ->when($admin->role !== 'asdep' && $admin->role !== 'superadmin' && $admin->role !== 'admin', function ($subQuery) use ($admin) {
+                    $subQuery->whereIn('laporan_id', function ($innerQuery) use ($admin) {
+                        $innerQuery->select('id')
+                            ->from('laporans')
+                            ->where('disposisi', $admin->role);
+                    });
+                });
+        })->count();
 
         // Definisikan status secara eksplisit
         $allStatuses = [
@@ -146,6 +205,8 @@ class indexAdmin extends Controller
             'perempuan' => $perempuan,
             'totalTerdisposisi' => $totalTerdisposisi,
             'belumTerdisposisi' => $belumTerdisposisi,
+            'totalAssignedToAnalis' => $totalAssignedToAnalis,
+            'totalNotAssigned' => $totalNotAssigned,
             'deputi1' => $deputi1,
             'deputi2' => $deputi2,
             'deputi3' => $deputi3,

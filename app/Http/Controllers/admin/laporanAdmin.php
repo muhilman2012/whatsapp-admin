@@ -26,10 +26,17 @@ class laporanAdmin extends Controller
             'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
         ];
 
-         // Ambil kategori sesuai role pengguna
-        $kategori = in_array($userRole, ['superadmin', 'admin']) 
-            ? array_keys($kategoriDeputi) // Semua kategori untuk superadmin dan admin
-            : ($kategoriDeputi[$userRole] ?? []); // Kategori sesuai role Deputi
+        // Ambil kategori sesuai role pengguna
+        if (in_array($userRole, ['superadmin', 'admin'])) {
+            // Semua kategori untuk superadmin dan admin
+            $kategori = array_keys($kategoriDeputi);
+        } elseif ($userRole === 'asdep') {
+            // Jika pengguna adalah asdep, ambil kategori berdasarkan unit
+            $kategori = Laporan::getKategoriByUnit(auth()->guard('admin')->user()->unit);
+        } else {
+            // Kategori sesuai role Deputi
+            $kategori = $kategoriDeputi[$userRole] ?? [];
+        }
 
         // Ambil parameter `type` untuk menentukan jenis laporan
         $type = $request->query('type', 'all'); // Default ke `all`

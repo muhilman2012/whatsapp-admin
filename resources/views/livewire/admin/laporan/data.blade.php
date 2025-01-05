@@ -24,20 +24,27 @@
             <div>
                 <input wire:model="search" type="text" class="form-control ms-2" placeholder="Cari...">
             </div>
-            <!-- Select Kategori -->
             <div class="ms-2">
                 <select wire:model="filterKategori" class="form-select ms-2" style="width: 200px;">
                     <option value="" selected>Semua Kategori</option>
-                    <optgroup label="SP4N Lapor">
-                        @foreach ($kategoriSP4NLapor as $item)
-                            <option value="{{ $item }}">{{ $item }}</option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="Kategori Baru">
-                        @foreach ($kategoriBaru as $item)
-                            <option value="{{ $item }}">{{ $item }}</option>
-                        @endforeach
-                    </optgroup>
+                    @if (auth('admin')->user()->role === 'asdep' || auth('admin')->user()->role === 'analis')
+                        <optgroup label="Kategori">
+                            @foreach ($kategoriUnit as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                            @endforeach
+                        </optgroup>
+                    @else
+                        <optgroup label="SP4N Lapor">
+                            @foreach ($kategoriSP4NLapor as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Kategori Baru">
+                            @foreach ($kategoriBaru as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                            @endforeach
+                        </optgroup>
+                    @endif
                 </select>
             </div>
             <!-- Filter Status -->

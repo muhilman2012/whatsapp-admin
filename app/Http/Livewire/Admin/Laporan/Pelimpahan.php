@@ -22,7 +22,23 @@ class Pelimpahan extends Component
 
     public function render()
     {
+        $user = auth()->guard('admin')->user(); // Ambil data pengguna yang sedang login
         $query = Laporan::whereNotNull('disposisi_terbaru');
+
+        // Filter berdasarkan role pengguna
+        if (in_array($user->role, ['superadmin', 'admin'])) {
+            // Superadmin dan Admin dapat melihat semua data pelimpahan
+            // Tidak perlu filter tambahan
+        } elseif ($user->role === 'asdep') {
+            // Ambil kategori berdasarkan unit asdep
+            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);
+            $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori unit
+        } elseif ($user->role === 'analis') {
+            // Analis hanya dapat melihat laporan yang di-assign kepada mereka
+            $query->whereHas('assignment', function ($q) use ($user) {
+                $q->where('analis_id', $user->id_admins); // Filter berdasarkan analis yang login
+            });
+        }
 
         // Pencarian
         if (!empty($this->search)) {

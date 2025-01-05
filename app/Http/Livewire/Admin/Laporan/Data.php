@@ -29,6 +29,7 @@ class Data extends Component
     public $filterAssignment = ''; // Properti untuk menyimpan filter
     public $filterStatus = ''; // Untuk filter status
     public $tanggal; // Properti untuk menyimpan tanggal yang dipilih
+    public $kategoriUnit;
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -41,7 +42,13 @@ class Data extends Component
         // Terima filter kategori dari URL
         $this->filterKategori = request()->get('filterKategori', '');
 
-        // Muat data analis berdasarkan role pengguna
+        // Dapatkan informasi user yang sedang login
+        $user = auth('admin')->user();
+
+        // Muat data kategori sesuai unit pengguna
+        $this->kategoriUnit = Laporan::getKategoriByUnit($user->unit);
+
+        // Muat data analis (jika diperlukan)
         $this->loadAnalisByDeputi();
     }
 
@@ -88,23 +95,26 @@ class Data extends Component
         $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor(); // SP4N Lapor
         $kategoriBaru = Laporan::getKategoriBaru(); // Kategori Baru
 
-        // Ambil daftar analis
-        $analisList = admins::where('role', 'analis')->get(['id_admins', 'username']);
-
         // Query data laporan
         $data = Laporan::with(['assignment.assignedTo', 'assignment.assignedBy']);
 
         // Filter berdasarkan role pengguna
-        if ($user->role === 'analis') {
-            // Hanya ambil laporan yang ditugaskan ke analis yang sedang login
-            $data->whereHas('assignment', function ($query) use ($user) {
-                $query->where('analis_id', $user->id_admins);
-            });
+        if ($user->role === 'asdep') {
+            // Ambil kategori berdasarkan unit asdep
+            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);
+
+            if (!empty($kategoriByUnit)) {
+                $data->whereIn('kategori', $kategoriByUnit);
+            }
         } elseif (in_array($user->role, ['admin', 'superadmin'])) {
             // Jika pengguna adalah admin atau superadmin, tidak ada filter tambahan
-            // Anda bisa menambahkan logika lain jika diperlukan
+        } elseif ($user->role === 'analis') {
+            // Jika pengguna adalah analis, filter berdasarkan assignment
+            $data->whereHas('assignment', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins); // Filter berdasarkan analis yang login
+            });
         } else {
-            // Jika bukan admin atau superadmin, filter berdasarkan disposisi
+            // Jika bukan admin, superadmin, atau analis, filter berdasarkan disposisi
             $data->where(function ($query) use ($user) {
                 $query->where('disposisi', $user->role)
                     ->orWhere('disposisi_terbaru', $user->role);
@@ -152,7 +162,7 @@ class Data extends Component
             'kategoriSP4NLapor' => $kategoriSP4NLapor,
             'kategoriBaru' => $kategoriBaru,
             'namaDeputi' => $namaDeputi,
-            'analisList' => $analisList,
+            'analisList' => $this->analisList,
         ]);
     }
 
@@ -251,11 +261,17 @@ class Data extends Component
             ->with(['assignment.assignedTo', 'assignment.assignedBy']);
 
         // Filter berdasarkan role pengguna
-        if ($user->role === 'analis') {
-            $data->whereHas('assignment', function ($query) use ($user) {
-                $query->where('analis_id', $user->id_admins);
-            });
-        } elseif ($user->role !== 'admin') {
+        if ($user->role === 'asdep') {
+            // Ambil kategori berdasarkan unit asdep
+            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);
+
+            if (!empty($kategoriByUnit)) {
+                $data->whereIn('kategori', $kategoriByUnit);
+            }
+        } elseif (in_array($user->role, ['admin', 'superadmin'])) {
+            // Jika pengguna adalah admin atau superadmin, tidak ada filter tambahan
+        } else {
+            // Jika bukan admin atau superadmin, filter berdasarkan disposisi
             $data->where(function ($query) use ($user) {
                 $query->where('disposisi', $user->role)
                     ->orWhere('disposisi_terbaru', $user->role);
@@ -273,7 +289,7 @@ class Data extends Component
             });
         }
 
-        // Filter berdasarkan kategori
+        // Filter berdasarkan kategori yang dipilih
         if (!empty($this->filterKategori)) {
             $data->where('kategori', $this->filterKategori);
         }
@@ -290,7 +306,7 @@ class Data extends Component
             $data->has('assignment');
         }
 
-        return $data->orderBy($this->sortField, $this->sortDirection)->get();
+        return $data->orderBy($this->sortField, $this->sortDirection)->paginate($this->pages);
     }
 
     public function loadAnalisByDeputi()
@@ -331,9 +347,9 @@ class Data extends Component
     }
 
     private static $deputiMapping = [
-        'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital',
+        'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
         'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
         'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
         'deputi_4' => 'Deputi Bidang Administrasi',
-    ];    
+    ];
 }
