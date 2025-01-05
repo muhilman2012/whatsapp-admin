@@ -17,6 +17,23 @@ class indexAdmin extends Controller
         // Ambil admin yang sedang login
         $admin = auth()->guard('admin')->user();
 
+        // Mapping nama lengkap deputi ke singkatan
+        $deputiMapping = [
+            'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital' => 'deputi_1',
+            'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia' => 'deputi_2',
+            'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan' => 'deputi_3',
+            'Deputi Bidang Administrasi' => 'deputi_4',
+        ];
+        
+        // Ambil nama deputi dari kolom deputi di tabel admins
+        $deputiName = $admin->deputi; // Misalkan kolom 'deputi' di tabel admins berisi nama lengkap
+
+        // Dapatkan singkatan deputi berdasarkan nama lengkap
+        $deputiRole = array_search($deputiName, $deputiMapping);
+
+        // Ambil kategori yang relevan untuk role asdep
+        $kategoriByUnit = Laporan::getKategoriByUnit($admin->unit);
+
         // Ambil daftar kategori sesuai Deputi menggunakan getter
         $kategoriDeputi = Laporan::getKategoriDeputi();
 
@@ -89,7 +106,10 @@ class indexAdmin extends Controller
                   ->orWhere('disposisi_terbaru', 'deputi_4');
         })->count();
         
-        // Total laporan yang terassign ke analis
+        // Total laporan berdasarkan role
+        $totalLaporan = $totalLaporanQuery->count(); // Total laporan untuk role tertentu
+
+        // Hitung jumlah laporan yang sudah di-assign
         $totalAssignedToAnalis = $totalLaporanQuery->whereIn('id', function ($query) use ($admin) {
             $query->select('laporan_id')
                 ->from('assignments')
@@ -107,27 +127,10 @@ class indexAdmin extends Controller
                             ->where('disposisi', $admin->role);
                     });
                 });
-        })->count();
+        })->count(); // Pastikan ini adalah count() untuk mendapatkan integer
 
-        // Total laporan yang belum di-assign
-        $totalNotAssigned = $totalLaporanQuery->whereNotIn('id', function ($query) use ($admin) {
-            $query->select('laporan_id')
-                ->from('assignments')
-                ->when($admin->role === 'asdep', function ($subQuery) use ($admin) {
-                    $subQuery->whereIn('laporan_id', function ($innerQuery) use ($admin) {
-                        $innerQuery->select('id')
-                            ->from('laporans')
-                            ->whereIn('kategori', Laporan::getKategoriByUnit($admin->unit));
-                    });
-                })
-                ->when($admin->role !== 'asdep' && $admin->role !== 'superadmin' && $admin->role !== 'admin', function ($subQuery) use ($admin) {
-                    $subQuery->whereIn('laporan_id', function ($innerQuery) use ($admin) {
-                        $innerQuery->select('id')
-                            ->from('laporans')
-                            ->where('disposisi', $admin->role);
-                    });
-                });
-        })->count();
+        // Hitung total laporan yang belum di-assign
+        $totalNotAssigned = $totalLaporan - $totalAssignedToAnalis; // Ini sekarang harus berfungsi
 
         // Definisikan status secara eksplisit
         $allStatuses = [
@@ -137,10 +140,13 @@ class indexAdmin extends Controller
             'Proses verifikasi dan telaah'
         ];
 
-        // Ambil data status berdasarkan role
+        // Pastikan status data juga diambil dengan benar
         $statusData = Laporan::selectRaw('status, COUNT(*) as total')
-            ->when(!in_array($admin->role, ['superadmin', 'admin']), function ($query) use ($admin) {
-                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin atau admin
+            ->when($admin->role === 'asdep', function ($query) use ($kategoriByUnit) {
+                $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori
+            })
+            ->when(!in_array($admin->role, ['superadmin', 'admin', 'asdep']), function ($query) use ($admin) {
+                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin, admin, atau asdep
             })
             ->groupBy('status')
             ->get()
@@ -169,14 +175,17 @@ class indexAdmin extends Controller
             ];
         }
 
-        // Data Laporan Harian
+        // Query untuk laporan harian
         $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
-        ->when(!in_array($admin->role, ['superadmin', 'admin']), function ($query) use ($admin) {
-            $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin atau admin
-        })
-        ->groupBy('tanggal')
-        ->orderBy('tanggal', 'ASC')
-        ->get();
+            ->when($admin->role === 'asdep', function ($query) use ($kategoriByUnit) {
+                $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori
+            })
+            ->when(!in_array($admin->role, ['superadmin', 'admin', 'asdep']), function ($query) use ($admin) {
+                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin, admin, atau asdep
+            })
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'ASC')
+            ->get();
 
         // Data laporan per provinsi
         $provinsiKeywords = $this->getProvinsiKeywords();
