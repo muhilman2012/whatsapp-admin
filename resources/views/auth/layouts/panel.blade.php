@@ -18,6 +18,16 @@
     <link rel="stylesheet" href="{{ url('/assets/dist/css/auth/panel.css') }}">
     <link rel="stylesheet" href="{{ url('/assets/dist/css/color.css') }}">
     <link rel="stylesheet" href="{{ url('/assets/dist/css/animated.css') }}">
+    <style>
+       body {
+           background-image: url('{{ asset('/images/elements/bg_istana.jpg') }}');
+           background-size: cover;
+           background-position: center;
+           background-repeat: no-repeat;
+           min-height: 100vh;
+           overflow-x: hidden;
+       }
+    </style>
     @livewireStyles
 </head>
 
