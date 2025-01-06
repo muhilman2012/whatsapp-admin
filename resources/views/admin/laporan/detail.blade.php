@@ -53,8 +53,8 @@
                     @if($data->sumber_pengaduan === 'whatsapp')
                         <!-- Jika sumber pengaduan adalah WhatsApp -->
                         <div>
-                            @if($data->dokumen_identitas)
-                                <a href="{{ $data->dokumen_identitas }}" target="_blank">Lihat Identitas , </a>
+                            @if($data->dokumen_ktp)
+                                <a href="{{ $data->dokumen_ktp }}" target="_blank">Lihat Identitas , </a>
                             @endif
 
                             @if($data->dokumen_kk)
