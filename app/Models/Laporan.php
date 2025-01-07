@@ -215,7 +215,7 @@ class Laporan extends Model
     private static $kategoriUnit = [
         'Asisten Deputi Pembangunan Sumber Daya Manusia' => ['Agama', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pendidikan dan Kebudayaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Ketenagakerjaan', 'Kepemudaan dan Olahraga', 'Keluarga Berencana'],
         'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Corona Virus', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana'],
-        'Asisten Deputi Ekonomi dan Keuangan' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional'],
+        'Asisten Deputi Ekonomi dan Keuangan' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional', 'TNI/Polri'],
         'Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat'],
         'Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam' => ['Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Perumahan'],
         'Asisten Deputi Politik, Hukum, dan Otonomi Daerah' => ['Politik dan Hukum', 'Politisasi ASN', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Daerah Perbatasan', 'Pertanahan'],
@@ -223,7 +223,6 @@ class Laporan extends Model
         'Asisten Deputi Tata Kelola Pemerintahan' => ['SP4N Lapor', 'Manajemen ASN', 'Pelayanan Publik'],
         'Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif' => ['Perlindungan Konsumen', 'Teknologi Informasi dan Komunikasi', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan'],
         'Asisten Deputi Hubungan Luar Negeri' => ['Luar Negeri'],
-        'Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan' => ['TNI/Polri'],
         'Biro Perencanaan dan Keuangan' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
     ];    
 
