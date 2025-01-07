@@ -215,8 +215,8 @@ class Laporan extends Model
     private static $kategoriUnit = [
         'Asisten Deputi Pembangunan Sumber Daya Manusia' => ['Agama', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pendidikan dan Kebudayaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Ketenagakerjaan', 'Kepemudaan dan Olahraga', 'Keluarga Berencana'],
         'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Corona Virus', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana'],
-        'Asisten Deputi Ekonomi dan Keuangan' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional', 'TNI/Polri'],
-        'Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat'],
+        'Asisten Deputi Ekonomi dan Keuangan' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional'],
+        'Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'TNI/Polri'],
         'Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam' => ['Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Perumahan'],
         'Asisten Deputi Politik, Hukum, dan Otonomi Daerah' => ['Politik dan Hukum', 'Politisasi ASN', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Daerah Perbatasan', 'Pertanahan'],
         'Asisten Deputi Penanggulangan Kemiskinan' => ['Sosial dan Kesejahteraan'],
