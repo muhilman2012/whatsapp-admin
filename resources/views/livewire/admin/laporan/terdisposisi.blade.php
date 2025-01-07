@@ -57,49 +57,9 @@
                     <option value="Proses verifikasi dan telaah">Verifikasi</option>
                 </select>
             </div>
-            @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
-            <!-- Filter Assignment -->
-            <div class="ms-2">
-                <select wire:model="filterAssignment" class="form-select">
-                    <option value="">Semua Data</option>
-                    <option value="unassigned">Belum Ter-assign</option>
-                    <option value="assigned">Sudah Ter-assign</option>
-                </select>
-            </div>
-            @endif
             <!-- Input Tanggal -->
             <div class="col-auto ms-2">
                 <input wire:model="tanggal" type="date" name="tanggal" id="tanggal" class="form-control" required>
-            </div>
-            <!-- Export Filtered Data -->
-            <div class="ms-2">
-                <div class="dropdown">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="exportFilteredDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        Export Filtered Data
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="exportFilteredDropdown">
-                        <li>
-                            <form action="{{ route('admin.laporan.export.filtered.excel') }}" method="GET">
-                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
-                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
-                                <input type="hidden" name="search" value="{{ $search }}">
-                                <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
-                                <input type="hidden" name="tanggal" value="{{ $tanggal }}">
-                                <button type="submit" class="dropdown-item">Export to Excel</button>
-                            </form>
-                        </li>
-                        <li>
-                            <form action="{{ route('admin.laporan.export.filtered.pdf') }}" method="GET">
-                                <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
-                                <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
-                                <input type="hidden" name="search" value="{{ $search }}">
-                                <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
-                                <input type="hidden" name="tanggal" value="{{ $tanggal }}">
-                                <button type="submit" class="dropdown-item">Export to PDF</button>
-                            </form>
-                        </li>
-                    </ul>
-                </div>
             </div>
             <!-- Select Jumlah Halaman -->
             <div class="ms-2">
@@ -118,12 +78,6 @@
                     <option value="asc">Terlama</option>
                 </select>
             </div>
-            <!-- Tombol Import -->
-            @if (auth('admin')->user()->role === 'superadmin')
-            <div class="ms-2">
-                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">Import</button>
-            </div>
-            @endif
         </div>
     </div>
 
@@ -141,8 +95,8 @@
                     <th>Judul Pengaduan</th>
                     <th>Kategori</th>
                     <th>
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
-                            Disposisi
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
+                            Disposisi ke
                         @elseif (auth('admin')->user()->role === 'analis')
                             Disposisi dari
                         @endif
@@ -164,9 +118,16 @@
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
                     <td>
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
-                            <!-- Menampilkan nama deputi -->
-                            {{ $item->disposisi_terbaru ?? $item->disposisi ?? 'Belum terdisposisi' }}
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                            <!-- Menampilkan nama analis yang menangani -->
+                            @php
+                                $assignment = $item->assignment->where('laporan_id', $item->id)->first();
+                            @endphp
+                            @if ($assignment && $assignment->analis)
+                                {{ $assignment->analis->nama ?? 'Nama analis tidak ditemukan' }}
+                            @else
+                                <span class="text-danger">Belum diteruskan ke analis</span>
+                            @endif
                         @elseif (auth('admin')->user()->role === 'analis')
                             <!-- Menampilkan nama deputi yang memberikan tugas -->
                             @php

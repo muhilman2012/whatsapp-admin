@@ -57,9 +57,11 @@
                     <p class="text-label fw-bold mb-1">Klasifikasi:</p>
                     <p>{{ $data->klasifikasi ?? 'Belum ada klasifikasi' }}</p>
                 </div> -->
-                <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Disposisi:</p>
-                    <p>{{ $data->disposisi ?? 'Belum ada disposisi' }}</p>
+                <div class="col-md-6">  
+                    <p class="text-label fw-bold mb-1">Disposisi:</p>  
+                    <p>  
+                        {{ isset($namaDeputi[$data->disposisi]) ? $namaDeputi[$data->disposisi] : 'Belum ada disposisi' }}  
+                    </p>  
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Judul:</p>
@@ -70,24 +72,40 @@
                     <p>{{ $data->detail }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Dokumen Pendukung:</p>
-                    @if($data->dokumen_pendukung)
-                        @if($data->sumber_pengaduan === 'whatsapp')
-                            <!-- Jika sumber pengaduan adalah WhatsApp -->
-                            <a href="{{ $data->dokumen_pendukung }}" target="_blank">
-                                Lihat Dokumen
-                            </a>
-                        @elseif($data->sumber_pengaduan === 'tatap muka')
-                            <!-- Jika sumber pengaduan adalah Tatap Muka -->
-                            <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank">
-                                Lihat Dokumen
-                            </a>
-                        @else
-                            <!-- Jika sumber pengaduan tidak diketahui -->
-                            <p>Sumber pengaduan tidak valid</p>
-                        @endif
+                    <p class="text-label fw-bold mb-1">Dokumen Pendukung:</p> 
+                    @if($data->sumber_pengaduan === 'whatsapp')
+                        <!-- Jika sumber pengaduan adalah WhatsApp -->
+                        <div>
+                            @if($data->dokumen_ktp)
+                                <a href="{{ $data->dokumen_ktp }}" target="_blank">Lihat Identitas , </a>
+                            @endif
+
+                            @if($data->dokumen_kk)
+                                <a href="{{ $data->dokumen_kk }}" target="_blank">Lihat KK , </a>
+                            @endif
+
+                            @if($data->dokumen_skuasa)
+                                <a href="{{ $data->dokumen_skuasa }}" target="_blank">Lihat Surat Kuasa , </a>
+                            @endif
+
+                            @if($data->dokumen_pendukung)
+                                <a href="{{ $data->dokumen_pendukung }}" target="_blank">Lihat Dokumen Pengaduan</a>
+                            @else
+                                <span>Tidak ada Dokumen Pengaduan</span>
+                            @endif
+                        </div>
+                    @elseif($data->sumber_pengaduan === 'tatap muka')
+                        <!-- Jika sumber pengaduan adalah Tatap Muka -->
+                        <div>
+                            @if($data->dokumen_pendukung)
+                                <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank">Lihat Dokumen Pengaduan</a>
+                            @else
+                                <span>Tidak ada Dokumen Pengaduan</span>
+                            @endif
+                        </div>
                     @else
-                        <p>Tidak ada dokumen pendukung</p>
+                        <!-- Jika sumber pengaduan tidak diketahui -->
+                        <p>Sumber pengaduan tidak valid</p>
                     @endif
                 </div>
             </div>

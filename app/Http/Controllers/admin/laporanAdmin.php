@@ -40,7 +40,7 @@ class laporanAdmin extends Controller
 
         // Ambil parameter `type` untuk menentukan jenis laporan
         $type = $request->query('type', 'all'); // Default ke `all`
-        $validTypes = ['all', 'pelimpahan', 'pending', 'revisi', 'approved'];
+        $validTypes = ['all', 'pelimpahan', 'pending', 'revisi', 'approved', 'terdisposisi'];
 
         if (!in_array($type, $validTypes)) {
             abort(404, 'Halaman tidak ditemukan.');
@@ -52,6 +52,7 @@ class laporanAdmin extends Controller
             'pending' => 'Laporan Pending',
             'revisi' => 'Laporan Revisi',
             'approved' => 'Laporan Approved',
+            'terdisposisi' => 'Laporan Terdisposisi',
             'all' => 'Semua Data Laporan',
         };
 
@@ -68,6 +69,9 @@ class laporanAdmin extends Controller
             })
             ->when($type === 'approved', function ($query) {
                 $query->where('status_analisis', 'Approved'); // Approved
+            })
+            ->when($type === 'terdisposisi', function ($query) {  
+                $query->whereHas('assignment'); // Hanya ambil laporan yang memiliki assignment  
             })
             ->when($request->filterKategori, function ($query) use ($request) {
                 $query->where('kategori', $request->filterKategori);

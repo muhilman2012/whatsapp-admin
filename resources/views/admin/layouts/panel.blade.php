@@ -110,7 +110,7 @@
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
                         </a>
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
+                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'terdisposisi']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Terdisposisi
                         </a>
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
