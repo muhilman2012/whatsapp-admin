@@ -97,23 +97,15 @@ class Terdisposisi extends Component
     
         // Filter berdasarkan role pengguna  
         if ($user->role === 'asdep') {  
-            // Ambil kategori berdasarkan unit asdep  
-            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);  
-    
-            if (!empty($kategoriByUnit)) {  
-                $data->whereIn('kategori', $kategoriByUnit);  
-            }  
-    
-            // Hanya ambil laporan yang di-disposisi ke asdep ini  
-            $data->where(function ($query) use ($user) {  
-                $query->where('disposisi', $user->role)  
-                    ->orWhere('disposisi_terbaru', $user->role);  
+            // Asdep hanya dapat melihat laporan yang di-disposisi kepada mereka  
+            $data->whereHas('assignment', function ($query) use ($user) {  
+                $query->where('assigned_by', $user->id_admins); // Filter berdasarkan assignedBy  
             });  
         } elseif (in_array($user->role, ['admin', 'superadmin'])) {  
             // Jika pengguna adalah admin atau superadmin, ambil semua laporan yang sudah ter-assign  
             $data->whereHas('assignment'); // Hanya ambil laporan yang memiliki assignment  
         } elseif (in_array($user->role, ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'])) {  
-            // Jika pengguna adalah deputi, hanya ambil laporan yang di-disposisi ke mereka  
+            // Deputi hanya dapat melihat laporan yang di-disposisi kepada mereka  
             $data->where(function ($query) use ($user) {  
                 $query->where('disposisi', $user->role)  
                     ->orWhere('disposisi_terbaru', $user->role);  
