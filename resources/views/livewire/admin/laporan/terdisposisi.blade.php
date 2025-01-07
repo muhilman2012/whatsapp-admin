@@ -95,7 +95,7 @@
                     <th>Judul Pengaduan</th>
                     <th>Kategori</th>
                     <th>
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                             Disposisi ke
                         @elseif (auth('admin')->user()->role === 'analis')
                             Disposisi dari
