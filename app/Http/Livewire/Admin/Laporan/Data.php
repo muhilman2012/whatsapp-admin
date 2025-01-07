@@ -309,29 +309,35 @@ class Data extends Component
         return $data->orderBy($this->sortField, $this->sortDirection)->paginate($this->pages);
     }
 
-    public function loadAnalisByDeputi()
-    {
-        $user = auth()->guard('admin')->user(); // Ambil data pengguna yang sedang login
-
-        if ($user->role === 'admin' || $user->role === 'superadmin') {
-            // Admin dan Superadmin dapat melihat semua data analis, diurutkan berdasarkan username (A-Z)
-            $this->analisList = admins::where('role', 'analis')
-                ->orderBy('username', 'asc') // Urutkan berdasarkan abjad
-                ->get(['id_admins', 'username', 'deputi']);
-        } else {
-            // Role deputi hanya dapat melihat analis dengan deputi yang sesuai
-            $deputiName = self::$deputiMapping[$user->role] ?? null;
-
-            if ($deputiName) {
-                $this->analisList = admins::where('role', 'analis')
-                    ->where('deputi', $deputiName) // Filter berdasarkan nama deputi
-                    ->orderBy('username', 'asc') // Urutkan berdasarkan abjad
-                    ->get(['id_admins', 'username', 'deputi']);
-            } else {
-                $this->analisList = collect(); // Jika tidak cocok, kosongkan data
-            }
-        }
-    }
+    public function loadAnalisByDeputi()  
+    {  
+        $user = auth()->guard('admin')->user(); // Ambil data pengguna yang sedang login  
+    
+        if ($user->role === 'admin' || $user->role === 'superadmin') {  
+            // Admin dan Superadmin dapat melihat semua data analis, diurutkan berdasarkan username (A-Z)  
+            $this->analisList = admins::where('role', 'analis')  
+                ->orderBy('username', 'asc') // Urutkan berdasarkan abjad  
+                ->get(['id_admins', 'username', 'deputi']);  
+        } elseif ($user->role === 'asdep') {  
+            // Role asdep hanya dapat melihat analis dengan deputi yang sesuai  
+            $this->analisList = admins::where('role', 'analis')  
+                ->where('deputi', $user->unit) // Filter berdasarkan unit asdep  
+                ->orderBy('username', 'asc') // Urutkan berdasarkan abjad  
+                ->get(['id_admins', 'username', 'deputi']);  
+        } else {  
+            // Role deputi hanya dapat melihat analis dengan deputi yang sesuai  
+            $deputiName = self::$deputiMapping[$user->role] ?? null;  
+    
+            if ($deputiName) {  
+                $this->analisList = admins::where('role', 'analis')  
+                    ->where('deputi', $deputiName) // Filter berdasarkan nama deputi  
+                    ->orderBy('username', 'asc') // Urutkan berdasarkan abjad  
+                    ->get(['id_admins', 'username', 'deputi']);  
+            } else {  
+                $this->analisList = collect(); // Jika tidak cocok, kosongkan data  
+            }  
+        }  
+    }  
 
     public function updatedSelectedDeputi($value)
     {
