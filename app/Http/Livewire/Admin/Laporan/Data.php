@@ -321,7 +321,7 @@ class Data extends Component
         } elseif ($user->role === 'asdep') {  
             // Role asdep hanya dapat melihat analis dengan deputi yang sesuai  
             $this->analisList = admins::where('role', 'analis')  
-                ->where('deputi', $user->unit) // Filter berdasarkan unit asdep  
+                ->where('deputi', $deputiName) // Filter berdasarkan nama deputi 
                 ->orderBy('username', 'asc') // Urutkan berdasarkan abjad  
                 ->get(['id_admins', 'username', 'deputi']);  
         } else {  
