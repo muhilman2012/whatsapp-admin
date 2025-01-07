@@ -319,6 +319,9 @@ class Data extends Component
                 ->orderBy('username', 'asc') // Urutkan berdasarkan abjad  
                 ->get(['id_admins', 'username', 'deputi']);  
         } elseif ($user->role === 'asdep') {  
+            // Role deputi hanya dapat melihat analis dengan deputi yang sesuai  
+            $deputiName = self::$deputiMapping[$user->role] ?? null;  
+            
             // Role asdep hanya dapat melihat analis dengan deputi yang sesuai  
             $this->analisList = admins::where('role', 'analis')  
                 ->where('deputi', $deputiName) // Filter berdasarkan nama deputi 
