@@ -319,17 +319,13 @@ class Data extends Component
                 ->orderBy('username', 'asc') // Urutkan berdasarkan abjad    
                 ->get(['id_admins', 'username', 'deputi']);    
         } elseif ($user->role === 'asdep') {    
-            // Role asdep hanya dapat melihat analis dengan deputi yang sesuai  
-            $deputiName = self::$deputiMapping[$user->role] ?? null; // Ambil nama deputi berdasarkan role asdep  
+            // Role asdep hanya dapat melihat analis berdasarkan kolom deputi yang sama  
+            $deputiName = $user->deputi; // Ambil nama deputi dari pengguna yang sedang login  
     
-            if ($deputiName) {  
-                $this->analisList = admins::where('role', 'analis')    
-                    ->where('deputi', $deputiName) // Filter berdasarkan nama deputi    
-                    ->orderBy('username', 'asc') // Urutkan berdasarkan abjad    
-                    ->get(['id_admins', 'username', 'deputi']);    
-            } else {  
-                $this->analisList = collect(); // Jika tidak cocok, kosongkan data    
-            }  
+            $this->analisList = admins::where('role', 'analis')    
+                ->where('deputi', $deputiName) // Filter berdasarkan nama deputi yang sama    
+                ->orderBy('username', 'asc') // Urutkan berdasarkan abjad    
+                ->get(['id_admins', 'username', 'deputi']);    
         } else {    
             // Role deputi hanya dapat melihat analis dengan deputi yang sesuai    
             $deputiName = self::$deputiMapping[$user->role] ?? null;    
