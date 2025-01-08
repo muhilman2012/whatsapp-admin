@@ -214,7 +214,7 @@ class Laporan extends Model
 
     private static $kategoriUnit = [
         'Asisten Deputi Pembangunan Sumber Daya Manusia' => ['Agama', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pendidikan dan Kebudayaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Ketenagakerjaan', 'Kepemudaan dan Olahraga', 'Keluarga Berencana'],
-        'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Corona Virus', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana'],
+        'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Corona Virus', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana', 'Ketenagakerjaan'],
         'Asisten Deputi Ekonomi dan Keuangan' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional'],
         'Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'TNI/Polri', 'Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan', 'Daerah Perbatasan', 'Pelayanan Publik'], //hapus setelah TNI/Polri
         'Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam' => ['Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Perumahan'],
