@@ -16,6 +16,10 @@
             <th>Kategori</th>
             <th>Status</th>
             <th>Tanggapan</th>
+            <th>Dokumen KTP</th>
+            <th>Dokumen KK</th>
+            <th>Dokumen Pendukung</th>
+            <th>Dokumen Surat Kuasa</th>
         </tr>
     </thead>
     <tbody>
@@ -36,6 +40,10 @@
                 <td>{{ $laporan->kategori }}</td>
                 <td>{{ $laporan->status }}</td>
                 <td>{{ $laporan->tanggapan }}</td>
+                <td>{{ $laporan->dokumen_ktp }}</td>
+                <td>{{ $laporan->dokumen_kk }}</td>
+                <td>{{ $laporan->dokumen_pendukung }}</td>
+                <td>{{ $laporan->dokumen_skuasa }}</td>
             </tr>
         @endforeach
 
