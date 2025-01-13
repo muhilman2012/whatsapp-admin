@@ -83,7 +83,9 @@ class indexAdmin extends Controller
         $perempuan = $perempuanQuery->where('jenis_kelamin', 'P')->count();
 
         // Total laporan yang terdisposisi
-        $totalTerdisposisi = Laporan::whereNotNull('disposisi')->count();
+        $totalTerdisposisi = Laporan::whereNotNull('disposisi')
+            ->whereNotNull('disposisi_terbaru')
+            ->count();
         $belumTerdisposisi = Laporan::whereNull('disposisi')  
             ->whereNull('disposisi_terbaru')  
             ->count();
