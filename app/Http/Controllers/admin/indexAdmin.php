@@ -85,7 +85,7 @@ class indexAdmin extends Controller
         // Total laporan yang terdisposisi
         $totalTerdisposisi = Laporan::whereNotNull('disposisi')->count();
         $belumTerdisposisi = Laporan::whereNull('disposisi')  
-            ->orWhereNotNull('disposisi_terbaru')  
+            ->orWhereNull('disposisi_terbaru')  
             ->count();
 
         $deputi1 = Laporan::where(function ($query) {
