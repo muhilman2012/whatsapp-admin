@@ -47,21 +47,21 @@
             <label for="unit" class="form-label">Unit</label>
             <select class="form-select" id="unit" name="unit" required>
                 <option disabled selected>-- Pilih Unit --</option>
-                <option value="Asisten Deputi Ekonomi dan Keuangan">Asisten Deputi Ekonomi dan Keuangan</option>
-                <option value="Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam">Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam</option>
+                <option value="Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital">Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital</option>
                 <option value="Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif">Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif</option>
+                <option value="Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan">Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan</option>
+                <option value="Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa">Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa</option>
+                <option value="Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga">Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga</option>
                 <option value="Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana">Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana</option>
-                <option value="Asisten Deputi Pembangunan Sumber Daya Manusia">Asisten Deputi Pembangunan Sumber Daya Manusia</option>
-                <option value="Asisten Deputi Penanggulangan Kemiskinan">Asisten Deputi Penanggulangan Kemiskinan</option>
-                <option value="Asisten Deputi Tata Kelola Pemerintahan">Asisten Deputi Tata Kelola Pemerintahan</option>
-                <option value="Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan">Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan</option>
-                <option value="Asisten Deputi Politik, Hukum, dan Otonomi Daerah">Asisten Deputi Politik, Hukum, dan Otonomi Daerah</option>
-                <option value="Asisten Deputi Hubungan Luar Negeri">Asisten Deputi Hubungan Luar Negeri</option>
+                <option value="Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga">Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga</option>
+                <option value="Asisten Deputi Hubungan Luar Negeri dan Pertahanan">Asisten Deputi Hubungan Luar Negeri dan Pertahanan</option>
+                <option value="Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia">Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia</option>
+                <option value="Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah">Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah</option>
+                <option value="Biro Tata Usaha dan Sumber Daya Manusia">Biro Tata Usaha dan Sumber Daya Manusia</option>
                 <option value="Biro Perencanaan dan Keuangan">Biro Perencanaan dan Keuangan</option>
-                <option value="Biro Tata Usaha,Teknologi Informasi, dan Kepegawaian">Biro Tata Usaha,Teknologi Informasi, dan Kepegawaian</option>
-                <option value="Biro Pers, Media, dan Informasi">Biro Pers, Media, dan Informasi</option>
-                <option value="Biro Protokol dan Kerumahtanggaan">Biro Protokol dan Kerumahtanggaan</option>
                 <option value="Biro Umum">Biro Umum</option>
+                <option value="Biro Protokol dan Kerumahtanggaan">Biro Protokol dan Kerumahtanggaan</option>
+                <option value="Biro Pers, Media, dan Informasi">Biro Pers, Media, dan Informasi</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>

@@ -61,21 +61,21 @@
             <select class="form-select" id="unit" name="unit" required>
                 <option selected disabled>-- Pilih Unit --</option>
                 <option value="Admin" {{ $user->deputi == 'Admin' ? 'selected' : '' }}>Admin</option>
-                <option value="Asisten Deputi Ekonomi dan Keuangan" {{ $user->unit == 'Asisten Deputi Ekonomi dan Keuangan' ? 'selected' : '' }}>Asisten Deputi Ekonomi dan Keuangan</option>
-                <option value="Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam" {{ $user->unit == 'Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam' ? 'selected' : '' }}>Asisten Deputi Infrastruktur, Ketahanan Energi, dan Sumber Daya Alam</option>
+                <option value="Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital" {{ $user->unit == 'Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital' ? 'selected' : '' }}>Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital</option>
                 <option value="Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif" {{ $user->unit == 'Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif' ? 'selected' : '' }}>Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif</option>
+                <option value="Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan" {{ $user->unit == 'Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan' ? 'selected' : '' }}>Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan</option>
+                <option value="Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa" {{ $user->unit == 'Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa' ? 'selected' : '' }}>Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa</option>
+                <option value="Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga" {{ $user->unit == 'Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga' ? 'selected' : '' }}>Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga</option>
                 <option value="Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana" {{ $user->unit == 'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' ? 'selected' : '' }}>Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana</option>
-                <option value="Asisten Deputi Pembangunan Sumber Daya Manusia" {{ $user->unit == 'Asisten Deputi Pembangunan Sumber Daya Manusia' ? 'selected' : '' }}>Asisten Deputi Pembangunan Sumber Daya Manusia</option>
-                <option value="Asisten Deputi Penanggulangan Kemiskinan" {{ $user->unit == 'Asisten Deputi Penanggulangan Kemiskinan' ? 'selected' : '' }}>Asisten Deputi Penanggulangan Kemiskinan</option>
-                <option value="Asisten Deputi Tata Kelola Pemerintahan" {{ $user->unit == 'Asisten Deputi Tata Kelola Pemerintahan' ? 'selected' : '' }}>Asisten Deputi Tata Kelola Pemerintahan</option>
-                <option value="Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan" {{ $user->unit == 'Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan' ? 'selected' : '' }}>Asisten Deputi Wawasan Kebangsaan, Pertahanan, dan Keamanan</option>
-                <option value="Asisten Deputi Politik, Hukum, dan Otonomi Daerah" {{ $user->unit == 'Asisten Deputi Politik, Hukum, dan Otonomi Daerah' ? 'selected' : '' }}>Asisten Deputi Politik, Hukum, dan Otonomi Daerah</option>
-                <option value="Asisten Deputi Hubungan Luar Negeri" {{ $user->unit == 'Asisten Deputi Hubungan Luar Negeri' ? 'selected' : '' }}>Asisten Deputi Hubungan Luar Negeri</option>
+                <option value="Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga" {{ $user->unit == 'Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga' ? 'selected' : '' }}>Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga</option>
+                <option value="Asisten Deputi Hubungan Luar Negeri dan Pertahanan" {{ $user->unit == 'Asisten Deputi Hubungan Luar Negeri dan Pertahanan' ? 'selected' : '' }}>Asisten Deputi Hubungan Luar Negeri dan Pertahanan</option>
+                <option value="Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia" {{ $user->unit == 'Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia' ? 'selected' : '' }}>Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia</option>
+                <option value="Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah" {{ $user->unit == 'Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah' ? 'selected' : '' }}>Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah</option>
+                <option value="Biro Tata Usaha dan Sumber Daya Manusia" {{ $user->unit == 'Biro Tata Usaha dan Sumber Daya Manusia' ? 'selected' : '' }}>Biro Tata Usaha dan Sumber Daya Manusia</option>
                 <option value="Biro Perencanaan dan Keuangan" {{ $user->unit == 'Biro Perencanaan dan Keuangan' ? 'selected' : '' }}>Biro Perencanaan dan Keuangan</option>
-                <option value="Biro Tata Usaha,Teknologi Informasi, dan Kepegawaian" {{ $user->unit == 'Biro Tata Usaha,Teknologi Informasi, dan Kepegawaian' ? 'selected' : '' }}>Biro Tata Usaha,Teknologi Informasi, dan Kepegawaian</option>
-                <option value="Biro Pers, Media, dan Informasi" {{ $user->unit == 'Biro Pers, Media, dan Informasi' ? 'selected' : '' }}>Biro Pers, Media, dan Informasi</option>
-                <option value="Biro Protokol dan Kerumahtanggaan" {{ $user->unit == 'Biro Protokol dan Kerumahtanggaan' ? 'selected' : '' }}>Biro Protokol dan Kerumahtanggaan</option>
                 <option value="Biro Umum" {{ $user->unit == 'Biro Umum' ? 'selected' : '' }}>Biro Umum</option>
+                <option value="Biro Protokol dan Kerumahtanggaan" {{ $user->unit == 'Biro Protokol dan Kerumahtanggaan' ? 'selected' : '' }}>Biro Protokol dan Kerumahtanggaan</option>
+                <option value="Biro Pers, Media, dan Informasi" {{ $user->unit == 'Biro Pers, Media, dan Informasi' ? 'selected' : '' }}>Biro Pers, Media, dan Informasi</option>
             </select>
         </div>
         <button type="submit" class="btn btn-primary">Simpan</button>
