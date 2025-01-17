@@ -64,6 +64,7 @@
                     <option value="">Semua Data</option>
                     <option value="unassigned">Belum Ter-assign</option>
                     <option value="assigned">Sudah Ter-assign</option>
+                    <option value="unassigned_disposition">Belum Terdisposisi</option>
                 </select>
             </div>
             @endif

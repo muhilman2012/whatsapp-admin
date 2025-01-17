@@ -143,10 +143,16 @@ class Data extends Component
         }
 
         // Filter berdasarkan status assignment
-        if ($this->filterAssignment === 'unassigned') {
-            $data->doesntHave('assignment'); // Data belum ter-assign
-        } elseif ($this->filterAssignment === 'assigned') {
-            $data->has('assignment'); // Data sudah ter-assign
+        if ($this->filterAssignment === 'unassigned') {  
+            $data->doesntHave('assignment'); // Data belum ter-assign  
+        } elseif ($this->filterAssignment === 'assigned') {  
+            $data->has('assignment'); // Data sudah ter-assign  
+        } elseif ($this->filterAssignment === 'unassigned_disposition') {  
+            // Filter untuk laporan yang belum terdisposisi  
+            $data->where(function ($query) {  
+                $query->whereNull('disposisi')  
+                      ->whereNull('disposisi_terbaru');  
+            });  
         }
 
         // Filter berdasarkan tanggal
