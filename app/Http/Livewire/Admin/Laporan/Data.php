@@ -160,8 +160,20 @@ class Data extends Component
             $data->whereDate('created_at', $this->tanggal);
         }
 
-        // Paginate data
-        $data = $data->orderBy($this->sortField, $this->sortDirection)->paginate($this->pages);
+        // Urutkan data berdasarkan status  
+            $data->orderByRaw("  
+            CASE   
+                WHEN status = 'Proses verifikasi dan telaah' THEN 1  
+                WHEN status = 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' THEN 2  
+                WHEN status = 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' THEN 3  
+                WHEN status = 'Belum dapat diproses lebih lanjut' THEN 4  
+                ELSE 5  
+            END  
+        ")  
+        ->orderBy($this->sortField, $this->sortDirection); // Tambahkan sorting berdasarkan field dan direction yang ada  
+
+        // Paginate data  
+        $data = $data->paginate($this->pages);
 
         return view('livewire.admin.laporan.data', [
             'data' => $data,
