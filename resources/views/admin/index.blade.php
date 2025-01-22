@@ -225,12 +225,10 @@
                 </div>
 
                 <!-- Bar Chart Laporan Harian -->
-                <div class="col-6">
-                    <div class="card border-0 shadow-sm p-3 h-100 justify-content-center" style="overflow-x: auto;">
-                        <!-- Tambahkan div pembungkus dengan lebar dinamis -->
-                        <div style="width: 1000px;"> <!-- Lebar disesuaikan agar hanya 20 bar terlihat -->
-                            <canvas id="laporanHarianChart"></canvas>
-                        </div>
+                <div class="col-12" style="overflow-x: auto;">
+                    <!-- Pembungkus untuk chart dengan lebar dinamis -->
+                    <div id="chartWrapper" style="min-width: 1200px;"> <!-- Default lebar sesuai kebutuhan -->
+                        <canvas id="laporanHarianChart"></canvas>
                     </div>
                 </div>
 
@@ -302,9 +300,17 @@
         const ctx = document.getElementById('laporanHarianChart').getContext('2d');
         const laporanHarian = @json($laporanHarian);
 
+        // Data untuk chart
         const labels = laporanHarian.map(item => item.tanggal);
         const dataWhatsapp = laporanHarian.map(item => item.total_whatsapp);
         const dataTatapMuka = laporanHarian.map(item => item.total_tatap_muka);
+
+        // Hitung lebar chart secara dinamis (30px per bar, 20 bar max terlihat)
+        const totalBars = labels.length;
+        const barWidth = 30; // Lebar setiap bar
+        const visibleBars = 20; // Jumlah maksimal bar yang ingin terlihat
+        const chartWrapper = document.getElementById('chartWrapper');
+        chartWrapper.style.minWidth = `${Math.max(totalBars * barWidth, visibleBars * barWidth)}px`;
 
         new Chart(ctx, {
             type: 'bar',
@@ -315,32 +321,31 @@
                         label: 'WhatsApp',
                         data: dataWhatsapp,
                         backgroundColor: 'rgba(54, 162, 235, 0.5)', // Warna untuk WhatsApp
-                        barThickness: 30, // Ketebalan bar tetap
+                        barThickness: barWidth, // Ketebalan bar tetap
                     },
                     {
                         label: 'Tatap Muka',
                         data: dataTatapMuka,
                         backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka
-                        barThickness: 30, // Ketebalan bar tetap
+                        barThickness: barWidth, // Ketebalan bar tetap
                     }
                 ]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'x', // Default sumbu x
+                maintainAspectRatio: false, // Memastikan chart tidak terlalu kecil
                 scales: {
                     x: {
                         title: { display: true, text: 'Tanggal' },
-                        stacked: true, // Bar bertumpuk
+                        stacked: true, // Mengaktifkan stacking
                         ticks: {
-                            maxRotation: 45, // Rotasi label agar lebih rapi
+                            maxRotation: 45, // Rotasi label agar rapi
                             minRotation: 0,
                         },
                     },
                     y: {
                         title: { display: true, text: 'Jumlah Laporan' },
-                        stacked: true, // Bar bertumpuk
+                        stacked: true, // Mengaktifkan stacking
                         beginAtZero: true,
                     },
                 },
