@@ -226,8 +226,11 @@
 
                 <!-- Bar Chart Laporan Harian -->
                 <div class="col-6">
-                    <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
-                        <canvas id="laporanHarianChart"></canvas>
+                    <div class="card border-0 shadow-sm p-3 h-100 justify-content-center" style="overflow-x: auto;">
+                        <!-- Tambahkan div pembungkus dengan style overflow -->
+                        <div style="width: 1500px;">
+                            <canvas id="laporanHarianChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -294,60 +297,61 @@
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-<script>  
-    document.addEventListener('DOMContentLoaded', function () {  
-        const ctx = document.getElementById('laporanHarianChart').getContext('2d');  
-        const laporanHarian = @json($laporanHarian);  
-  
-        const labels = laporanHarian.map(item => item.tanggal);  
-        const dataWhatsapp = laporanHarian.map(item => item.total_whatsapp);  
-        const dataTatapMuka = laporanHarian.map(item => item.total_tatap_muka);  
-  
-        new Chart(ctx, {  
-            type: 'bar',  
-            data: {  
-                labels: labels,  
-                datasets: [  
-                    {  
-                        label: 'WhatsApp',  
-                        data: dataWhatsapp,  
-                        backgroundColor: 'rgba(54, 162, 235, 0.5)', // Warna untuk WhatsApp  
-                    },  
-                    {  
-                        label: 'Tatap Muka',  
-                        data: dataTatapMuka,  
-                        backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka  
-                    }  
-                ]  
-            },  
-            options: {  
-                responsive: true,  
-                scales: {  
-                    x: {  
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('laporanHarianChart').getContext('2d');
+        const laporanHarian = @json($laporanHarian);
+
+        const labels = laporanHarian.map(item => item.tanggal);
+        const dataWhatsapp = laporanHarian.map(item => item.total_whatsapp);
+        const dataTatapMuka = laporanHarian.map(item => item.total_tatap_muka);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'WhatsApp',
+                        data: dataWhatsapp,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)', // Warna untuk WhatsApp
+                    },
+                    {
+                        label: 'Tatap Muka',
+                        data: dataTatapMuka,
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
                         title: { display: true, text: 'Tanggal' },
-                        stacked: true, // Mengaktifkan stacking  
-                    },  
-                    y: {  
-                        title: { display: true, text: 'Jumlah Laporan' },  
-                        stacked: true, // Mengaktifkan stacking  
-                        beginAtZero: true  
-                    }  
-                },  
-                plugins: {  
-                    legend: { display: true },  
-                    tooltip: { enabled: true },  
-                    datalabels: {  
-                        anchor: 'end',  
-                        align: 'start',  
-                        formatter: (value) => value,  
-                        color: '#000',  
-                        font: { weight: 'bold' }  
-                    }  
-                }  
-            },  
-            plugins: [ChartDataLabels] // Tambahkan plugin untuk menampilkan data  
-        });  
-    });  
+                        stacked: true, // Mengaktifkan stacking
+                    },
+                    y: {
+                        title: { display: true, text: 'Jumlah Laporan' },
+                        stacked: true, // Mengaktifkan stacking
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: { display: true },
+                    tooltip: { enabled: true },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'start',
+                        formatter: (value) => value,
+                        color: '#000',
+                        font: { weight: 'bold' }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels] // Tambahkan plugin untuk menampilkan data
+        });
+    });
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
