@@ -227,8 +227,8 @@
                 <!-- Bar Chart Laporan Harian -->
                 <div class="col-6">
                     <div class="card border-0 shadow-sm p-3 h-100 justify-content-center" style="overflow-x: auto;">
-                        <!-- Tambahkan div pembungkus dengan style overflow -->
-                        <div style="width: 1500px;">
+                        <!-- Tambahkan div pembungkus dengan lebar dinamis -->
+                        <div style="width: 1000px;"> <!-- Lebar disesuaikan agar hanya 20 bar terlihat -->
                             <canvas id="laporanHarianChart"></canvas>
                         </div>
                     </div>
@@ -315,27 +315,34 @@
                         label: 'WhatsApp',
                         data: dataWhatsapp,
                         backgroundColor: 'rgba(54, 162, 235, 0.5)', // Warna untuk WhatsApp
+                        barThickness: 30, // Ketebalan bar tetap
                     },
                     {
                         label: 'Tatap Muka',
                         data: dataTatapMuka,
                         backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka
+                        barThickness: 30, // Ketebalan bar tetap
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                indexAxis: 'x', // Default sumbu x
                 scales: {
                     x: {
                         title: { display: true, text: 'Tanggal' },
-                        stacked: true, // Mengaktifkan stacking
+                        stacked: true, // Bar bertumpuk
+                        ticks: {
+                            maxRotation: 45, // Rotasi label agar lebih rapi
+                            minRotation: 0,
+                        },
                     },
                     y: {
                         title: { display: true, text: 'Jumlah Laporan' },
-                        stacked: true, // Mengaktifkan stacking
-                        beginAtZero: true
-                    }
+                        stacked: true, // Bar bertumpuk
+                        beginAtZero: true,
+                    },
                 },
                 plugins: {
                     legend: { display: true },
@@ -345,11 +352,11 @@
                         align: 'start',
                         formatter: (value) => value,
                         color: '#000',
-                        font: { weight: 'bold' }
-                    }
-                }
+                        font: { weight: 'bold' },
+                    },
+                },
             },
-            plugins: [ChartDataLabels] // Tambahkan plugin untuk menampilkan data
+            plugins: [ChartDataLabels], // Tambahkan plugin untuk menampilkan data
         });
     });
 </script>
