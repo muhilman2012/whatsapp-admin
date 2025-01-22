@@ -90,25 +90,18 @@ class indexAdmin extends Controller
             ->whereNull('disposisi_terbaru')  
             ->count();
 
-        $deputi1 = Laporan::where(function ($query) {
-            $query->where('disposisi', 'deputi_1')
-                  ->orWhere('disposisi_terbaru', 'deputi_1');
-        })->count();
+        // Hitung total laporan untuk setiap deputi berdasarkan sumber pengaduan
+        $deputi1WhatsApp = Laporan::where('disposisi', 'deputi_1')->where('sumber_pengaduan', 'whatsapp')->count();  
+        $deputi1TatapMuka = Laporan::where('disposisi', 'deputi_1')->where('sumber_pengaduan', 'tatap muka')->count();  
         
-        $deputi2 = Laporan::where(function ($query) {
-            $query->where('disposisi', 'deputi_2')
-                  ->orWhere('disposisi_terbaru', 'deputi_2');
-        })->count();
+        $deputi2WhatsApp = Laporan::where('disposisi', 'deputi_2')->where('sumber_pengaduan', 'whatsapp')->count();  
+        $deputi2TatapMuka = Laporan::where('disposisi', 'deputi_2')->where('sumber_pengaduan', 'tatap muka')->count();  
         
-        $deputi3 = Laporan::where(function ($query) {
-            $query->where('disposisi', 'deputi_3')
-                  ->orWhere('disposisi_terbaru', 'deputi_3');
-        })->count();
+        $deputi3WhatsApp = Laporan::where('disposisi', 'deputi_3')->where('sumber_pengaduan', 'whatsapp')->count();  
+        $deputi3TatapMuka = Laporan::where('disposisi', 'deputi_3')->where('sumber_pengaduan', 'tatap muka')->count();  
         
-        $deputi4 = Laporan::where(function ($query) {
-            $query->where('disposisi', 'deputi_4')
-                  ->orWhere('disposisi_terbaru', 'deputi_4');
-        })->count();
+        $deputi4WhatsApp = Laporan::where('disposisi', 'deputi_4')->where('sumber_pengaduan', 'whatsapp')->count();  
+        $deputi4TatapMuka = Laporan::where('disposisi', 'deputi_4')->where('sumber_pengaduan', 'tatap muka')->count();
         
         // Total laporan berdasarkan role
         $totalLaporan = $totalLaporanQuery->count(); // Total laporan untuk role tertentu
@@ -179,16 +172,18 @@ class indexAdmin extends Controller
             ];
         }
 
-        // Query untuk laporan harian
-        $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal, COUNT(*) as total')
-            ->when($admin->role === 'asdep', function ($query) use ($kategoriByUnit) {
-                $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori
-            })
-            ->when(!in_array($admin->role, ['superadmin', 'admin', 'asdep']), function ($query) use ($admin) {
-                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin, admin, atau asdep
-            })
-            ->groupBy('tanggal')
-            ->orderBy('tanggal', 'ASC')
+        // Query untuk laporan harian  
+        $laporanHarian = Laporan::selectRaw('DATE(created_at) as tanggal,   
+            SUM(CASE WHEN sumber_pengaduan = "whatsapp" THEN 1 ELSE 0 END) as total_whatsapp,   
+            SUM(CASE WHEN sumber_pengaduan = "tatap muka" THEN 1 ELSE 0 END) as total_tatap_muka')  
+            ->when($admin->role === 'asdep', function ($query) use ($kategoriByUnit) {  
+                $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori  
+            })  
+            ->when(!in_array($admin->role, ['superadmin', 'admin', 'asdep']), function ($query) use ($admin) {  
+                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin, admin, atau asdep  
+            })  
+            ->groupBy('tanggal')  
+            ->orderBy('tanggal', 'ASC')  
             ->get();
 
         // Data laporan per provinsi
@@ -220,10 +215,14 @@ class indexAdmin extends Controller
             'belumTerdisposisi' => $belumTerdisposisi,
             'totalAssignedToAnalis' => $totalAssignedToAnalis,
             'totalNotAssigned' => $totalNotAssigned,
-            'deputi1' => $deputi1,
-            'deputi2' => $deputi2,
-            'deputi3' => $deputi3,
-            'deputi4' => $deputi4,
+            'deputi1WhatsApp' => $deputi1WhatsApp,
+            'deputi1TatapMuka' => $deputi1TatapMuka,
+            'deputi2WhatsApp' => $deputi2WhatsApp,
+            'deputi2TatapMuka' => $deputi2TatapMuka,
+            'deputi3WhatsApp' => $deputi3WhatsApp,
+            'deputi3TatapMuka' => $deputi3TatapMuka,
+            'deputi4WhatsApp' => $deputi4WhatsApp,
+            'deputi4TatapMuka' => $deputi4TatapMuka,
             'laporanHarian' => $laporanHarian,
             'provinsiData' => $provinsiData,
             'judulFrequencies' => $judulFrequencies,

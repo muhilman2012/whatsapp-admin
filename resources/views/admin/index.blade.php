@@ -85,9 +85,10 @@
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-briefcase fa-3x"></i>
+                            <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $deputi1 }}</p>
+                                <p class="card-title mb-0">Whatsapp: {{ $deputi1WhatsApp }}</p>
+                                <p class="card-title mb-0">Tatap Muka: {{ $deputi1TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -98,9 +99,10 @@
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-briefcase fa-3x"></i>
+                            <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $deputi2 }}</p>
+                                <p class="card-title mb-0">Whatsapp: {{ $deputi2WhatsApp }}</p>
+                                <p class="card-title mb-0">Tatap Muka: {{ $deputi2TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -143,9 +145,10 @@
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-briefcase fa-3x"></i>
+                            <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $deputi3 }}</p>
+                                <p class="card-title mb-0">Whatsapp: {{ $deputi3WhatsApp }}</p>
+                                <p class="card-title mb-0">Tatap Muka: {{ $deputi3TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -156,9 +159,10 @@
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-briefcase fa-3x"></i>
+                            <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title fs-2 mb-0">{{ $deputi4 }}</p>
+                                <p class="card-title mb-0">Whatsapp: {{ $deputi4WhatsApp }}</p>
+                                <p class="card-title mb-0">Tatap Muka: {{ $deputi4TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -290,48 +294,60 @@
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('laporanHarianChart').getContext('2d');
-        const laporanHarian = @json($laporanHarian);
-
-        const labels = laporanHarian.map(item => item.tanggal);
-        const data = laporanHarian.map(item => item.total);
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Laporan Harian',
-                    data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: true },
-                    tooltip: { enabled: true },
-                    datalabels: { // Menampilkan angka di atas batang
-                        anchor: 'end',
-                        align: 'start',
-                        formatter: (value) => value,
-                        color: '#000',
-                        font: { weight: 'bold' }
-                    }
-                },
-                scales: {
-                    x: { title: { display: true, text: 'Tanggal' } },
-                    y: { title: { display: true, text: 'Jumlah Laporan' }, beginAtZero: true }
-                }
-            },
-            plugins: [ChartDataLabels] // Tambahkan plugin untuk menampilkan data
-        });
-    });
+<script>  
+    document.addEventListener('DOMContentLoaded', function () {  
+        const ctx = document.getElementById('laporanHarianChart').getContext('2d');  
+        const laporanHarian = @json($laporanHarian);  
+  
+        const labels = laporanHarian.map(item => item.tanggal);  
+        const dataWhatsapp = laporanHarian.map(item => item.total_whatsapp);  
+        const dataTatapMuka = laporanHarian.map(item => item.total_tatap_muka);  
+  
+        new Chart(ctx, {  
+            type: 'bar',  
+            data: {  
+                labels: labels,  
+                datasets: [  
+                    {  
+                        label: 'WhatsApp',  
+                        data: dataWhatsapp,  
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)', // Warna untuk WhatsApp  
+                    },  
+                    {  
+                        label: 'Tatap Muka',  
+                        data: dataTatapMuka,  
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka  
+                    }  
+                ]  
+            },  
+            options: {  
+                responsive: true,  
+                scales: {  
+                    x: {  
+                        title: { display: true, text: 'Tanggal' },
+                        stacked: true, // Mengaktifkan stacking  
+                    },  
+                    y: {  
+                        title: { display: true, text: 'Jumlah Laporan' },  
+                        stacked: true, // Mengaktifkan stacking  
+                        beginAtZero: true  
+                    }  
+                },  
+                plugins: {  
+                    legend: { display: true },  
+                    tooltip: { enabled: true },  
+                    datalabels: {  
+                        anchor: 'end',  
+                        align: 'start',  
+                        formatter: (value) => value,  
+                        color: '#000',  
+                        font: { weight: 'bold' }  
+                    }  
+                }  
+            },  
+            plugins: [ChartDataLabels] // Tambahkan plugin untuk menampilkan data  
+        });  
+    });  
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
