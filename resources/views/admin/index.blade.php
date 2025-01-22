@@ -33,8 +33,17 @@
             height: 420px !important;
             width: 420px !important;
         }
-
         
+        .chart-container {  
+            width: 100%; /* Atur lebar sesuai kebutuhan */  
+            max-width: 100%; /* Pastikan tidak melebihi lebar kontainer */  
+        }  
+        
+        #laporanHarianChart {  
+            width: 2000px; /* Atur lebar canvas sesuai jumlah tanggal */  
+            height: 400px; /* Atur tinggi sesuai kebutuhan */  
+        }  
+
     </style>
 @endsection
 
@@ -226,8 +235,8 @@
 
                 <!-- Bar Chart Laporan Harian -->
                 <div class="col-6">
-                    <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
-                        <canvas id="laporanHarianChart"></canvas>
+                    <div class="chart-container" style="overflow-x: auto;">  
+                        <canvas id="laporanHarianChart"></canvas>  
                     </div>
                 </div>
 
@@ -312,11 +321,13 @@
                         label: 'WhatsApp',  
                         data: dataWhatsapp,  
                         backgroundColor: 'rgba(54, 162, 235, 0.5)', // Warna untuk WhatsApp  
+                        barThickness: 30,
                     },  
                     {  
                         label: 'Tatap Muka',  
                         data: dataTatapMuka,  
-                        backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka  
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)', // Warna untuk Tatap Muka
+                        barThickness: 30,
                     }  
                 ]  
             },  
