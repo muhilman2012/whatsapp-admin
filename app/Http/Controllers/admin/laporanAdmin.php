@@ -110,9 +110,7 @@ class laporanAdmin extends Controller
             'jenis_kelamin' => 'required|in:L,P',
             'alamat_lengkap' => 'required',
             'judul' => 'required|max:255',
-            'lokasi' => 'required|string|max:255',
             'detail' => 'required',
-            'tanggal_kejadian' => 'nullable|date',
             'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
@@ -137,11 +135,8 @@ class laporanAdmin extends Controller
             'jenis_kelamin' => $request->jenis_kelamin,
             'alamat_lengkap' => $request->alamat_lengkap,
             'judul' => $request->judul,
-            'lokasi' => $request->lokasi,
             'detail' => $request->detail,
-            'lokasi' => $request->lokasi,
             'dokumen_pendukung' => $fileName,
-            'tanggal_kejadian' => $request->tanggal_kejadian,
             'sumber_pengaduan' => 'tatap muka',
         ]);
 

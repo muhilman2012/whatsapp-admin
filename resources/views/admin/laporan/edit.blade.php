@@ -175,8 +175,7 @@
                     <option value="" selected>Pilih Status</option>
                     <option value="Penanganan Selesai" {{ $data->status === 'Penanganan Selesai' ? 'selected' : 'Penanganan Selesai' }}>Penanganan Selesai</option>
                     <option value="Menunggu kelengkapan Data dukung dari Pelapor" {{ $data->status === 'Menunggu kelengkapan Data dukung dari Pelapor' ? 'selected' : '' }}>Menunggu kelengkapan Data dukung dari Pelapor</option>
-                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang" {{ $data->status === 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' ? 'selected' : '' }}>Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang</option>
-                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut" {{ $data->status === 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' ? 'selected' : '' }}>Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut</option>
+                    <option value="Disampaikan kepada Instansi Berwenang dan dalam pemantauan penanganan lebih lanjut" {{ $data->status === 'Disampaikan kepada Instansi Berwenang dan dalam pemantauan penanganan lebih lanjut' ? 'selected' : '' }}>Disampaikan kepada Instansi Berwenang dan dalam pemantauan penanganan lebih lanjut</option>
                     <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
                 </select>
             </div>
