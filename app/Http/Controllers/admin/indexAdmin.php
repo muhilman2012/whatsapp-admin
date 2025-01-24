@@ -307,7 +307,10 @@ class indexAdmin extends Controller
 
     public function showChart()
     {
-        $provinsiData = $this->getProvinsiData();
+        $provinsiData = $this->getProvinsiData()
+            ->sortByDesc('total') // Mengurutkan berdasarkan jumlah laporan terbanyak
+            ->values(); // Reset index agar terurut rapi untuk view
+
         return view('admin.index', compact('provinsiData'));
     }
 
