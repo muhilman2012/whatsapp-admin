@@ -148,6 +148,7 @@
                             Disposisi dari
                         @endif
                     </th>
+                    <th>Sumber</th>
                     <th>Dikirim</th>
                     <th>Sisa Hari</th>
                     <th>Aksi</th>
@@ -174,6 +175,15 @@
                                 $assignedBy = $item->assignment->where('laporan_id', $item->id)->first();
                             @endphp
                             {{ $assignedBy->assignedBy->nama ?? 'Tidak diketahui' }}
+                        @endif
+                    </td>
+                    <td>
+                        @if($item->sumber_pengaduan === 'tatap muka')
+                            <span class="badge bg-primary">TM</span>
+                        @elseif($item->sumber_pengaduan === 'whatsapp')
+                            <span class="badge bg-success">WA</span>
+                        @else
+                            <span class="badge bg-secondary">{{ $item->sumber_pengaduan }}</span>
                         @endif
                     </td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
