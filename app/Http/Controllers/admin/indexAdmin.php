@@ -235,29 +235,80 @@ class indexAdmin extends Controller
     {
         return [
             'Aceh', 'Sumatera Utara', 'Sumatera Barat', 'Riau', 'Kepulauan Riau', 'Jambi',
-            'Sumatera Selatan', 'Bangka Belitung', 'Bengkulu', 'Lampung', 'DKI Jakarta',
-            'Jawa Barat', 'Jawa Tengah', 'Yogyakarta', 'Jawa Timur', 'Banten', 'Bali',
+            'Sumatera Selatan', 'Kepulauan Bangka Belitung', 'Bengkulu', 'Lampung', 'DKI Jakarta',
+            'Jawa Barat', 'Jawa Tengah', 'DI Yogyakarta', 'Jawa Timur', 'Banten', 'Bali',
             'Nusa Tenggara Barat', 'Nusa Tenggara Timur', 'Kalimantan Barat', 'Kalimantan Tengah',
             'Kalimantan Selatan', 'Kalimantan Timur', 'Kalimantan Utara', 'Sulawesi Utara',
             'Sulawesi Tengah', 'Sulawesi Selatan', 'Sulawesi Tenggara', 'Gorontalo',
-            'Sulawesi Barat', 'Maluku', 'Maluku Utara', 'Papua', 'Papua Barat',
+            'Sulawesi Barat', 'Maluku', 'Maluku Utara', 'Papua', 'Papua Barat/Barat Daya',
             'Papua Tengah', 'Papua Selatan', 'Papua Pegunungan'
         ];
     }
 
-    private function getProvinsiData($provinsiKeywords, $kategori, $role)
+    private function getNikToProvinsiMapping()
     {
-        $query = Laporan::selectRaw("
-            CASE " . implode(' ', array_map(fn($provinsi) => "WHEN alamat_lengkap LIKE '%$provinsi%' THEN '$provinsi'", $provinsiKeywords)) . "
-            ELSE 'Lainnya' END as provinsi, COUNT(*) as total
-        ");
+        return [
+            '11' => 'Aceh',
+            '12' => 'Sumatera Utara',
+            '13' => 'Sumatera Barat',
+            '14' => 'Riau',
+            '15' => 'Jambi',
+            '16' => 'Sumatera Selatan',
+            '17' => 'Bengkulu',
+            '18' => 'Lampung',
+            '19' => 'Kepulauan Bangka Belitung',
+            '21' => 'Kepulauan Riau',
+            '31' => 'DKI Jakarta',
+            '32' => 'Jawa Barat',
+            '33' => 'Jawa Tengah',
+            '34' => 'DI Yogyakarta',
+            '35' => 'Jawa Timur',
+            '36' => 'Banten',
+            '51' => 'Bali',
+            '52' => 'Nusa Tenggara Barat',
+            '53' => 'Nusa Tenggara Timur',
+            '61' => 'Kalimantan Barat',
+            '62' => 'Kalimantan Tengah',
+            '63' => 'Kalimantan Selatan',
+            '64' => 'Kalimantan Timur',
+            '65' => 'Kalimantan Utara',
+            '71' => 'Sulawesi Utara',
+            '72' => 'Sulawesi Tengah',
+            '73' => 'Sulawesi Selatan',
+            '74' => 'Sulawesi Tenggara',
+            '75' => 'Gorontalo',
+            '76' => 'Sulawesi Barat',
+            '81' => 'Maluku',
+            '82' => 'Maluku Utara',
+            '91' => 'Papua',
+            '92' => 'Papua Barat/Barat Daya',
+            '93' => 'Papua Selatan',
+            '94' => 'Papua Tengah',
+            '95' => 'Papua Pegunungan'
+        ];
+    }
 
-        // Memperbolehkan akses untuk superadmin dan admin
-        if (!empty($kategori) && !in_array($role, ['superadmin', 'admin'])) {
-            $query->whereIn('kategori', $kategori)->where('disposisi', $role);
+    private function getProvinsiData()
+    {
+        $nikToProvinsiMapping = $this->getNikToProvinsiMapping();
+
+        // Membuat kondisi CASE SQL berdasarkan mapping nik ke provinsi
+        $caseStatement = "CASE ";
+        foreach ($nikToProvinsiMapping as $nik => $provinsi) {
+            $caseStatement .= "WHEN LEFT(nik, 2) = '$nik' THEN '$provinsi' ";
         }
+        $caseStatement .= "ELSE 'Lainnya' END as provinsi";
 
-        return $query->groupBy('provinsi')->get();
+        // Query untuk menghitung jumlah laporan per provinsi
+        return Laporan::selectRaw("$caseStatement, COUNT(*) as total")
+            ->groupBy('provinsi')
+            ->get();
+    }
+
+    public function showChart()
+    {
+        $provinsiData = $this->getProvinsiData();
+        return view('admin.index', compact('provinsiData'));
     }
 
     private function getJudulFrequencies($kategori, $role)

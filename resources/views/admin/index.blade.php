@@ -417,7 +417,10 @@
                 }
             }
         });
-
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
         // Data untuk Chart Judul
         const judulData = @json($judulFrequencies);
 
