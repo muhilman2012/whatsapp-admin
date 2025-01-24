@@ -96,7 +96,7 @@
 
                 <!-- Lokasi -->
                 <div class="mb-3">
-                    <label for="lokasi" class="form-label fw-bold">Lokasi Kejadian <span class="text-danger">*</span></label>
+                    <label for="lokasi" class="form-label fw-bold">Lokasi Kejadian</label>
                     <input type="text" name="lokasi" id="lokasi" class="form-control @error('lokasi') is-invalid @enderror" value="{{ old('lokasi') }}">
                     @error('lokasi')
                     <div class="invalid-feedback">{{ $message }}</div>

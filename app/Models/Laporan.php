@@ -191,7 +191,8 @@ class Laporan extends Model
         'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air'],
         'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli', 'tanah', 'bangunan', 'bpn'],
         'Pelayanan Publik' => ['samsat', 'pelayanan', 'sim', 'birokrasi'],
-        'TNI/Polri' => ['tni', 'polri'],
+        'TNI' => ['tni'],
+        'Polri' => ['polri'],
         'Lainnya' => [],
     ];
 
@@ -220,8 +221,8 @@ class Laporan extends Model
         'Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga' => ['Corona Virus', 'Kesehatan'],
         'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana', 'Ketenagakerjaan', 'Keluarga Berencana'],
         'Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga' => ['Agama', 'Kesetaraan Gender dan Sosial Inklusif', 'Pendidikan dan Kebudayaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Kepemudaan dan Olahraga'],
-        'Asisten Deputi Hubungan Luar Negeri dan Pertahanan' => ['Luar Negeri', 'TNI/Polri'],
-        'Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Politik dan Hukum', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Pertanahan'],
+        'Asisten Deputi Hubungan Luar Negeri dan Pertahanan' => ['Luar Negeri', 'TNI'],
+        'Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Politik dan Hukum', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Pertanahan', 'Polri'],
         'Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah' => ['SP4N Lapor', 'Manajemen ASN', 'Pelayanan Publik', 'Politisasi ASN', 'Netralitas ASN', 'Daerah Perbatasan'],
         'Biro Perencanaan dan Keuangan' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
         'Biro Tata Usaha dan Sumber Daya Manusia' => [],

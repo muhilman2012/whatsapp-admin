@@ -99,48 +99,49 @@ class laporanAdmin extends Controller
         return view('admin.laporan.create');
     }
 
-    public function store(Request $request)
-    {
-        // Validasi data
-        $request->validate([
-            'nomor_pengadu' => 'required|string|max:15', // Nomor pengadu wajib
-            'email' => 'nullable|email|max:255', // Email opsional
-            'nama_lengkap' => 'required|string|max:255',
-            'nik' => 'required|digits:16',
-            'jenis_kelamin' => 'required|in:L,P',
-            'alamat_lengkap' => 'required',
-            'judul' => 'required|max:255',
-            'detail' => 'required',
-            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        ]);
-
-        // Generate nomor tiket unik berupa angka 7 digit
-        $nomorTiket = $this->generateNomorTiket();
-
-        // Proses dokumen pendukung
-        $fileName = null;
-        if ($request->hasFile('dokumen_pendukung')) {
-            $file = $request->file('dokumen_pendukung');
-            $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension(); // Rename file dengan ID tiket
-            $file->move(storage_path('app/public/dokumen'), $fileName); // Simpan file di storage/public
-        }
-
-        // Simpan data ke database
-        Laporan::create([
-            'nomor_tiket' => $nomorTiket,
-            'nomor_pengadu' => $request->nomor_pengadu,
-            'email' => $request->email,
-            'nama_lengkap' => $request->nama_lengkap,
-            'nik' => $request->nik,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'alamat_lengkap' => $request->alamat_lengkap,
-            'judul' => $request->judul,
-            'detail' => $request->detail,
-            'dokumen_pendukung' => $fileName,
-            'sumber_pengaduan' => 'tatap muka',
-        ]);
-
-        return redirect()->route('admin.laporan')->with('success', 'Laporan berhasil ditambahkan.');
+    public function store(Request $request)  
+    {  
+        // Validasi data  
+        $request->validate([  
+            'nomor_pengadu' => 'required|string|max:15', // Nomor pengadu wajib  
+            'email' => 'nullable|email|max:255', // Email opsional  
+            'nama_lengkap' => 'required|string|max:255',  
+            'nik' => 'required|digits:16',  
+            'jenis_kelamin' => 'required|in:L,P',  
+            'alamat_lengkap' => 'required',  
+            'judul' => 'required|max:255',  
+            'detail' => 'required',  
+            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',  
+        ]);  
+    
+        // Generate nomor tiket unik berupa angka 7 digit  
+        $nomorTiket = $this->generateNomorTiket();  
+    
+        // Proses dokumen pendukung  
+        $fileName = null;  
+        if ($request->hasFile('dokumen_pendukung')) {  
+            $file = $request->file('dokumen_pendukung');  
+            $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension(); // Rename file dengan ID tiket  
+            $file->move(storage_path('app/public/dokumen'), $fileName); // Simpan file di storage/public  
+        }  
+    
+        // Simpan data ke database dan simpan model ke dalam variabel  
+        $laporan = Laporan::create([  
+            'nomor_tiket' => $nomorTiket,  
+            'nomor_pengadu' => $request->nomor_pengadu,  
+            'email' => $request->email,  
+            'nama_lengkap' => $request->nama_lengkap,  
+            'nik' => $request->nik,  
+            'jenis_kelamin' => $request->jenis_kelamin,  
+            'alamat_lengkap' => $request->alamat_lengkap,  
+            'judul' => $request->judul,  
+            'detail' => $request->detail,  
+            'dokumen_pendukung' => $fileName,  
+            'sumber_pengaduan' => 'tatap muka',  
+        ]);  
+    
+        // Redirect ke halaman detail laporan dengan nomor tiket dan pesan sukses  
+        return redirect()->route('admin.laporan.detail', ['nomor_tiket' => $laporan->nomor_tiket])->with('success', 'Laporan berhasil ditambahkan.');  
     }
 
     /**
