@@ -83,7 +83,7 @@ class ImportController extends Controller
                         'detail' => $row[12] ?? null,
                         'kategori' => $row[13] ?? null,
                         'status' => "Proses verifikasi dan telaah",
-                        'tanggapan' => "Laporan pengaduan Anda dalam proses verifikasi & penelaahan, sesuai ketentuan akan dilakukan dalam 14 (empat belas) hari kerja sejak laporan lengkap diterima.",
+                        'tanggapan' => "Laporan pengaduan Saudara dalam proses verifikasi & penelaahan.",
                         'sumber_pengaduan' => "tatap muka",
                     ]);
 
