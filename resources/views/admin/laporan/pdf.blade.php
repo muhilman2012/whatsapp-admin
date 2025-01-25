@@ -54,7 +54,7 @@
     <ol>
         <li>Tanda terima ini digunakan hanya untuk kepentingan pelayanan Pengaduan Masyarakat dan tidak dapat digunakan untuk kepentingan peradilan hukum lainnya.</li>
         <li>Pengadu dapat melacak perkembangan penanganan aduan melalui nomor Whatsapp 0811-1704-2204.</li>
-        <li>Untuk kekurangan kelengkapan dokumen pendukung dapat dikirimkan ke alamat email: lapormaswapres@set.wapresri.go.id.</li>
+        <li>Untuk kekurangan kelengkapan dokumen pendukung dapat dikirimkan ke alamat email: datadukunglmw@set.wapresri.go.id.</li>
     </ol>
 
     <div class="watermark">

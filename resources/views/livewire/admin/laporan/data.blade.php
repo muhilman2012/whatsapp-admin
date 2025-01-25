@@ -51,9 +51,9 @@
             <div class="ms-2">
                 <select wire:model="filterStatus" class="form-select">
                     <option value="">Semua Status</option>
-                    <option value="Belum dapat diproses lebih lanjut">Tidak Diproses</option>
-                    <option value="Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang">Pemantauan</option>
-                    <option value="Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
+                    <option value="Penanganan Selesai">Selesai</option>
+                    <option value="Menunggu kelengkapan data dukung dari Pelapor">Kurang Berkas</option>
+                    <option value="Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
                     <option value="Proses verifikasi dan telaah">Verifikasi</option>
                 </select>
             </div>
