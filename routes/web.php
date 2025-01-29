@@ -8,8 +8,9 @@ use App\Http\Controllers\admin\profileAdmin;
 use App\Http\Controllers\admin\ExportController;
 use App\Http\Controllers\admin\ImportController;
 use App\Http\Controllers\admin\UserManagementController;
+use App\Http\Controllers\admin\NotificationController;
 
-
+// auth controllers
 use App\Http\Controllers\auth\authAdmin;
 
 /*
@@ -50,6 +51,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
 
         // Assign to Analis
         Route::post('/dashboard/laporan/assign', [laporanAdmin::class, 'assignToAnalis'])->name('admin.laporan.assign');
+        // Rute untuk mengambil notifikasi berdasarkan analis
+        Route::get('/dashboard/notifications/analyst', [NotificationController::class, 'indexForAnalyst']);
+        // Rute untuk mengambil notifikasi berdasarkan role (misalnya pelimpahan)
+        Route::get('/dashboard/notifications/role-based', [NotificationController::class, 'roleBasedNotifications']);
+        // Rute untuk menandai notifikasi sebagai sudah dibaca
+        Route::post('/dashboard/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);
     });
 
     // Export/Import untuk Admin, Deputi, dan Asdep

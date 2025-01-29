@@ -53,7 +53,7 @@ class indexAdmin extends Controller
             $totalLaporan = $totalLaporanQuery->count();
         } elseif ($admin->role === 'analis') {
             // Jika pengguna adalah analis, hitung laporan yang di-assign ke mereka
-            $totalLaporan = $totalLaporanQuery->whereHas('assignment', function ($query) use ($admin) {
+            $totalLaporan = $totalLaporanQuery->whereHas('assignments', function ($query) use ($admin) {
                 $query->where('analis_id', $admin->id_admins); // Filter berdasarkan analis yang login
             })->count();
         } elseif ($admin->role === 'asdep') {

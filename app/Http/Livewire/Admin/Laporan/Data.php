@@ -5,8 +5,12 @@ namespace App\Http\Livewire\Admin\Laporan;
 use App\Models\Laporan;
 use App\Models\admins;
 use App\Models\Assignment;
+use App\Models\Notification;
+use App\Models\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class Data extends Component
 {
@@ -30,6 +34,9 @@ class Data extends Component
     public $filterStatus = ''; // Untuk filter status
     public $tanggal; // Properti untuk menyimpan tanggal yang dipilih
     public $kategoriUnit;
+    public $currentPageData = [];
+    public $filterPelimpahan = false; // Untuk filter pelimpahan
+    public $filterStatusAnalisis = ''; // Untuk filter status analisis
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -82,7 +89,8 @@ class Data extends Component
 
     public function render()
     {
-        $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini
+        // Ambil data pengguna yang sedang login
+        $user = auth()->guard('admin')->user();
 
         $namaDeputi = [
             'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital',
@@ -91,114 +99,166 @@ class Data extends Component
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        // Ambil kategori dari getter
-        $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor(); // SP4N Lapor
-        $kategoriBaru = Laporan::getKategoriBaru(); // Kategori Baru
+        // Dapatkan data terfilter menggunakan metode getFilteredData
+        $data = $this->getFilteredData();
 
-        // Query data laporan
-        $data = Laporan::with(['assignment.assignedTo', 'assignment.assignedBy']);
+        // Simpan ID data pada halaman yang dipaginate saat ini
+        $this->currentPageData = $data->pluck('id')->toArray();
 
-        // Filter berdasarkan role pengguna
-        if ($user->role === 'asdep') {
-            // Ambil kategori berdasarkan unit asdep
-            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);
+        // Hitung total data yang terfilter berdasarkan kategori, status, dan pencarian
+        $totalFiltered = Laporan::query()
+            ->when($this->filterKategori, function ($query) {
+                $query->where('kategori', $this->filterKategori);
+            })
+            ->when($this->filterStatus, function ($query) {
+                $query->where('status', $this->filterStatus);
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($query) {
+                    $query->where('nomor_tiket', 'like', '%' . $this->search . '%')
+                        ->orWhere('nama_lengkap', 'like', '%' . $this->search . '%')
+                        ->orWhere('nik', 'like', '%' . $this->search . '%')
+                        ->orWhere('status', 'like', '%' . $this->search . '%')
+                        ->orWhere('judul', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->count();
 
-            if (!empty($kategoriByUnit)) {
-                $data->whereIn('kategori', $kategoriByUnit);
-            }
-        } elseif (in_array($user->role, ['admin', 'superadmin'])) {
-            // Jika pengguna adalah admin atau superadmin, tidak ada filter tambahan
-        } elseif ($user->role === 'analis') {
-            // Jika pengguna adalah analis, filter berdasarkan assignment
-            $data->whereHas('assignment', function ($query) use ($user) {
-                $query->where('analis_id', $user->id_admins); // Filter berdasarkan analis yang login
-            });
-        } else {
-            // Jika bukan admin, superadmin, atau analis, filter berdasarkan disposisi
-            $data->where(function ($query) use ($user) {
-                $query->where('disposisi', $user->role)
-                    ->orWhere('disposisi_terbaru', $user->role);
-            });
-        }
-
-        // Pencarian berdasarkan kolom tertentu
-        if (!empty($this->search)) {
-            $data->where(function ($query) {
-                $query->where('nomor_tiket', 'like', '%' . $this->search . '%')
-                    ->orWhere('nama_lengkap', 'like', '%' . $this->search . '%')
-                    ->orWhere('nik', 'like', '%' . $this->search . '%')
-                    ->orWhere('status', 'like', '%' . $this->search . '%')
-                    ->orWhere('judul', 'like', '%' . $this->search . '%');
-            });
-        }
-
-        // Filter berdasarkan kategori yang dipilih
-        if (!empty($this->filterKategori)) {
-            $data->where('kategori', $this->filterKategori);
-        }
-
-        // Filter berdasarkan status
-        if (!empty($this->filterStatus)) {
-            $data->where('status', $this->filterStatus);
-        }
-
-        // Filter berdasarkan status assignment
-        if ($this->filterAssignment === 'unassigned') {  
-            $data->doesntHave('assignment'); // Data belum ter-assign  
-        } elseif ($this->filterAssignment === 'assigned') {  
-            $data->has('assignment'); // Data sudah ter-assign  
-        } elseif ($this->filterAssignment === 'unassigned_disposition') {  
-            // Filter untuk laporan yang belum terdisposisi  
-            $data->where(function ($query) {  
-                $query->whereNull('disposisi')  
-                      ->whereNull('disposisi_terbaru');  
-            });  
-        }
-
-        // Filter berdasarkan tanggal
-        if (!empty($this->tanggal)) {
-            $data->whereDate('created_at', $this->tanggal);
-        }
-
-        // Urutkan data berdasarkan status  
-            $data->orderByRaw("  
-            CASE   
-                WHEN status = 'Proses verifikasi dan telaah' THEN 1  
-                WHEN status = 'Disampaikan kepada Pimpinan K/L untuk penanganan lebih lanjut' THEN 2  
-                WHEN status = 'Dalam pemantauan terhadap penanganan yang sedang dilakukan oleh instansi berwenang' THEN 3  
-                WHEN status = 'Belum dapat diproses lebih lanjut' THEN 4  
-                ELSE 5  
-            END  
-        ")  
-        ->orderBy($this->sortField, $this->sortDirection); // Tambahkan sorting berdasarkan field dan direction yang ada  
-
-        // Paginate data  
-        $data = $data->paginate($this->pages);
+        // Tentukan apakah semua data pada halaman saat ini sudah terpilih
+        $this->selectAll = count(array_intersect($this->currentPageData, $this->selected)) === count($this->currentPageData);
 
         return view('livewire.admin.laporan.data', [
             'data' => $data,
-            'kategoriSP4NLapor' => $kategoriSP4NLapor,
-            'kategoriBaru' => $kategoriBaru,
+            'totalFiltered' => $totalFiltered,
+            'kategoriSP4NLapor' => Laporan::getKategoriSP4NLapor(),
+            'kategoriBaru' => Laporan::getKategoriBaru(),
             'namaDeputi' => $namaDeputi,
             'analisList' => $this->analisList,
         ]);
     }
 
+    public function getFilteredData()  
+    {  
+        $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini  
+    
+        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy']);  
+    
+        // Filter berdasarkan role pengguna  
+        if ($user->role === 'asdep') {  
+            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);  
+            if (!empty($kategoriByUnit)) {  
+                $data->whereIn('kategori', $kategoriByUnit);  
+            }  
+        } elseif (in_array($user->role, ['admin', 'superadmin'])) {  
+            // No additional filters for admin or superadmin  
+        } elseif ($user->role === 'analis') {  
+            $data->whereHas('assignments', function ($query) use ($user) {  
+                $query->where('analis_id', $user->id_admins);  
+            });  
+        } else {  
+            $data->where(function ($query) use ($user) {  
+                $query->where('disposisi', $user->role)  
+                    ->orWhere('disposisi_terbaru', $user->role);  
+            });  
+        }
+
+        // Filter status analisis
+        if ($this->filterStatusAnalisis) {
+            $data->where('status_analisis', $this->filterStatusAnalisis);
+        }
+
+        // Filter data pelimpahan - Menghindari data dengan nilai di kedua kolom disposisi dan disposisi_terbaru
+        // Data pelimpahan: memiliki nilai di kedua kolom disposisi dan disposisi_terbaru
+        if ($this->filterPelimpahan) {
+            $data->whereNotNull('disposisi_terbaru'); // hanya menampilkan laporan yang memiliki disposisi_terbaru
+        } else {
+            // Filter data biasa - hanya ada nilai di kolom disposisi
+            $data->whereNull('disposisi_terbaru'); // hanya menampilkan laporan yang tidak memiliki disposisi_terbaru
+        }
+    
+        // Pencarian berdasarkan kolom tertentu  
+        if (!empty($this->search)) {  
+            $data->where(function ($query) {  
+                $query->where('nomor_tiket', 'like', '%' . $this->search . '%')  
+                    ->orWhere('nama_lengkap', 'like', '%' . $this->search . '%')  
+                    ->orWhere('nik', 'like', '%' . $this->search . '%')  
+                    ->orWhere('status', 'like', '%' . $this->search . '%')  
+                    ->orWhere('judul', 'like', '%' . $this->search . '%');  
+            });  
+        }  
+    
+        // Filter berdasarkan kategori yang dipilih  
+        if (!empty($this->filterKategori)) {  
+            $data->where('kategori', $this->filterKategori);  
+        }  
+    
+        // Filter berdasarkan status  
+        if (!empty($this->filterStatus)) {  
+            $data->where('status', $this->filterStatus);  
+        }  
+    
+        // Filter berdasarkan status assignment  
+        if ($this->filterAssignment === 'unassigned') {  
+            $data->doesntHave('assignments');  
+        } elseif ($this->filterAssignment === 'assigned') {  
+            $data->has('assignments');  
+        } elseif ($this->filterAssignment === 'unassigned_disposition') {  
+            // Filter untuk laporan yang tidak memiliki disposisi dan disposisi_terbaru  
+            $data->whereNull('disposisi')  
+                ->whereNull('disposisi_terbaru'); // Both must be null  
+        } elseif ($this->filterAssignment === 'either_disposition') {  
+            // Filter untuk laporan yang memiliki salah satu dari disposisi atau disposisi_terbaru null  
+            $data->where(function ($query) {  
+                $query->whereNull('disposisi')  
+                    ->orWhereNull('disposisi_terbaru'); // At least one must be null  
+            });  
+        }  
+    
+        // Filter untuk hanya menampilkan laporan dengan disposisi dan disposisi_terbaru terisi  
+        // $data->where(function ($query) {  
+        //     $query->whereNotNull('disposisi')  
+        //         ->orWhereNotNull('disposisi_terbaru');  
+        // });  
+    
+        // Filter berdasarkan tanggal  
+        if (!empty($this->tanggal)) {  
+            $data->whereDate('created_at', $this->tanggal);  
+        }  
+    
+        // Urutkan data berdasarkan status  
+        $data->orderByRaw("
+            CASE
+                WHEN EXISTS(SELECT 1 FROM assignments WHERE assignments.laporan_id = laporans.id) THEN 1
+                ELSE 0
+            END,
+            CASE
+                WHEN status = 'Proses verifikasi dan telaah' THEN 1
+                WHEN status = 'Menunggu kelengkapan data dukung dari Pelapor' THEN 2
+                WHEN status = 'Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut' THEN 3
+                WHEN status = 'Penanganan Selesai' THEN 4
+                ELSE 5
+            END
+        ")->orderBy($this->sortField, $this->sortDirection);  
+    
+        // Paginate data berdasarkan jumlah halaman  
+        return $data->paginate($this->pages);  
+    }
+
     public function updatedSelectAll($value)
     {
         if ($value) {
-            // Pilih semua data yang terlihat dalam pagination
-            $this->selected = Laporan::pluck('id')->toArray();
+            // Tambahkan semua ID data pada halaman saat ini ke selected
+            $this->selected = array_unique(array_merge($this->selected, $this->currentPageData));
         } else {
-            // Kosongkan pilihan
-            $this->selected = [];
+            // Hapus ID data pada halaman saat ini dari selected
+            $this->selected = array_diff($this->selected, $this->currentPageData);
         }
     }
 
     public function updatedSelected()
     {
-        // Pastikan "Select All" berubah berdasarkan data yang dipilih
-        $this->selectAll = count($this->selected) === Laporan::count();
+        // Perbarui status select all berdasarkan data pada halaman saat ini
+        $this->selectAll = count(array_intersect($this->currentPageData, $this->selected)) === count($this->currentPageData);
     }
 
     public function updateKategoriMassal()
@@ -227,104 +287,159 @@ class Data extends Component
         }
     }
 
-    public function assignToAnalis()
-    {
-        if (empty($this->selected) || empty($this->selectedAnalis)) {
-            session()->flash('error', 'Pilih analis dan data terlebih dahulu.');
-            return;
-        }
-
-        $this->validate([
-            'selectedAnalis' => 'required|exists:admins,id_admins',
-            'assignNotes' => 'nullable|string|max:255', // Catatan tidak wajib
-        ]);
-
-        foreach ($this->selected as $laporanId) {
-            Assignment::create([
-                'laporan_id' => $laporanId,
-                'analis_id' => $this->selectedAnalis,
-                'notes' => $this->assignNotes, // Boleh kosong
-                'assigned_by' => auth('admin')->user()->id_admins,
+    public function assignToAnalis()  
+    {  
+        // Check if any reports and an analyst have been selected  
+        if (empty($this->selected) || empty($this->selectedAnalis)) {  
+            session()->flash('error', 'Pilih analis dan data terlebih dahulu.');  
+            return;  
+        }  
+    
+        // Validate the selected analyst and optional notes  
+        $this->validate([  
+            'selectedAnalis' => 'required|exists:admins,id_admins',  
+            'assignNotes' => 'nullable|string|max:255', // Optional notes  
+        ]);  
+    
+        foreach ($this->selected as $laporanId) {  
+            // Check if the report already has an existing assignment  
+            $existingAssignment = Assignment::where('laporan_id', $laporanId)->first();  
+    
+            if ($existingAssignment) {  
+                session()->flash('error', "Laporan #{$laporanId} sudah ditugaskan ke analis lain.");  
+                continue; // Skip to the next report if already assigned  
+            }  
+    
+            // Create a new assignment  
+            Assignment::create([  
+                'laporan_id' => $laporanId,  
+                'analis_id' => $this->selectedAnalis,  
+                'notes' => $this->assignNotes, // Optional notes  
+                'assigned_by' => auth('admin')->user()->id_admins, // ID of the user assigning  
+            ]);  
+    
+            // Send notification to the assigned analyst  
+            Notification::create([  
+                'assigner_id' => auth('admin')->user()->id_admins, // ID of the user assigning  
+                'assignee_id' => $this->selectedAnalis, // ID of the assigned analyst  
+                'laporan_id' => $laporanId, // ID of the report  
+                'is_read' => false, // Set as unread  
+                'message' => "telah ditugaskan kepada Anda.", // Notification message  
             ]);
-        }
 
-        session()->flash('success', 'Laporan berhasil di-assign ke analis.');
-        $this->reset(['selected', 'selectedAnalis', 'assignNotes', 'selectAll']);
-        $this->dispatchBrowserEvent('closeModal', ['modalId' => 'assignModal']);
+            // Log aktivitas penugasan ke analis
+            Log::create([
+                'laporan_id' => $laporanId,
+                'activity' => 'Laporan ditugaskan ke analis ' . $this->selectedAnalis,
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+        }  
+    
+        // Reset selections and show success message  
+        $this->reset(['selected', 'selectAll', 'selectedAnalis']);  
+        session()->flash('success', 'Laporan berhasil di-assign ke analis.');  
     }
 
-    // Logika untuk pelimpahan data
-    public function pelimpahan()
+    public function pelimpahan(Request $request)
     {
+        // Cek jika selected atau selectedDisposisi kosong
         if (empty($this->selected) || empty($this->selectedDisposisi)) {
             session()->flash('error', 'Pilih data dan disposisi baru terlebih dahulu.');
             return;
         }
 
-        Laporan::whereIn('id', $this->selected)->update([
-            'disposisi_terbaru' => $this->selectedDisposisi,
-            'disposisi' => null, // Hilangkan dari disposisi sebelumnya
-        ]);
+        foreach ($this->selected as $laporanId) {
+            $laporan = Laporan::find($laporanId);
 
+            if (!$laporan) {
+                session()->flash('error', "Laporan #{$laporanId} tidak ditemukan.");
+                continue;
+            }
+
+            // Update disposisi_terbaru
+            $laporan->update([
+                'disposisi_terbaru' => $this->selectedDisposisi,
+            ]);
+
+            // Ambil nama kedeputian berdasarkan disposisi yang dipilih
+            $deputiName = $this->getNamaKedeputian($this->selectedDisposisi); // Nama kedeputian
+
+            // Cari assignee_id untuk deputi yang relevan
+            $deputi = admins::where('role', $this->selectedDisposisi)->first();
+            $assigneeId = $deputi ? $deputi->id_admins : null;  // Ambil ID deputi yang relevan
+
+            // Jika assignee_id untuk deputi ditemukan, kirimkan notifikasi
+            if ($assigneeId) {
+                Notification::create([
+                    'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
+                    'assignee_id' => $assigneeId,                        // ID penerima notifikasi (deputi)
+                    'laporan_id' => $laporanId,                           // ID laporan yang dipilih
+                    'message' => 'Pelimpahan data ke ' . $deputiName,     // Pesan notifikasi
+                    'role' => $deputiName,                                // Isi role dengan nama kedeputian
+                    'is_read' => false,                                   // Status notifikasi belum dibaca
+                ]);
+            }
+
+            // Kirim notifikasi ke asdep yang relevan
+            $asdepUsers = admins::where('role', 'asdep')
+                                ->where('deputi', $deputiName) // Filter berdasarkan nama deputi yang sesuai
+                                ->get();
+
+            foreach ($asdepUsers as $asdep) {
+                Notification::create([
+                    'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
+                    'assignee_id' => $asdep->id_admins,                  // ID penerima notifikasi (asdep)
+                    'laporan_id' => $laporanId,                           // ID laporan yang dipilih
+                    'message' => 'Pelimpahan data ke ' . $deputiName,     // Pesan notifikasi
+                    'role' => $deputiName,                                // Isi role dengan nama kedeputian
+                    'is_read' => false,                                   // Status notifikasi belum dibaca
+                ]);
+            }
+
+            // Menyimpan log pelimpahan
+            Log::create([
+                'laporan_id' => $laporanId,
+                'activity' => 'Laporan dipelimpahkan ke deputi ' . $request->$deputiName(),
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+        }
+
+        // Reset pilihan dan tampilkan pesan sukses
         $this->reset(['selected', 'selectedDisposisi']);
         session()->flash('success', 'Pelimpahan berhasil dilakukan.');
         $this->dispatchBrowserEvent('closeModal', ['modalId' => 'pelimpahanModal']);
     }
 
-    public function getFilteredData()
+    // Fungsi untuk mendapatkan nama kedeputian berdasarkan disposisi
+    private function getNamaKedeputian($disposisi)
     {
-        $user = auth()->guard('admin')->user();
+        // Mapping disposisi ke nama kedeputian
+        return self::$deputiMapping[$disposisi] ?? null;  
+    }
 
-        $data = Laporan::query()
-            ->with(['assignment.assignedTo', 'assignment.assignedBy']);
-
-        // Filter berdasarkan role pengguna
-        if ($user->role === 'asdep') {
-            // Ambil kategori berdasarkan unit asdep
-            $kategoriByUnit = Laporan::getKategoriByUnit($user->unit);
-
-            if (!empty($kategoriByUnit)) {
-                $data->whereIn('kategori', $kategoriByUnit);
-            }
-        } elseif (in_array($user->role, ['admin', 'superadmin'])) {
-            // Jika pengguna adalah admin atau superadmin, tidak ada filter tambahan
-        } else {
-            // Jika bukan admin atau superadmin, filter berdasarkan disposisi
-            $data->where(function ($query) use ($user) {
-                $query->where('disposisi', $user->role)
-                    ->orWhere('disposisi_terbaru', $user->role);
-            });
-        }
-
-        // Pencarian berdasarkan kolom tertentu
-        if (!empty($this->search)) {
-            $data->where(function ($query) {
-                $query->where('nomor_tiket', 'like', '%' . $this->search . '%')
-                    ->orWhere('nama_lengkap', 'like', '%' . $this->search . '%')
-                    ->orWhere('nik', 'like', '%' . $this->search . '%')
-                    ->orWhere('status', 'like', '%' . $this->search . '%')
-                    ->orWhere('judul', 'like', '%' . $this->search . '%');
-            });
-        }
-
-        // Filter berdasarkan kategori yang dipilih
-        if (!empty($this->filterKategori)) {
-            $data->where('kategori', $this->filterKategori);
-        }
-
-        // Filter berdasarkan status
-        if (!empty($this->filterStatus)) {
-            $data->where('status', $this->filterStatus);
-        }
-
-        // Filter berdasarkan status assignment
-        if ($this->filterAssignment === 'unassigned') {
-            $data->doesntHave('assignment');
-        } elseif ($this->filterAssignment === 'assigned') {
-            $data->has('assignment');
-        }
-
-        return $data->orderBy($this->sortField, $this->sortDirection)->paginate($this->pages);
+    // Fungsi untuk mendapatkan role berdasarkan disposisi
+    private function getRoleByDisposisi($disposisi)
+    {
+        return $disposisi;  
+    }
+    
+    private function getUserIdByRole($role)  
+    {  
+        // Retrieve the user ID based on the role  
+        return admins::where('role', $role)->first()->id_admins ?? null;  
+    }  
+    
+    private function sendNotification($assignerId, $assigneeId, $laporanId, $message)  
+    {  
+        if ($assigneeId) {  
+            Notification::create([  
+                'assigner_id' => $assignerId,  
+                'assignee_id' => $assigneeId,  
+                'laporan_id' => $laporanId,  
+                'is_read' => false, // Set as unread  
+                'message' => $message, // Add the message for the notification  
+            ]);  
+        }  
     }
 
     public function loadAnalisByDeputi()    

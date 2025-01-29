@@ -69,6 +69,16 @@ class admins extends Authenticatable
         return $this->belongsToMany(Laporan::class, 'assignments', 'assigned_to', 'laporan_id');
     }
 
+    public function assignedAssignments()  
+    {  
+        return $this->hasMany(Assignment::class, 'assigned_by');  
+    }  
+  
+    public function notifications()  
+    {  
+        return $this->hasMany(Notification::class, 'assignee_id');  
+    }
+    
     public function hasRole(array $roles): bool
     {
         return in_array($this->role, $roles);

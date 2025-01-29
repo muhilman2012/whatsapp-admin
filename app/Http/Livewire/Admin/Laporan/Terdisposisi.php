@@ -93,29 +93,30 @@ class Terdisposisi extends Component
         $kategoriBaru = Laporan::getKategoriBaru(); // Kategori Baru  
     
         // Query data laporan  
-        $data = Laporan::with(['assignment.assignedTo', 'assignment.assignedBy']);  
+        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy']);  
     
         // Filter berdasarkan role pengguna  
         if ($user->role === 'asdep') {  
             // Asdep hanya dapat melihat laporan yang di-disposisi kepada mereka  
-            $data->whereHas('assignment', function ($query) use ($user) {  
+            $data->whereHas('assignments', function ($query) use ($user) {  
                 $query->where('assigned_by', $user->id_admins); // Filter berdasarkan assignedBy  
             });  
         } elseif (in_array($user->role, ['admin', 'superadmin'])) {  
             // Jika pengguna adalah admin atau superadmin, ambil semua laporan yang sudah ter-assign  
-            $data->whereHas('assignment'); // Hanya ambil laporan yang memiliki assignment  
+            $data->whereHas('assignments'); // Hanya ambil laporan yang memiliki assignment  
         } elseif (in_array($user->role, ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'])) {  
             // Deputi hanya dapat melihat laporan yang di-disposisi kepada mereka  
-            $data->where(function ($query) use ($user) {  
-                $query->where('disposisi', $user->role)  
-                    ->orWhere('disposisi_terbaru', $user->role);  
-            });  
+            $data->whereHas('assignments', function ($query) use ($user) {  
+                $query->whereHas('assignedBy', function ($subQuery) use ($user) {  
+                    $subQuery->where('deputi', $user->deputi); // Cocokkan dengan kolom deputi  
+                });  
+            }); 
         } elseif ($user->role === 'analis') {  
             // Jika pengguna adalah analis, filter berdasarkan assignment  
-            $data->whereHas('assignment', function ($query) use ($user) {  
+            $data->whereHas('assignments', function ($query) use ($user) {  
                 $query->where('analis_id', $user->id_admins); // Filter berdasarkan analis yang login  
             });  
-        }  
+        }
     
         // Pencarian berdasarkan kolom tertentu  
         if (!empty($this->search)) {  
@@ -152,6 +153,6 @@ class Terdisposisi extends Component
             'kategoriBaru' => $kategoriBaru,  
             'namaDeputi' => $namaDeputi,  
             'analisList' => $this->analisList,  
-        ]);  
+        ]);
     }
 }

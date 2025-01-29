@@ -4,6 +4,10 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
+use App\Models\admins;
+use App\Models\Log;
+use App\Models\Assignment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -71,7 +75,7 @@ class laporanAdmin extends Controller
                 $query->where('status_analisis', 'Approved'); // Approved
             })
             ->when($type === 'terdisposisi', function ($query) {  
-                $query->whereHas('assignment'); // Hanya ambil laporan yang memiliki assignment  
+                $query->whereHas('assignments'); // Hanya ambil laporan yang memiliki assignment  
             })
             ->when($request->filterKategori, function ($query) use ($request) {
                 $query->where('kategori', $request->filterKategori);
@@ -113,10 +117,10 @@ class laporanAdmin extends Controller
             'detail' => 'required',  
             'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',  
         ]);  
-    
+        
         // Generate nomor tiket unik berupa angka 7 digit  
         $nomorTiket = $this->generateNomorTiket();  
-    
+        
         // Proses dokumen pendukung  
         $fileName = null;  
         if ($request->hasFile('dokumen_pendukung')) {  
@@ -124,7 +128,7 @@ class laporanAdmin extends Controller
             $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension(); // Rename file dengan ID tiket  
             $file->move(storage_path('app/public/dokumen'), $fileName); // Simpan file di storage/public  
         }  
-    
+        
         // Simpan data ke database dan simpan model ke dalam variabel  
         $laporan = Laporan::create([  
             'nomor_tiket' => $nomorTiket,  
@@ -138,10 +142,20 @@ class laporanAdmin extends Controller
             'detail' => $request->detail,  
             'dokumen_pendukung' => $fileName,  
             'sumber_pengaduan' => 'tatap muka',  
-        ]);  
-    
+            'petugas' => auth('admin')->user()->nama, // Menyimpan nama petugas yang membuat laporan
+        ]);
+        
+        logger()->info('Laporan baru dibuat oleh ' . auth('admin')->user()->nama . ' dengan nomor tiket ' . $laporan->nomor_tiket);
+
+        // Menyimpan log aktivitas
+        Log::create([
+            'laporan_id' => $laporan->id,
+            'activity' => 'Laporan baru dibuat oleh ' . auth('admin')->user()->nama,
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
         // Redirect ke halaman detail laporan dengan nomor tiket dan pesan sukses  
-        return redirect()->route('admin.laporan.detail', ['nomor_tiket' => $laporan->nomor_tiket])->with('success', 'Laporan berhasil ditambahkan.');  
+        return redirect()->route('admin.laporan.detail', ['nomor_tiket' => $laporan->nomor_tiket])->with('success', 'Laporan berhasil ditambahkan.');
     }
 
     /**
@@ -158,11 +172,17 @@ class laporanAdmin extends Controller
         return $nomorTiket;
     }
 
-    public function show($nomor_tiket)
-    {
-        $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
-
-        return view('admin.laporan.detail', compact('data'));
+    public function show($nomor_tiket)  
+    {  
+        // Fetch the Laporan record along with its associated assignments  
+        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])  
+            ->where('nomor_tiket', $nomor_tiket)  
+            ->firstOrFail();  
+    
+        // Get the latest assignment for the report  
+        $latestAssignment = $data->assignments->last(); // Assuming you want the latest assignment  
+    
+        return view('admin.laporan.detail', compact('data', 'latestAssignment'));  
     }
 
     public function edit($nomor_tiket)
@@ -195,24 +215,84 @@ class laporanAdmin extends Controller
             return redirect()->back()->with('error', 'Laporan tidak ditemukan!');
         }
 
+        // Menyimpan nilai sebelumnya untuk log
+        $oldData = $laporan->toArray();
+
         // Validasi input
         $request->validate([
-            'kategori' => 'required|string',
-            'disposisi' => 'required|string',
             'status' => 'nullable|string|max:255',
             'tanggapan' => 'nullable|string',
         ]);
 
         // Update data laporan
         $laporan->update([
-            'kategori' => $request->kategori,
-            'disposisi' => $request->disposisi,
             'status' => $request->status,
             'tanggapan' => $request->tanggapan,
         ]);
 
-        // Log keberhasilan
-        logger('Data berhasil diperbarui:', $laporan->toArray());
+        // Log pembaruan data
+        logger('Laporan #'.$laporan->nomor_tiket.' diperbarui oleh '.auth('admin')->user()->username, [
+            'old_data' => $oldData,
+            'updated_data' => $laporan->toArray(),
+            'updated_by' => auth('admin')->user()->username
+        ]);
+
+        // Menyimpan log aktivitas
+        Log::create([
+            'laporan_id' => $laporan->id,
+            'activity' => 'Laporan baru diperbarui oleh ' . auth('admin')->user()->nama,
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
+        // Mengambil ID analis yang ditugaskan pada laporan ini
+        $assignments = Assignment::where('laporan_id', $laporan->id)->get();
+        
+        // Kirimkan notifikasi kepada analis yang terlibat
+        foreach ($assignments as $assignment) {
+            $analis = $assignment->assignedTo;
+
+            // Kirim notifikasi kepada analis
+            Notification::create([
+                'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim
+                'assignee_id' => $analis->id_admins,  // ID penerima (analis)
+                'laporan_id' => $laporan->id,  // ID laporan
+                'message' => 'Anda telah memperbarui status/tanggapan',
+                'is_read' => false,  // Notifikasi belum dibaca
+            ]);
+        }
+
+        // Tentukan nama deputi berdasarkan disposisi atau disposisi_terbaru
+        $deputiName = $laporan->disposisi_terbaru ?: $laporan->disposisi; // Pilih disposisi_terbaru jika ada, jika tidak pilih disposisi
+
+        // Cari deputi yang bertanggung jawab terhadap laporan ini (disposisi_terbaru atau disposisi)
+        $deputi = admins::where('role', $deputiName)->first();
+        
+        if ($deputi) {
+            // Kirim notifikasi kepada deputi
+            Notification::create([
+                'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim
+                'assignee_id' => $deputi->id_admins,  // ID penerima (deputi)
+                'laporan_id' => $laporan->id,  // ID laporan
+                'message' => 'Laporan telah diperbarui oleh analis.',
+                'is_read' => false,  // Notifikasi belum dibaca
+            ]);
+        }
+
+        // Kirimkan notifikasi ke asdep yang meng-assign analis tersebut
+        foreach ($assignments as $assignment) {
+            $assignedBy = $assignment->assignedBy; // Ambil asdep yang meng-assign
+
+            if ($assignedBy && $assignedBy->role === 'asdep') { // Pastikan yang meng-assign adalah asdep
+                // Kirim notifikasi kepada asdep
+                Notification::create([
+                    'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim
+                    'assignee_id' => $assignedBy->id_admins,  // ID penerima (asdep)
+                    'laporan_id' => $laporan->id,  // ID laporan
+                    'message' => 'Analis telah memperbarui status/tanggapan',
+                    'is_read' => false,  // Notifikasi belum dibaca
+                ]);
+            }
+        }
 
         // Redirect ke halaman detail dengan pesan sukses
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
@@ -220,25 +300,54 @@ class laporanAdmin extends Controller
 
     public function storeAnalis(Request $request, $nomor_tiket)
     {
-        // dd($request->all());
+        // Ambil data laporan berdasarkan nomor tiket
         $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
         // Validasi input
         $request->validate([
-            'lembar_kerja_analis' => 'required|string',
+            'lembar_kerja_analis' => 'required|string', // Validasi lembar kerja analis
         ]);
 
-        // Simpan lembar kerja analis
+        // Simpan lembar kerja analis dan set status analisis menjadi Pending
         $laporan->update([
             'lembar_kerja_analis' => $request->lembar_kerja_analis,
-            'status_analisis' => 'Pending', // Set status analisis menjadi Pending
+            'status_analisis' => 'Menunggu Persetujuan', // Status analisis menjadi 'Menunggu Persetujuan'
         ]);
 
         // Log keberhasilan
-        logger('Lembar Kerja Analis:', [
+        logger('Lembar Kerja Analis diperbarui oleh '.auth('admin')->user()->username, [
+            'laporan_nomor_tiket' => $laporan->nomor_tiket,
             'lembar_kerja_analis' => $request->lembar_kerja_analis,
+            'status_analisis' => $laporan->status_analisis,
+            'updated_by' => auth('admin')->user()->username
         ]);
 
+        // Menyimpan log aktivitas
+        Log::create([
+            'laporan_id' => $laporan->id,
+            'activity' => 'Laporan dianalisis oleh ' . auth('admin')->user()->nama,
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
+        // Kirimkan notifikasi ke assigner (asdep) yang meng-assign analis ini
+        $assignment = Assignment::where('laporan_id', $laporan->id)->first(); // Ambil data assignment pertama untuk laporan ini
+
+        if ($assignment) {
+            $assigner = $assignment->assignedBy; // Ambil assigner (asdep)
+
+            if ($assigner && $assigner->role === 'asdep') {
+                // Kirimkan notifikasi ke assigner (asdep)
+                Notification::create([
+                    'assigner_id' => auth('admin')->user()->id_admins, // ID pengirim notifikasi
+                    'assignee_id' => $assigner->id_admins, // ID penerima (asdep)
+                    'laporan_id' => $laporan->id, // ID laporan
+                    'message' => 'Analis telah menganalisis Laporan ini',
+                    'is_read' => false, // Notifikasi belum dibaca
+                ]);
+            }
+        }
+
+        // Redirect kembali ke halaman detail laporan dengan pesan sukses
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Lembar Kerja Analis berhasil disimpan.');
     }
 
@@ -343,16 +452,76 @@ class laporanAdmin extends Controller
 
     public function approval(Request $request, $nomorTiket)
     {
+        // Ambil data laporan berdasarkan nomor tiket
         $laporan = Laporan::where('nomor_tiket', $nomorTiket)->firstOrFail();
 
+        // Cek aksi yang dilakukan
         if ($request->approval_action === 'approved') {
-            $laporan->status_analisis = 'Approved';
+            $laporan->status_analisis = 'Disetujui'; // Status analisis berubah menjadi Disetujui
+            $laporan->catatan_analisis = $request->catatan ?? null; // Catatan analisis (nullable)
+
+            // Kirimkan notifikasi ke analis bahwa hasil analisis disetujui
+            $this->sendNotificationToAnalis($laporan, 'Hasil analisis Anda Disetujui');
+
         } elseif ($request->approval_action === 'rejected') {
-            $laporan->status_analisis = 'Rejected';
+            $laporan->status_analisis = 'Perbaikan'; // Status analisis berubah menjadi Perbaikan
+            $laporan->catatan_analisis = $request->catatan ?? null; // Catatan analisis (nullable)
+
+            // Kirimkan notifikasi ke analis bahwa hasil analisis perlu diperbaiki
+            $this->sendNotificationToAnalis($laporan, 'Hasil analisis Anda perlu Perbaikan');
         }
 
+        // Simpan perubahan pada laporan
         $laporan->save();
 
+        // Log perubahan status analisis
+        logger('Status analisis telah diperbarui oleh '.auth('admin')->user()->username, [
+            'old_status' => $laporan->getOriginal('status_analisis'),
+            'new_status' => $laporan->status_analisis,
+            'catatan' => $laporan->catatan_analisis,
+            'updated_by' => auth('admin')->user()->username
+        ]);
+
+        // Menyimpan log aktivitas
+        Log::create([
+            'laporan_id' => $laporan->id,
+            'activity' => 'Analisis disetujui/ditolak oleh ' . auth('admin')->user()->nama,
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
+        // Redirect ke halaman detail laporan dengan pesan sukses
         return redirect()->route('admin.laporan.detail', $nomorTiket)->with('success', 'Status analisis berhasil diperbarui!');
     }
+
+    private function sendNotificationToAnalis($laporan, $message)
+    {
+        // Kirim notifikasi ke analis yang terkait
+        $assignments = Assignment::where('laporan_id', $laporan->id)->get();
+        foreach ($assignments as $assignment) {
+            $analis = $assignment->assignedTo;
+
+            // Kirim notifikasi
+            Notification::create([
+                'assigner_id' => auth('admin')->user()->id_admins,
+                'assignee_id' => $analis->id_admins,
+                'laporan_id' => $laporan->id,
+                'message' => $message,
+                'is_read' => false,
+            ]);
+        }
+    }
+
+    // Fungsi untuk mendapatkan nama kedeputian berdasarkan disposisi
+    private function getNamaKedeputian($disposisi)
+    {
+        // Mapping disposisi ke nama kedeputian
+        return self::$deputiMapping[$disposisi] ?? null;  
+    }
+
+    private static $deputiMapping = [
+        'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital',
+        'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+        'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
+        'deputi_4' => 'Deputi Bidang Administrasi',
+    ];
 }

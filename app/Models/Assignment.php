@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Assignment extends Model
 {
+    use HasFactory;
+    
     protected $fillable = ['laporan_id', 'analis_id', 'notes', 'assigned_by'];
 
     public function assignedTo()

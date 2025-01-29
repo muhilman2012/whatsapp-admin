@@ -8,6 +8,7 @@
     <meta name="author" content="Muhammad Hilman">
     <meta name="msapplication-navbutton-color" content="#ffffff" />
     <meta name="apple-mobile-web-app-status-bar-style" content="#ffffff" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{asset('/images/logo/LaporMasWapres.png')}}" />
     @yield('head')
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,6 +32,24 @@
                 </button>
                 <a class="navbar-brand me-auto text-danger" href="#">Dash<span class="text-warning">board</span></a>
                 <ul class="nav ms-auto">
+                    <li class="nav-item dropstart">  
+                        <a class="nav-link text-dark ps-3" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">  
+                            <i class="fa fa-bell fa-lg py-2" aria-hidden="true"></i>  
+                            <span class="badge bg-danger" id="unread-count">0</span>  
+                        </a>  
+                        <div class="dropdown-menu mt-2 pt-0" aria-labelledby="navbarDropdown" id="notification-dropdown">  
+                            <div class="d-flex p-3 border-bottom align-items-center mb-2">
+                                <i class="fa fa-bell me-3" aria-hidden="true"></i>  
+                                <span class="fw-bold lh-1">Notifikasi</span>  
+                            </div>  
+                            <div id="notification-list" style="max-height: 300px; overflow-y: auto;">  
+                                <!-- Notifications will be loaded here -->  
+                                <div id="no-notifications" class="text-center" style="display: none;">
+                                    <p>Belum ada notifikasi baru.</p>
+                                </div>
+                            </div>  
+                        </div>  
+                    </li>
                     <li class="nav-item dropstart">
                         <a class="nav-link text-dark ps-3 pe-1" href="#" id="navbarDropdown" role="button"
                             data-bs-toggle="dropdown">
@@ -110,25 +129,25 @@
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
                         </a>
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'terdisposisi']) }}">
+                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'terdisposisi']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Terdisposisi
-                        </a>
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
+                        </a> -->
+                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Review Tanggapan
-                        </a>
+                        </a> -->
                         @endif
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'analis']))
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
+                        <!-- @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'analis'])) -->
+                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Buat Tanggapan
-                        </a>
-                        @endif
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'rejected']) }}">
+                        </a> -->
+                        <!-- @endif -->
+                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'rejected']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Revisi Tanggapan
-                        </a>
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan.create') }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Input Pengaduan
-                        </a>
+                        </a> -->
                     </div>
+                    <a class="nav-link px-3" href="{{ route('admin.laporan.create') }}">
+                        <i class="fas fa-newspaper box-icon" aria-hidden="true"></i>Tambah Pengaduan
+                    </a>
                     @if (auth('admin')->user()->role === 'superadmin')
                     <hr class="soft my-1 text-white">
                     <a class="nav-link px-3" href="{{ route('admin.user_management.index') }}">
@@ -175,6 +194,116 @@
         })
     </script>
     @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            updateNotifications();
+
+            async function updateNotifications() {
+                try {
+                    const analystData = await fetchNotificationsForAnalyst();
+                    const roleData = await fetchNotificationsForRole();
+
+                    const totalUnread = analystData.unreadCount + roleData.unreadCount;
+                    const unreadCountElement = document.getElementById('unread-count');
+                    const noNotificationsElement = document.getElementById('no-notifications');
+                    const notificationList = document.getElementById('notification-list');
+
+                    // Tampilkan jumlah notifikasi atau kosongkan jika tidak ada
+                    unreadCountElement.innerText = totalUnread > 0 ? totalUnread : '0';
+
+                    // Kosongkan daftar notifikasi sebelum menambahkan yang baru
+                    notificationList.innerHTML = '';
+
+                    // Periksa jika ada notifikasi
+                    if (totalUnread === 0) {
+                        noNotificationsElement.style.display = 'block';  // Tampilkan pesan "Belum ada notifikasi"
+                    } else {
+                        noNotificationsElement.style.display = 'none';   // Sembunyikan pesan "Belum ada notifikasi"
+                        renderNotifications(analystData.notifications, 'Nomor Pengaduan');
+                        renderNotifications(roleData.notifications, 'Pelimpahan Laporan');
+                    }
+                } catch (error) {
+                    console.error('Error fetching notifications:', error);
+                }
+            }
+
+            async function fetchNotificationsForAnalyst() {
+                try {
+                    const response = await fetch('/admin/dashboard/notifications/analyst');
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching analyst notifications:', error);
+                    return { notifications: [], unreadCount: 0 };
+                }
+            }
+
+            async function fetchNotificationsForRole() {
+                try {
+                    const response = await fetch('/admin/dashboard/notifications/role-based');
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching role-based notifications:', error);
+                    return { notifications: [], unreadCount: 0 };
+                }
+            }
+
+            function renderNotifications(notifications, titlePrefix) {
+                const notificationList = document.getElementById('notification-list');
+
+                if (notifications.length === 0) return;
+
+                notifications.forEach(notification => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item py-2 overflow-hidden text-truncate bg-light';
+
+                    item.innerHTML = `
+                        <a href="/admin/dashboard/laporan/${notification.laporan.nomor_tiket}" class="d-block text-decoration-none text-dark">
+                            <p class="lh-1 mb-0 fw-bold">${titlePrefix} #${notification.laporan.nomor_tiket}</p>
+                            <small class="content-text">${notification.message}</small><br>
+                            <small class="content-text">Dari: ${notification.assigner.nama}</small>
+                        </a>
+                        <small class="text-primary d-block mt-1 tandai-sudah-dibaca" style="cursor: pointer;" data-id="${notification.id}">Tandai sudah dibaca</small>
+                    `;
+
+                    const markAsReadButton = item.querySelector('.tandai-sudah-dibaca');
+                    markAsReadButton.addEventListener('click', async function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        await markNotificationAsRead(notification.id);
+                        updateNotifications(); // Refresh setelah menandai sebagai dibaca
+                    });
+
+                    notificationList.appendChild(item);
+                });
+            }
+
+            async function markNotificationAsRead(notificationId) {
+                try {
+                    const response = await fetch('/admin/dashboard/notifications/mark-as-read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ id: notificationId })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        console.log('Notifikasi berhasil ditandai sebagai dibaca');
+                    } else {
+                        console.error('Gagal menandai notifikasi:', result.message);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

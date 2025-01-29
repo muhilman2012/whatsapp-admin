@@ -304,7 +304,7 @@ class Laporan extends Model
         return $query->where('disposisi', $role);
     }
 
-    public function assignment()
+    public function assignments()
     {
         // Menggunakan hasMany karena satu laporan bisa memiliki banyak assignment
         return $this->hasMany(Assignment::class, 'laporan_id');
@@ -314,5 +314,40 @@ class Laporan extends Model
     {
         // Anda bisa menggunakan relasi hasMany untuk mendapatkan daftar analis yang ditugaskan ke laporan
         return $this->hasManyThrough(admins::class, Assignment::class, 'laporan_id', 'id_admins', 'id', 'analis_id');
+    }
+
+    public function notifications()  
+    {  
+        return $this->hasMany(Notification::class, 'laporan_id');  
+    }
+
+    public function scopeFilterKategori($query, $filterKategori)
+    {
+        if (!empty($filterKategori)) {
+            $query->where('kategori', $filterKategori);
+        }
+        return $query;
+    }
+
+    public function scopeFilterStatus($query, $filterStatus)
+    {
+        if (!empty($filterStatus)) {
+            $query->where('status', $filterStatus);
+        }
+        return $query;
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        if (!empty($search)) {
+            $query->where(function ($query) use ($search) {
+                $query->where('nomor_tiket', 'like', '%' . $search . '%')
+                    ->orWhere('nama_lengkap', 'like', '%' . $search . '%')
+                    ->orWhere('nik', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%')
+                    ->orWhere('judul', 'like', '%' . $search . '%');
+            });
+        }
+        return $query;
     }
 }

@@ -105,17 +105,32 @@
                     <p class="text-label fw-bold mb-1">Tanggapan:</p>
                     <p>{{ $data->tanggapan ?? 'Belum ada tanggapan' }}</p>
                 </div>
+                <div class="col-md-6">  
+                    <p class="text-label fw-bold mb-1">Diposisi dari:</p>  
+                    @if ($data->assignments && $data->assignments->isNotEmpty())  
+                        @foreach ($data->assignments as $assignment)  
+                            <p>{{ $assignment->assignedBy->nama ?? 'Tidak diketahui' }}</p>  
+                        @endforeach
+                    @else  
+                        <p>Tidak ada disposisi</p>  
+                    @endif  
+                </div>  
+                <div class="col-md-6">  
+                    <p class="text-label fw-bold mb-1">Catatan Disposisi:</p>  
+                    @if ($data->assignments && $data->assignments->isNotEmpty())  
+                        @foreach ($data->assignments as $assignment)  
+                            <p>{{ $assignment->notes ?? 'Tidak ada catatan' }}</p>  
+                        @endforeach  
+                    @else  
+                        <p>Tidak ada catatan disposisi</p>  
+                    @endif  
+                </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Analisis:</p>
                     <p>{{ $data->status_analisis }}</p>
 
                     @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
-                        <form action="{{ route('admin.laporan.approval', $data->nomor_tiket) }}" method="post" class="d-inline">
-                            @csrf
-                            @method('put')
-                            <button type="submit" name="approval_action" value="approved" class="btn btn-success">Setujui Analisis</button>
-                            <button type="submit" name="approval_action" value="rejected" class="btn btn-danger">Revisi Analisis</button>
-                        </form>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Revisi Analisis</button>
                     @endif
                 </div>
                 <div class="col-md-6">
@@ -124,13 +139,49 @@
                 </div>
             </div>
             <button class="btn btn-secondary mt-3" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
-            <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Update Pengaduan</a>
+            @if (auth()->user()->hasRole(['analis']))
+                @if($data->status_analisis !== 'Disetujui') 
+                    <!-- Jika status analisis bukan Disetujui, tampilkan tombol Analisis -->
+                    <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Analisis</a>
+                @else
+                    <!-- Jika status analisis sudah Disetujui, tampilkan tombol Perbarui Pengaduan -->
+                    <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
+                @endif
+            @endif
+            @if (auth()->user()->hasRole(['superadmin','admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
+                <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
+            @endif
         </div>
     </div>
     <div class="mt-3 text-end">
         <a href="{{ route('admin.laporan.download', $data->nomor_tiket) }}" class="btn btn-success">
             Download Bukti Pengaduan (PDF)
         </a>
+    </div>
+</div>
+
+<!-- Modal Catatan untuk Approval atau Revisi -->
+<div class="modal fade" id="approvalModal" tabindex="-1" aria-labelledby="approvalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="{{ route('admin.laporan.approval', $data->nomor_tiket) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approvalModalLabel">Persetujuan Analisis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="catatan">Catatan (Opsional):</label>
+                    <textarea class="form-control" name="catatan" id="catatan" rows="4"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" name="approval_action" value="approved" class="btn btn-success">Setujui</button>
+                    <button type="submit" name="approval_action" value="rejected" class="btn btn-danger">Revisi</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

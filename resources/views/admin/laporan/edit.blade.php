@@ -116,20 +116,25 @@
     <div class="d-block rounded bg-white shadow mb-3 p-5">
         <form action="{{ route('admin.laporan.analis.store', $data->nomor_tiket) }}" method="post">
             @csrf
-            <!-- Status Analisis -->
-            <div class="mb-3">
-                <label class="form-label fw-bold">Status Analisis</label>
-                <p>{{ $data->status_analisis }}</p>
+            <div class="row">
+                <!-- Status Analisis -->
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Status Analisis</label>
+                    <p>{{ $data->status_analisis }}</p>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Catatan Analisis</label>
+                    <p>{{ $data->catatan_analisis }}</p>
+                </div>
             </div>
             <!-- Input Lembar Kerja Analis -->
             <div class="mb-3">
                 <label for="lembar_kerja_analis" class="form-label fw-bold">Lembar Kerja Analis</label>
                 <textarea name="lembar_kerja_analis" id="lembar_kerja_analis" rows="6" class="form-control">{{ old('lembar_kerja_analis', $data->lembar_kerja_analis) }}</textarea>
             </div>
-
             <!-- Tombol Submit -->
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-success">Simpan Lembar Kerja</button>
+                <button type="submit" class="btn btn-success">Kirim Analisis</button>
             </div>
         </form>
     </div>
@@ -140,7 +145,7 @@
             @csrf
             @method('put')
             <!-- Dropdown Kategori -->
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="kategori" class="form-label fw-bold">Kategori</label>
                 <select name="kategori" id="kategori" class="form-control">
                     <optgroup label="SP4N Lapor">
@@ -154,19 +159,19 @@
                         @endforeach
                     </optgroup>
                 </select>
-            </div>
+            </div> -->
 
             <!-- Dropdown Disposisi -->
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label for="disposisi" class="form-label fw-bold">Disposisi</label>
                 <select name="disposisi" id="disposisi" class="form-control">
                     @foreach ($semuaDisposisi as $key => $value)
                         <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>
-                            {{ $namaDeputi[$key] ?? $value }} <!-- Gunakan nama deputi dari mapping -->
+                            {{ $namaDeputi[$key] ?? $value }}
                         </option>
                     @endforeach
                 </select>
-            </div>
+            </div> -->
 
             <!-- Dropdown Status -->
             <div class="mb-3">

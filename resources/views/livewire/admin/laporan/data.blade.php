@@ -62,12 +62,26 @@
             <div class="ms-2">
                 <select wire:model="filterAssignment" class="form-select">
                     <option value="">Semua Data</option>
-                    <option value="unassigned">Belum Ter-assign</option>
-                    <option value="assigned">Sudah Ter-assign</option>
-                    <option value="unassigned_disposition">Belum Terdisposisi</option>
+                    <option value="unassigned">Belum Terdisposisi</option>
+                    <option value="assigned">Sudah Terdisposisi</option>
+                    @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin',]))
+                    <option value="unassigned_disposition">Belum Terdistribusi</option>
+                    @endif
                 </select>
             </div>
             @endif
+
+            <!-- Filter Status Analisis -->
+            <div class="ms-2">
+                <select wire:model="filterStatusAnalisis" class="form-select">
+                    <option value="">Semua Status Analisis</option>
+                    <option value="Menunggu Telaahan">Menunggu Telaahan</option>
+                    <option value="Menunggu Persetujuan">Menunggu Persetujuan</option>
+                    <option value="Disetujui">Disetujui</option>
+                    <option value="Perbaikan">Perbaikan</option>
+                </select>
+            </div>
+
             <!-- Input Tanggal -->
             <div class="col-auto ms-2">
                 <input wire:model="tanggal" type="date" name="tanggal" id="tanggal" class="form-control" required>
@@ -134,7 +148,10 @@
             <thead class="alert-secondary">
                 <tr>
                     <th scope="col">
-                        <input type="checkbox" wire:model="selectAll">
+                        <input type="checkbox" wire:model="selectAll"
+                            @if(count(array_intersect($currentPageData, $selected)) === count($currentPageData)) 
+                                checked 
+                            @endif>
                     </th>
                     <th scope="col">#</th>
                     <th>Nomor Tiket</th>
@@ -143,14 +160,19 @@
                     <th>Kategori</th>
                     <th>
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
-                            Disposisi
+                            Distribusi
                         @elseif (auth('admin')->user()->role === 'analis')
                             Disposisi dari
                         @endif
                     </th>
+                    <th>
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                            Disposisi ke
+                        @endif
+                    </th>
                     <th>Sumber</th>
                     <th>Dikirim</th>
-                    <th>Sisa Hari</th>
+                    <!-- <th>Sisa Hari</th> -->
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -172,10 +194,23 @@
                         @elseif (auth('admin')->user()->role === 'analis')
                             <!-- Menampilkan nama deputi yang memberikan tugas -->
                             @php
-                                $assignedBy = $item->assignment->where('laporan_id', $item->id)->first();
+                                $assignedBy = $item->assignments->where('laporan_id', $item->id)->first();
                             @endphp
                             {{ $assignedBy->assignedBy->nama ?? 'Tidak diketahui' }}
                         @endif
+                    </td>
+                    <td>  
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))  
+                            <!-- Menampilkan nama analis yang diberi tugas -->  
+                            @php  
+                                $assignedTo = $item->assignments->where('laporan_id', $item->id)->first();  
+                            @endphp  
+                            @if ($assignedTo)  
+                                <span>{{ $assignedTo->assignedTo->nama }}</span> <!-- Nama analis ditampilkan dalam warna hitam -->  
+                            @else  
+                                <span class="text-danger">Belum terdisposisi</span> <!-- Teks merah jika belum terdisposisi -->  
+                            @endif  
+                        @endif  
                     </td>
                     <td>
                         @if($item->sumber_pengaduan === 'tatap muka')
@@ -187,7 +222,7 @@
                         @endif
                     </td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
-                    <td>{{ $item->sisa_hari }}</td>
+                    <!-- <td>{{ $item->sisa_hari }}</td> -->
                     <td class="text-nowrap">
                         <a href="{{ route('admin.laporan.detail', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-eye fa-sm fa-fw"></i>
@@ -216,12 +251,12 @@
             <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#modalKategori">
                 Update Kategori
             </button>
-            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
+            <!-- <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
                 Update Disposisi
-            </button>
+            </button> -->
         @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#assignModal">
-                Assign to Analis
+                Disposisi ke Analis
             </button>
             <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#pelimpahanModal">
                 Limpahkan
@@ -316,7 +351,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="assignModalLabel">Assign to Analis</h5>
+                    <h5 class="modal-title" id="assignModalLabel">Disposisi ke Analis</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

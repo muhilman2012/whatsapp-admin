@@ -121,17 +121,17 @@
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                             <!-- Menampilkan nama analis yang menangani -->
                             @php
-                                $assignment = $item->assignment->where('laporan_id', $item->id)->first();
+                                $assignments = $item->assignments->where('laporan_id', $item->id)->first();
                             @endphp
-                            @if ($assignment && $assignment->analis)
-                                {{ $assignment->analis->nama ?? 'Nama analis tidak ditemukan' }}
+                            @if ($assignments && $assignments->analis)
+                                {{ $assignments->analis->nama ?? 'Nama analis tidak ditemukan' }}
                             @else
                                 <span class="text-danger">Belum diteruskan ke analis</span>
                             @endif
                         @elseif (auth('admin')->user()->role === 'analis')
                             <!-- Menampilkan nama deputi yang memberikan tugas -->
                             @php
-                                $assignedBy = $item->assignment->where('laporan_id', $item->id)->first();
+                                $assignedBy = $item->assignments->where('laporan_id', $item->id)->first();
                             @endphp
                             {{ $assignedBy->assignedBy->nama ?? 'Tidak diketahui' }}
                         @endif

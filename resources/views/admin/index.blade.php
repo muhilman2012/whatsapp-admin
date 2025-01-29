@@ -54,8 +54,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">Whatsapp: {{ $whatsapp }}</p>
-                                <p class="card-title mb-0">Tatap Muka: {{ $tatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $whatsapp }}</p>
+                                <p class="card-title mb-0">TM: {{ $tatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -87,8 +87,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">Whatsapp: {{ $deputi1WhatsApp }}</p>
-                                <p class="card-title mb-0">Tatap Muka: {{ $deputi1TatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $deputi1WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi1TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -101,8 +101,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">Whatsapp: {{ $deputi2WhatsApp }}</p>
-                                <p class="card-title mb-0">Tatap Muka: {{ $deputi2TatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $deputi2WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi2TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -123,7 +123,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Aduan Terdisposisi</small>
+                            <small class="text-start fw-bold">Aduan Terdistirbusi</small>
                         </div>
                     </div>
                 </div>
@@ -137,7 +137,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Belum Terdisposisi</small>
+                            <small class="text-start fw-bold">Belum Terdistirbusi</small>
                         </div>
                     </div>
                 </div>
@@ -147,8 +147,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">Whatsapp: {{ $deputi3WhatsApp }}</p>
-                                <p class="card-title mb-0">Tatap Muka: {{ $deputi3TatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $deputi3WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi3TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -161,8 +161,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">Whatsapp: {{ $deputi4WhatsApp }}</p>
-                                <p class="card-title mb-0">Tatap Muka: {{ $deputi4TatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $deputi4WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi4TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -225,7 +225,7 @@
                 </div>
 
                 <!-- Bar Chart Laporan Harian -->
-                <div class="col-12">
+                <div class="col-6">
                     <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
                         <canvas id="laporanHarianChart"></canvas>
                     </div>
@@ -304,8 +304,8 @@
 
         // Data untuk chart
         const labels = dataTerbaru.map(item => item.tanggal); // Hanya 20 tanggal terbaru
-        const dataWhatsapp = dataTerbaru.map(item => item.total_whatsapp); // Data WhatsApp
-        const dataTatapMuka = dataTerbaru.map(item => item.total_tatap_muka); // Data Tatap Muka
+        const dataWhatsapp = dataTerbaru.map(item => item.total_whatsapp); // Data WA
+        const dataTatapMuka = dataTerbaru.map(item => item.total_tatap_muka); // Data TM
 
         // Inisialisasi Chart.js
         new Chart(ctx, {
