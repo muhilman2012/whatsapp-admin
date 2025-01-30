@@ -374,7 +374,7 @@ class Data extends Component
                     'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
                     'assignee_id' => $assigneeId,                        // ID penerima notifikasi (deputi)
                     'laporan_id' => $laporanId,                           // ID laporan yang dipilih
-                    'message' => 'Pelimpahan data ke ' . $deputiName,     // Pesan notifikasi
+                    'message' => 'Pelimpahan data ke ' . $this->selectedDisposisi,     // Pesan notifikasi
                     'role' => $deputiName,                                // Isi role dengan nama kedeputian
                     'is_read' => false,                                   // Status notifikasi belum dibaca
                 ]);
@@ -390,7 +390,7 @@ class Data extends Component
                     'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
                     'assignee_id' => $asdep->id_admins,                  // ID penerima notifikasi (asdep)
                     'laporan_id' => $laporanId,                           // ID laporan yang dipilih
-                    'message' => 'Pelimpahan data ke ' . $deputiName,     // Pesan notifikasi
+                    'message' => 'Pelimpahan data ke ' . $this->selectedDisposisi,     // Pesan notifikasi
                     'role' => $deputiName,                                // Isi role dengan nama kedeputian
                     'is_read' => false,                                   // Status notifikasi belum dibaca
                 ]);
@@ -399,7 +399,7 @@ class Data extends Component
             // Menyimpan log pelimpahan
             Log::create([
                 'laporan_id' => $laporanId,
-                'activity' => 'Laporan dipelimpahkan ke deputi ' . $request->$deputiName(),
+                'activity' => 'Laporan dipelimpahkan ke deputi ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
         }
