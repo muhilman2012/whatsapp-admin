@@ -9,9 +9,11 @@
         border-radius: 0px 0px 4px 4px !important;
     }
     #detail {
-        min-height: 150px; /* Memperbesar field detail */
+        min-height: 200px; /* Memperbesar field detail */
     }
 </style>
+<link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
 @endsection
 
 @section('pages')
@@ -52,7 +54,7 @@
                     <div class="col-md-4">
                         <label for="jenis_kelamin" class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
                         <select name="jenis_kelamin" id="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror">
-                            <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                            <option disabled selected>Pilih Jenis Kelamin</option>
                             <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-Laki</option>
                             <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
                         </select>
@@ -126,6 +128,38 @@
                         <input type="file" name="dokumen_pendukung" id="dokumen_pendukung" class="form-control @error('dokumen_pendukung') is-invalid @enderror">
                         @error('dokumen_pendukung')
                         <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
+                <!-- Kategori dan Disposisi-->
+                <div class="row mb-3">
+                    <div class="form-group col-md-6">
+                        <label for="kategori" class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
+                        <select name="kategori" id="kategori" class="form-control @error('kategori') is-invalid @enderror">
+                            <option disabled selected>Pilih Kategori</option>
+                            @foreach($kategoriSP4NLapor as $kategori)
+                                <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
+                            @endforeach
+                        </select>
+                        @error('kategori')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="deputi" class="form-label fw-bold">Deputi <span class="text-danger">*</span></label>
+                        <select name="deputi" id="deputi" class="form-control @error('deputi') is-invalid @enderror">
+                                <option disabled selected>Pilih Disposisi Deputi</option>
+                            @foreach($namaDeputi as $key => $value)
+                                <option value="{{ $key }}" {{ old('deputi') == $key ? 'selected' : '' }}>{{ $value }}</option>
+                            @endforeach
+                        </select>
+                        @error('deputi')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
                         @enderror
                     </div>
                 </div>

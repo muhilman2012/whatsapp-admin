@@ -50,48 +50,6 @@ class Laporan extends Model
         'tanggapan' => 'Laporan pengaduan Saudara dalam proses verifikasi & penelaahan.',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
-
-        // Automasi kategori dan disposisi saat data dibuat
-        static::creating(function ($laporan) {
-            if (!empty($laporan->judul)) {
-                // Tentukan kategori dan disposisi berdasarkan judul
-                $result = self::tentukanKategoriDanDeputi($laporan->judul);
-                
-                // Tetapkan kategori, gunakan default jika tidak ada
-                $laporan->kategori = $laporan->kategori ?? $result['kategori'] ?? 'Lainnya';
-                
-                // Tetapkan disposisi, gunakan null jika tidak cocok
-                $laporan->disposisi = $laporan->disposisi ?? $result['deputi'] ?? null;
-            }
-
-            // Tetapkan deadline default 20 hari dari tanggal dibuat
-            $laporan->deadline = now()->addDays(20)->format('Y-m-d');
-        });
-
-        // Automasi kategori dan disposisi saat data diperbarui
-        static::updating(function ($laporan) {
-            if (!empty($laporan->judul)) {
-                // Tentukan kategori dan disposisi berdasarkan judul
-                $result = self::tentukanKategoriDanDeputi($laporan->judul);
-                
-                // Hanya ubah kategori dan disposisi jika kosong atau tidak diubah secara manual
-                $laporan->kategori = $laporan->kategori ?? $result['kategori'] ?? 'Lainnya';
-                $laporan->disposisi = $laporan->disposisi ?? $result['deputi'] ?? null;
-            }
-        });
-
-        // Automasi Create Petugas dari Log User Login  
-        static::creating(function ($model) {    
-            // Menggunakan guard 'admin' untuk mendapatkan informasi admin yang sedang login  
-            if (Auth::guard('admin')->check()) {    
-                $model->petugas = Auth::guard('admin')->user()->nama;    
-            }    
-        });
-    }
-
     public function getSisaHariAttribute()
     {
         $deadline = $this->created_at->addDays(20); // Deadline adalah 20 hari setelah created_at

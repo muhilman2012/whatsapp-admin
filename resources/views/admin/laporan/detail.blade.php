@@ -127,7 +127,7 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Analisis:</p>
-                    <p>{{ $data->status_analisis }}</p>
+                    <p>{{ $data->status_analisis }} - Catatan: {{ $data->catatan_analisis ?? 'Tidak ada catatan' }}</p>
 
                     @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Revisi Analisis</button>

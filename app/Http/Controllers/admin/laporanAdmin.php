@@ -100,61 +100,70 @@ class laporanAdmin extends Controller
 
     public function create()
     {
-        return view('admin.laporan.create');
+        $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor();
+        $kategoriBaru = Laporan::getKategoriBaru();
+
+        $namaDeputi = [
+            'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
+            'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+            'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
+            'deputi_4' => 'Deputi Bidang Administrasi',
+        ];
+
+        return view('admin.laporan.create', compact('kategoriSP4NLapor', 'kategoriBaru', 'namaDeputi'));
     }
 
     public function store(Request $request)  
-    {  
+    {
         // Validasi data  
-        $request->validate([  
-            'nomor_pengadu' => 'required|string|max:15', // Nomor pengadu wajib  
-            'email' => 'nullable|email|max:255', // Email opsional  
+        $validated = $request->validate([  
+            'nomor_pengadu' => 'required|string|max:15',
+            'email' => 'nullable|email|max:255',
             'nama_lengkap' => 'required|string|max:255',  
             'nik' => 'required|digits:16',  
             'jenis_kelamin' => 'required|in:L,P',  
             'alamat_lengkap' => 'required',  
             'judul' => 'required|max:255',  
             'detail' => 'required',  
-            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',  
+            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'kategori' => 'required',
+            'disposisi' => 'required',
         ]);  
         
-        // Generate nomor tiket unik berupa angka 7 digit  
         $nomorTiket = $this->generateNomorTiket();  
-        
-        // Proses dokumen pendukung  
         $fileName = null;  
+        
         if ($request->hasFile('dokumen_pendukung')) {  
             $file = $request->file('dokumen_pendukung');  
-            $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension(); // Rename file dengan ID tiket  
-            $file->move(storage_path('app/public/dokumen'), $fileName); // Simpan file di storage/public  
+            $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('public/dokumen', $fileName);
+            if (!$path) {
+                return back()->withErrors(['dokumen_pendukung' => 'Gagal menyimpan dokumen']);
+            }
         }  
         
-        // Simpan data ke database dan simpan model ke dalam variabel  
-        $laporan = Laporan::create([  
-            'nomor_tiket' => $nomorTiket,  
-            'nomor_pengadu' => $request->nomor_pengadu,  
-            'email' => $request->email,  
-            'nama_lengkap' => $request->nama_lengkap,  
-            'nik' => $request->nik,  
-            'jenis_kelamin' => $request->jenis_kelamin,  
-            'alamat_lengkap' => $request->alamat_lengkap,  
-            'judul' => $request->judul,  
-            'detail' => $request->detail,  
-            'dokumen_pendukung' => $fileName,  
-            'sumber_pengaduan' => 'tatap muka',  
-            'petugas' => auth('admin')->user()->nama, // Menyimpan nama petugas yang membuat laporan
-        ]);
-        
-        logger()->info('Laporan baru dibuat oleh ' . auth('admin')->user()->nama . ' dengan nomor tiket ' . $laporan->nomor_tiket);
+        try {
+            $laporan = Laporan::create([  
+                'nomor_tiket' => $nomorTiket,  
+                'nomor_pengadu' => $validated['nomor_pengadu'],  
+                'email' => $validated['email'],  
+                'nama_lengkap' => $validated['nama_lengkap'],  
+                'nik' => $validated['nik'],  
+                'jenis_kelamin' => $validated['jenis_kelamin'],  
+                'alamat_lengkap' => $validated['alamat_lengkap'],  
+                'judul' => $validated['judul'],  
+                'detail' => $validated['detail'],  
+                'dokumen_pendukung' => $fileName,
+                'kategori' => $validated['kategori'],
+                'disposisi' => $validated['disposisi'],
+                'sumber_pengaduan' => 'tatap muka',  
+                'petugas' => auth('admin')->user()->nama,
+            ]);
+        } catch (\Exception $e) {
+            logger()->error('Error saat menciptakan laporan: ' . $e->getMessage());
+            return back()->withInput()->withErrors(['error' => 'Error saat menciptakan laporan: ' . $e->getMessage()]);
+        }
 
-        // Menyimpan log aktivitas
-        Log::create([
-            'laporan_id' => $laporan->id,
-            'activity' => 'Laporan baru dibuat oleh ' . auth('admin')->user()->nama,
-            'user_id' => auth('admin')->user()->id_admins,
-        ]);
-
-        // Redirect ke halaman detail laporan dengan nomor tiket dan pesan sukses  
         return redirect()->route('admin.laporan.detail', ['nomor_tiket' => $laporan->nomor_tiket])->with('success', 'Laporan berhasil ditambahkan.');
     }
 

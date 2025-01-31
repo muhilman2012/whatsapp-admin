@@ -190,7 +190,7 @@
                     <td>
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                             <!-- Menampilkan nama deputi -->
-                            {{ $item->disposisi_terbaru ?? $item->disposisi ?? 'Belum terdisposisi' }}
+                            {{ $item->disposisi_terbaru ?? $item->disposisi ?? 'Belum terdistribusi' }}
                         @elseif (auth('admin')->user()->role === 'analis')
                             <!-- Menampilkan nama deputi yang memberikan tugas -->
                             @php
