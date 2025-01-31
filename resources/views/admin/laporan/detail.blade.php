@@ -99,7 +99,7 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Laporan:</p>
-                    <p>{{ $data->status }}</p>
+                    <span class="badge bg-primary">{{ $data->status }}</span>
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Tanggapan:</p>
@@ -127,10 +127,10 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Analisis:</p>
-                    <p>{{ $data->status_analisis }} - Catatan: {{ $data->catatan_analisis ?? 'Tidak ada catatan' }}</p>
+                    <p><span class="badge bg-primary">{{ $data->status_analisis }}</span> Catatan: {{ $data->catatan_analisis ?? 'Tidak ada catatan' }}</p>
 
                     @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Revisi Analisis</button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Perbaiki Analisis</button>
                     @endif
                 </div>
                 <div class="col-md-6">
@@ -178,7 +178,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     <button type="submit" name="approval_action" value="approved" class="btn btn-success">Setujui</button>
-                    <button type="submit" name="approval_action" value="rejected" class="btn btn-danger">Revisi</button>
+                    <button type="submit" name="approval_action" value="rejected" class="btn btn-danger">Perbaiki</button>
                 </div>
             </div>
         </form>

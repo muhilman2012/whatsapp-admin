@@ -85,14 +85,14 @@
             window.addEventListener('success', event => {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Good Jobs!',
+                    title: 'Sukses!',
                     text: event.detail,
                 })
             })
             window.addEventListener('erros', event => {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Opps...!',
+                    title: 'Maaf..',
                     text: event.detail,
                 })
             })

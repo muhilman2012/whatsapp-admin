@@ -43,7 +43,7 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status:</p>
-                    <p>{{ $data->status }}</p>
+                    <span class="badge bg-primary">{{ $data->status }}</span>
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Tanggapan:</p>
@@ -120,7 +120,7 @@
                 <!-- Status Analisis -->
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Status Analisis</label>
-                    <p>{{ $data->status_analisis }}</p>
+                    <span class="badge bg-primary">{{ $data->status_analisis }}</span>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Catatan Analisis</label>

@@ -125,23 +125,29 @@ class laporanAdmin extends Controller
             'alamat_lengkap' => 'required',  
             'judul' => 'required|max:255',  
             'detail' => 'required',  
-            'dokumen_pendukung' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'dokumen_pendukung' => 'required|file|mimes:pdf|max:2048',
             'kategori' => 'required',
             'disposisi' => 'required',
+            'lokasi' => 'nullable',
+            'tanggal_kejadian' => 'nullable|date'
         ]);  
-        
+
+        logger()->info('Validasi berhasil:', $validated);
+
         $nomorTiket = $this->generateNomorTiket();  
         $fileName = null;  
-        
+
         if ($request->hasFile('dokumen_pendukung')) {  
             $file = $request->file('dokumen_pendukung');  
             $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/dokumen', $fileName);
             if (!$path) {
+                logger()->error('Gagal menyimpan dokumen:', $file);
                 return back()->withErrors(['dokumen_pendukung' => 'Gagal menyimpan dokumen']);
             }
-        }  
-        
+            logger()->info('Dokumen berhasil disimpan:', ['path' => $path]);
+        }
+
         try {
             $laporan = Laporan::create([  
                 'nomor_tiket' => $nomorTiket,  
@@ -152,15 +158,18 @@ class laporanAdmin extends Controller
                 'jenis_kelamin' => $validated['jenis_kelamin'],  
                 'alamat_lengkap' => $validated['alamat_lengkap'],  
                 'judul' => $validated['judul'],  
-                'detail' => $validated['detail'],  
+                'detail' => $validated['detail'],
                 'dokumen_pendukung' => $fileName,
                 'kategori' => $validated['kategori'],
+                'lokasi' => $validated['lokasi'],
+                'tanggal_kejadian' => $validated['tanggal_kejadian'],
                 'disposisi' => $validated['disposisi'],
-                'sumber_pengaduan' => 'tatap muka',  
+                'sumber_pengaduan' => 'tatap muka',
                 'petugas' => auth('admin')->user()->nama,
             ]);
+            logger()->info('Laporan berhasil dibuat:', $laporan->toArray());
         } catch (\Exception $e) {
-            logger()->error('Error saat menciptakan laporan: ' . $e->getMessage());
+            logger()->error('Error saat menciptakan laporan: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withInput()->withErrors(['error' => 'Error saat menciptakan laporan: ' . $e->getMessage()]);
         }
 
@@ -178,6 +187,7 @@ class laporanAdmin extends Controller
             $nomorTiket = str_pad(mt_rand(1, 9999999), 7, '0', STR_PAD_LEFT); // Generate angka 7 digit
         } while (Laporan::where('nomor_tiket', $nomorTiket)->exists()); // Pastikan unik
 
+        logger()->info('Nomor tiket unik dihasilkan:', ['nomor_tiket' => $nomorTiket]);
         return $nomorTiket;
     }
 

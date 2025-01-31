@@ -12,8 +12,6 @@
         min-height: 200px; /* Memperbesar field detail */
     }
 </style>
-<link href="https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js"></script>
 @endsection
 
 @section('pages')
@@ -70,7 +68,7 @@
                         @enderror
                     </div>
                     <div class="col-md-4">
-                        <label for="nomor_pengadu" class="form-label fw-bold">Nomor Pengadu <span class="text-danger">*</span></label>
+                        <label for="nomor_pengadu" class="form-label fw-bold">Nomor Handphone Pengadu <span class="text-danger">*</span></label>
                         <input type="text" name="nomor_pengadu" id="nomor_pengadu" class="form-control @error('nomor_pengadu') is-invalid @enderror" value="{{ old('nomor_pengadu') }}">
                         @error('nomor_pengadu')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -124,7 +122,7 @@
                         @enderror
                     </div>
                     <div class="col-md-6">
-                        <label for="dokumen_pendukung" class="form-label fw-bold">Dokumen Pendukung</label>
+                        <label for="dokumen_pendukung" class="form-label fw-bold">Dokumen Pendukung <span class="text-danger">*</span></label>
                         <input type="file" name="dokumen_pendukung" id="dokumen_pendukung" class="form-control @error('dokumen_pendukung') is-invalid @enderror">
                         @error('dokumen_pendukung')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -137,10 +135,17 @@
                     <div class="form-group col-md-6">
                         <label for="kategori" class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
                         <select name="kategori" id="kategori" class="form-control @error('kategori') is-invalid @enderror">
-                            <option disabled selected>Pilih Kategori</option>
-                            @foreach($kategoriSP4NLapor as $kategori)
-                                <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
-                            @endforeach
+                                <option disabled selected>Pilih Kategori</option>
+                                <optgroup label="SP4N Lapor">
+                                    @foreach ($kategoriSP4NLapor as $kategori)
+                                        <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
+                                    @endforeach
+                                </optgroup>
+                                <optgroup label="Kategori Baru">
+                                    @foreach ($kategoriBaru as $kategori)
+                                        <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
+                                    @endforeach
+                                </optgroup>
                         </select>
                         @error('kategori')
                             <span class="invalid-feedback" role="alert">
@@ -149,14 +154,14 @@
                         @enderror
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="deputi" class="form-label fw-bold">Deputi <span class="text-danger">*</span></label>
-                        <select name="deputi" id="deputi" class="form-control @error('deputi') is-invalid @enderror">
+                        <label for="disposisi" class="form-label fw-bold">Deputi <span class="text-danger">*</span></label>
+                        <select name="disposisi" id="disposisi" class="form-control @error('disposisi') is-invalid @enderror">
                                 <option disabled selected>Pilih Disposisi Deputi</option>
                             @foreach($namaDeputi as $key => $value)
-                                <option value="{{ $key }}" {{ old('deputi') == $key ? 'selected' : '' }}>{{ $value }}</option>
+                                <option value="{{ $key }}" {{ old('disposisi') == $key ? 'selected' : '' }}>{{ $value }}</option>
                             @endforeach
                         </select>
-                        @error('deputi')
+                        @error('disposisi')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>
                             </span>
@@ -166,7 +171,7 @@
 
                 <!-- Submit -->
                 <div class="mb-3">
-                    <button type="submit" class="btn btn-outline-secondary form-control">Simpan</button>
+                    <button type="submit" class="btn btn-primary form-control">Buat Pengaduan</button>
                 </div>
             </form>
         </div>

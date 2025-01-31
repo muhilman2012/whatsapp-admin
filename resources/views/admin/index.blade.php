@@ -123,7 +123,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Aduan Terdistirbusi</small>
+                            <small class="text-start fw-bold">Aduan Terdistribusi</small>
                         </div>
                     </div>
                 </div>
@@ -137,7 +137,7 @@
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Belum Terdistirbusi</small>
+                            <small class="text-start fw-bold">Belum Terdistribusi</small>
                         </div>
                     </div>
                 </div>

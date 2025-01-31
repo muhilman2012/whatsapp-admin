@@ -109,7 +109,7 @@
             <div class="slider-body px-1 pb-4">
                 <nav class="nav flex-column" id="nav-acordion" role="tablist" aria-multiselectable="true">
                     <a class="nav-link px-3 active" href="{{ route('admin.index') }}">
-                        <i class="fa fa-home box-icon" aria-hidden="true"></i>Home
+                        <i class="fa fa-home box-icon" aria-hidden="true"></i>Beranda
                     </a>
                     <a class="nav-link px-3" href="{{ route('admin.profile') }}">
                         <i class="fas fa-user box-icon" aria-hidden="true"></i>Profile
@@ -156,7 +156,7 @@
                     @endif
                     <hr class="soft my-1 text-white">
                     <a class="btnLogout nav-link px-3" href="#">
-                        <i class="fas fa-sign-out-alt box-icon"></i>Logout
+                        <i class="fas fa-sign-out-alt box-icon"></i>Keluar
                     </a>
                 </nav>
             </div>

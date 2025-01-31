@@ -255,7 +255,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="button" wire:click="assignToAnalis" class="btn btn-primary">Assign</button>
+                    <button type="button" wire:click="assignToAnalis" class="btn btn-primary">Disposisikan</button>
                 </div>
             </div>
         </div>
@@ -271,7 +271,7 @@
                     </div>
                     <div class="modal-body">
                         <select wire:model="selectedDisposisi" class="form-control">
-                            <option value="">Pilih Deputi Baru</option>
+                            <option value="">Pilih Disposisi Baru</option>
                             @foreach ($namaDeputi as $key => $value)
                                 <option value="{{ $key }}">{{ $value }}</option>
                             @endforeach
@@ -279,7 +279,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan Pelimpahan</button>
+                        <button type="submit" class="btn btn-primary">Kirim Pelimpahan</button>
                     </div>
                 </div>
             </form>
@@ -397,11 +397,11 @@
         });
     </script>
 
-    @if(session()->has('success'))
+@if(session()->has('success'))
     <script>
         Swal.fire({
             icon: 'success',
-            title: 'Good Jobs!',
+            title: 'Sukses!',
             text: '{{ session()->get("success") }}',
             showConfirmButton: false,
             timer: 2500
@@ -412,7 +412,7 @@
     <script>
         Swal.fire({
             icon: 'error',
-            title: 'Opps...!',
+            title: 'Maaf..',
             text: '{{ session()->get("error") }}',
             showConfirmButton: false,
             timer: 2500

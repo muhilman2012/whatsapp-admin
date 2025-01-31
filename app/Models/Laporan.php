@@ -34,6 +34,7 @@ class Laporan extends Model
         'disposisi_terbaru',
         'sumber_pengaduan',
         'lembar_kerja_analis',
+        'status_analisis',
         'petugas',
         'created_at',
         'updated_at',
