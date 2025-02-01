@@ -119,7 +119,7 @@ class laporanAdmin extends Controller
     {
         // Validasi data tanpa 'disposisi'
         $validated = $request->validate([  
-            'nomor_pengadu' => 'required|string|max:15',
+            'nomor_pengadu' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:255',
             'nama_lengkap' => 'required|string|max:255',  
             'nik' => 'required|digits:16',  
