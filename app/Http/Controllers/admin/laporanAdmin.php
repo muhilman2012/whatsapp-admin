@@ -100,8 +100,7 @@ class laporanAdmin extends Controller
 
     public function create()
     {
-        $kategoriSP4NLapor = Laporan::getKategoriSP4NLapor();
-        $kategoriBaru = Laporan::getKategoriBaru();
+        $kategoriDeputi = Laporan::getKategoriDeputi2();
 
         $namaDeputi = [
             'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
@@ -110,12 +109,15 @@ class laporanAdmin extends Controller
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        return view('admin.laporan.create', compact('kategoriSP4NLapor', 'kategoriBaru', 'namaDeputi'));
+        // Debug data
+        // dd($kategoriDeputi, $namaDeputi);
+
+        return view('admin.laporan.create', compact('namaDeputi', 'kategoriDeputi'));
     }
 
     public function store(Request $request)  
     {
-        // Validasi data  
+        // Validasi data tanpa 'disposisi'
         $validated = $request->validate([  
             'nomor_pengadu' => 'required|string|max:15',
             'email' => 'nullable|email|max:255',
@@ -127,16 +129,13 @@ class laporanAdmin extends Controller
             'detail' => 'required',  
             'dokumen_pendukung' => 'required|file|mimes:pdf|max:2048',
             'kategori' => 'required',
-            'disposisi' => 'required',
             'lokasi' => 'nullable',
             'tanggal_kejadian' => 'nullable|date'
         ]);  
 
-        logger()->info('Validasi berhasil:', $validated);
-
+        // Proses penyimpanan dokumen
         $nomorTiket = $this->generateNomorTiket();  
         $fileName = null;  
-
         if ($request->hasFile('dokumen_pendukung')) {  
             $file = $request->file('dokumen_pendukung');  
             $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension();
@@ -145,10 +144,10 @@ class laporanAdmin extends Controller
                 logger()->error('Gagal menyimpan dokumen:', $file);
                 return back()->withErrors(['dokumen_pendukung' => 'Gagal menyimpan dokumen']);
             }
-            logger()->info('Dokumen berhasil disimpan:', ['path' => $path]);
         }
 
         try {
+            // Menyimpan laporan baru
             $laporan = Laporan::create([  
                 'nomor_tiket' => $nomorTiket,  
                 'nomor_pengadu' => $validated['nomor_pengadu'],  
@@ -163,11 +162,17 @@ class laporanAdmin extends Controller
                 'kategori' => $validated['kategori'],
                 'lokasi' => $validated['lokasi'],
                 'tanggal_kejadian' => $validated['tanggal_kejadian'],
-                'disposisi' => $validated['disposisi'],
                 'sumber_pengaduan' => 'tatap muka',
                 'petugas' => auth('admin')->user()->nama,
             ]);
-            logger()->info('Laporan berhasil dibuat:', $laporan->toArray());
+
+            // Menyimpan log aktivitas
+            Log::create([
+                'laporan_id' => $laporan->id,
+                'activity' => 'Laporan baru berhasil dibuat',
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+
         } catch (\Exception $e) {
             logger()->error('Error saat menciptakan laporan: ' . $e->getMessage(), ['exception' => $e]);
             return back()->withInput()->withErrors(['error' => 'Error saat menciptakan laporan: ' . $e->getMessage()]);
@@ -191,17 +196,20 @@ class laporanAdmin extends Controller
         return $nomorTiket;
     }
 
-    public function show($nomor_tiket)  
-    {  
-        // Fetch the Laporan record along with its associated assignments  
-        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])  
-            ->where('nomor_tiket', $nomor_tiket)  
-            ->firstOrFail();  
-    
-        // Get the latest assignment for the report  
-        $latestAssignment = $data->assignments->last(); // Assuming you want the latest assignment  
-    
-        return view('admin.laporan.detail', compact('data', 'latestAssignment'));  
+    public function show($nomor_tiket)
+    {
+        // Mengambil data Laporan bersama dengan 'assignments' dan relasi terkait
+        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
+            ->where('nomor_tiket', $nomor_tiket)
+            ->firstOrFail();
+
+        // Mendapatkan penugasan terakhir untuk laporan ini
+        $latestAssignment = $data->assignments->last(); // Diasumsikan Anda ingin penugasan terakhir
+
+        // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
+        $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
+
+        return view('admin.laporan.detail', compact('data', 'latestAssignment', 'logs'));
     }
 
     public function edit($nomor_tiket)
@@ -259,7 +267,7 @@ class laporanAdmin extends Controller
         // Menyimpan log aktivitas
         Log::create([
             'laporan_id' => $laporan->id,
-            'activity' => 'Laporan baru diperbarui oleh ' . auth('admin')->user()->nama,
+            'activity' => 'Laporan diperbarui oleh ' . auth('admin')->user()->nama,
             'user_id' => auth('admin')->user()->id_admins,
         ]);
 
@@ -474,10 +482,12 @@ class laporanAdmin extends Controller
         // Ambil data laporan berdasarkan nomor tiket
         $laporan = Laporan::where('nomor_tiket', $nomorTiket)->firstOrFail();
 
-        // Cek aksi yang dilakukan
+        // Menentukan pesan log berdasarkan aksi approval
+        $logMessage = '';
         if ($request->approval_action === 'approved') {
             $laporan->status_analisis = 'Disetujui'; // Status analisis berubah menjadi Disetujui
             $laporan->catatan_analisis = $request->catatan ?? null; // Catatan analisis (nullable)
+            $logMessage = 'Hasil Analisis disetujui';
 
             // Kirimkan notifikasi ke analis bahwa hasil analisis disetujui
             $this->sendNotificationToAnalis($laporan, 'Hasil analisis Anda Disetujui');
@@ -485,6 +495,7 @@ class laporanAdmin extends Controller
         } elseif ($request->approval_action === 'rejected') {
             $laporan->status_analisis = 'Perbaikan'; // Status analisis berubah menjadi Perbaikan
             $laporan->catatan_analisis = $request->catatan ?? null; // Catatan analisis (nullable)
+            $logMessage = 'Hasil Analisis perlu perbaikan';
 
             // Kirimkan notifikasi ke analis bahwa hasil analisis perlu diperbaiki
             $this->sendNotificationToAnalis($laporan, 'Hasil analisis Anda perlu Perbaikan');
@@ -494,17 +505,17 @@ class laporanAdmin extends Controller
         $laporan->save();
 
         // Log perubahan status analisis
-        logger('Status analisis telah diperbarui oleh '.auth('admin')->user()->username, [
+        logger()->info('Status analisis telah diperbarui oleh '.auth()->user()->name, [
             'old_status' => $laporan->getOriginal('status_analisis'),
             'new_status' => $laporan->status_analisis,
             'catatan' => $laporan->catatan_analisis,
-            'updated_by' => auth('admin')->user()->username
+            'updated_by' => auth()->user()->name
         ]);
 
-        // Menyimpan log aktivitas
+        // Menyimpan log aktivitas dengan pesan yang sesuai
         Log::create([
             'laporan_id' => $laporan->id,
-            'activity' => 'Analisis disetujui/ditolak oleh ' . auth('admin')->user()->nama,
+            'activity' => $logMessage . auth('admin')->user()->nama,
             'user_id' => auth('admin')->user()->id_admins,
         ]);
 

@@ -92,8 +92,10 @@ class Data extends Component
         // Ambil data pengguna yang sedang login
         $user = auth()->guard('admin')->user();
 
+        $kategoriDeputi = Laporan::getKategoriDeputi2();
+
         $namaDeputi = [
-            'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital',
+            'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
             'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
             'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
             'deputi_4' => 'Deputi Bidang Administrasi',
@@ -132,6 +134,7 @@ class Data extends Component
             'totalFiltered' => $totalFiltered,
             'kategoriSP4NLapor' => Laporan::getKategoriSP4NLapor(),
             'kategoriBaru' => Laporan::getKategoriBaru(),
+            'kategoriDeputi' => $kategoriDeputi,
             'namaDeputi' => $namaDeputi,
             'analisList' => $this->analisList,
         ]);
@@ -267,6 +270,15 @@ class Data extends Component
             Laporan::whereIn('id', $this->selected)
                 ->update(['kategori' => $this->selectedKategori]);
 
+            // Log aktivitas
+            foreach ($this->selected as $laporanId) {
+                Log::create([
+                    'laporan_id' => $laporanId,
+                    'activity' => 'Kategori diperbarui menjadi ' . $this->selectedKategori,
+                    'user_id' => auth('admin')->user()->id_admins,
+                ]);
+            }
+
             $this->reset(['selected', 'selectAll', 'selectedKategori']);
             session()->flash('success', 'Kategori berhasil diperbarui.');
         } else {
@@ -279,6 +291,15 @@ class Data extends Component
         if (!empty($this->selected) && !empty($this->selectedDisposisi)) {
             Laporan::whereIn('id', $this->selected)
                 ->update(['disposisi' => $this->selectedDisposisi]);
+
+            // Log aktivitas
+            foreach ($this->selected as $laporanId) {
+                Log::create([
+                    'laporan_id' => $laporanId,
+                    'activity' => 'Disposisi diperbarui menjadi ' . $this->selectedDisposisi,
+                    'user_id' => auth('admin')->user()->id_admins,
+                ]);
+            }
 
             $this->reset(['selected', 'selectAll', 'selectedDisposisi']);
             session()->flash('success', 'Disposisi berhasil diperbarui.');
@@ -399,7 +420,7 @@ class Data extends Component
             // Menyimpan log pelimpahan
             Log::create([
                 'laporan_id' => $laporanId,
-                'activity' => 'Laporan dipelimpahkan ke deputi ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
+                'activity' => 'Laporan dilimpahkan ke deputi ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
         }

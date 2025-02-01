@@ -51,6 +51,24 @@ class Laporan extends Model
         'tanggapan' => 'Laporan pengaduan Saudara dalam proses verifikasi & penelaahan.',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Mengisi kolom disposisi secara otomatis berdasarkan kategori
+        static::saving(function ($laporan) {
+            if (!empty($laporan->kategori)) {
+                $kategoriDeputi = self::$kategoriDeputi;
+                foreach ($kategoriDeputi as $deputi => $kategoris) {
+                    if (in_array($laporan->kategori, $kategoris)) {
+                        $laporan->disposisi = $deputi;
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
     public function getSisaHariAttribute()
     {
         $deadline = $this->created_at->addDays(20); // Deadline adalah 20 hari setelah created_at
@@ -179,6 +197,74 @@ class Laporan extends Model
         return array_keys(self::$kategoriBaru);
     }
 
+    public static function getKategoriDeputi2()
+    {
+        // Mendefinisikan kategori untuk setiap deputi secara manual
+        $kategoriDeputi = [];
+
+        // Deputi 1
+        $kategoriDeputi['deputi_1'] = [
+            'Ekonomi dan Keuangan',
+            'Lingkungan Hidup dan Kehutanan',
+            'Pekerjaan Umum dan Penataan Ruang',
+            'Pertanian dan Peternakan',
+            'Pemulihan Ekonomi Nasional',
+            'Energi dan Sumber Daya Alam',
+            'Mudik',
+            'Perairan',
+            'Perhubungan',
+            'Teknologi Informasi dan Komunikasi',
+            'Perlindungan Konsumen',
+            'Pariwisata dan Ekonomi Kreatif',
+            'Industri dan Perdagangan',
+            'Perumahan'
+        ];
+
+        // Deputi 2
+        $kategoriDeputi['deputi_2'] = [
+            'Agama',
+            'Corona Virus',
+            'Kesehatan',
+            'Kesetaraan Gender dan Sosial Inklusif',
+            'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi',
+            'Pendidikan dan Kebudayaan',
+            'Sosial dan Kesejahteraan',
+            'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)',
+            'Penanggulangan Bencana',
+            'Ketenagakerjaan',
+            'Kependudukan',
+            'Pemberdayaan Masyarakat, Koperasi, dan UMKM',
+            'Kepemudaan dan Olahraga',
+            'Keluarga Berencana',
+            'Penanggulangan Bencana'
+        ];
+
+        // Deputi 3
+        $kategoriDeputi['deputi_3'] = [
+            'Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat',
+            'Politik dan Hukum',
+            'Politisasi ASN',
+            'SP4N Lapor',
+            'Netralitas ASN',
+            'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)',
+            'Manajemen ASN',
+            'Luar Negeri',
+            'Pertanahan',
+            'Daerah Perbatasan',
+            'Pelayanan Publik',
+            'TNI/Polri'
+        ];
+
+        // Deputi 4
+        $kategoriDeputi['deputi_4'] = [
+            'Topik Khusus',
+            'Topik Lainnya',
+            'Bantuan Masyarakat'
+        ];
+
+        return $kategoriDeputi;
+    }
+
     private static $kategoriDeputi = [
         'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan'],
         'deputi_2' => ['Agama', 'Corona Virus', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Penanggulangan Bencana', 'Ketenagakerjaan', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Kepemudaan dan Olahraga', 'Keluarga Berencana', 'Penanggulangan Bencana'],
@@ -249,7 +335,7 @@ class Laporan extends Model
 
     public static function getKategoriDeputi()
     {
-        return self::$kategoriDeputi;
+        return array_keys(self::$kategoriDeputi);
     }
 
     public static function getKategoriByUnit($unit)

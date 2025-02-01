@@ -6,6 +6,7 @@ use App\Models\Laporan;
 use App\Models\admins;
 use App\Models\Assignment;
 use App\Models\Notification;
+use App\Models\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Http\Request;
@@ -90,6 +91,8 @@ class Pelimpahan extends Component
         // Ambil data pengguna yang sedang login
         $user = auth()->guard('admin')->user();
 
+        $kategoriDeputi = Laporan::getKategoriDeputi2();
+
         $namaDeputi = [
             'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata, dan Transformasi Digital',
             'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
@@ -130,6 +133,7 @@ class Pelimpahan extends Component
             'totalFiltered' => $totalFiltered,
             'kategoriSP4NLapor' => Laporan::getKategoriSP4NLapor(),
             'kategoriBaru' => Laporan::getKategoriBaru(),
+            'kategoriDeputi' => $kategoriDeputi,
             'namaDeputi' => $namaDeputi,
             'analisList' => $this->analisList,
         ]);
@@ -243,11 +247,42 @@ class Pelimpahan extends Component
         $this->selectAll = count(array_intersect($this->currentPageData, $this->selected)) === count($this->currentPageData);
     }
 
+    public function updateKategoriMassal()
+    {
+        if (!empty($this->selected) && !empty($this->selectedKategori)) {
+            Laporan::whereIn('id', $this->selected)
+                ->update(['kategori' => $this->selectedKategori]);
+
+            // Log aktivitas
+            foreach ($this->selected as $laporanId) {
+                Log::create([
+                    'laporan_id' => $laporanId,
+                    'activity' => 'Kategori diperbarui menjadi ' . $this->selectedKategori,
+                    'user_id' => auth('admin')->user()->id_admins,
+                ]);
+            }
+
+            $this->reset(['selected', 'selectAll', 'selectedKategori']);
+            session()->flash('success', 'Kategori berhasil diperbarui.');
+        } else {
+            session()->flash('error', 'Pilih kategori dan data terlebih dahulu.');
+        }
+    }
+
     public function updateDisposisiMassal()
     {
         if (!empty($this->selected) && !empty($this->selectedDisposisi)) {
             Laporan::whereIn('id', $this->selected)
                 ->update(['disposisi' => $this->selectedDisposisi]);
+
+            // Log aktivitas
+            foreach ($this->selected as $laporanId) {
+                Log::create([
+                    'laporan_id' => $laporanId,
+                    'activity' => 'Disposisi diperbarui menjadi ' . $this->selectedDisposisi,
+                    'user_id' => auth('admin')->user()->id_admins,
+                ]);
+            }
 
             $this->reset(['selected', 'selectAll', 'selectedDisposisi']);
             session()->flash('success', 'Disposisi berhasil diperbarui.');
@@ -256,45 +291,57 @@ class Pelimpahan extends Component
         }
     }
 
-    public function assignToAnalis()
-    {
-        if (empty($this->selected) || empty($this->selectedAnalis)) {
-            session()->flash('error', 'Pilih analis dan data terlebih dahulu.');
-            return;
-        }
-
-        $this->validate([
-            'selectedAnalis' => 'required|exists:admins,id_admins',
-            'assignNotes' => 'nullable|string|max:255', // Catatan opsional
-        ]);
-
-        foreach ($this->selected as $laporanId) {
-            $existingAssignment = Assignment::where('laporan_id', $laporanId)->first();
-
-            if ($existingAssignment) {
-                session()->flash('error', "Laporan #{$laporanId} sudah ditugaskan ke analis lain.");
-                continue;
-            }
-
-            // Buat assignment baru
-            Assignment::create([
-                'laporan_id' => $laporanId,
-                'analis_id' => $this->selectedAnalis,
-                'notes' => $this->assignNotes, // Catatan opsional
-                'assigned_by' => auth('admin')->user()->id_admins,
+    public function assignToAnalis()  
+    {  
+        // Check if any reports and an analyst have been selected  
+        if (empty($this->selected) || empty($this->selectedAnalis)) {  
+            session()->flash('error', 'Pilih analis dan data terlebih dahulu.');  
+            return;  
+        }  
+    
+        // Validate the selected analyst and optional notes  
+        $this->validate([  
+            'selectedAnalis' => 'required|exists:admins,id_admins',  
+            'assignNotes' => 'nullable|string|max:255', // Optional notes  
+        ]);  
+    
+        foreach ($this->selected as $laporanId) {  
+            // Check if the report already has an existing assignment  
+            $existingAssignment = Assignment::where('laporan_id', $laporanId)->first();  
+    
+            if ($existingAssignment) {  
+                session()->flash('error', "Laporan #{$laporanId} sudah ditugaskan ke analis lain.");  
+                continue; // Skip to the next report if already assigned  
+            }  
+    
+            // Create a new assignment  
+            Assignment::create([  
+                'laporan_id' => $laporanId,  
+                'analis_id' => $this->selectedAnalis,  
+                'notes' => $this->assignNotes, // Optional notes  
+                'assigned_by' => auth('admin')->user()->id_admins, // ID of the user assigning  
+            ]);  
+    
+            // Send notification to the assigned analyst  
+            Notification::create([  
+                'assigner_id' => auth('admin')->user()->id_admins, // ID of the user assigning  
+                'assignee_id' => $this->selectedAnalis, // ID of the assigned analyst  
+                'laporan_id' => $laporanId, // ID of the report  
+                'is_read' => false, // Set as unread  
+                'message' => "telah ditugaskan kepada Anda.", // Notification message  
             ]);
 
-            // Kirim notifikasi ke analis
-            Notification::create([
-                'assigner_id' => auth('admin')->user()->id_admins,
-                'assignee_id' => $this->selectedAnalis,
+            // Log aktivitas penugasan ke analis
+            Log::create([
                 'laporan_id' => $laporanId,
+                'activity' => 'Laporan ditugaskan ke analis ' . $this->selectedAnalis,
+                'user_id' => auth('admin')->user()->id_admins,
             ]);
-        }
-
-        // Reset pilihan dan tampilkan pesan sukses
-        $this->reset(['selected', 'selectAll', 'selectedAnalis']);
-        session()->flash('success', 'Laporan berhasil di-assign ke analis.');
+        }  
+    
+        // Reset selections and show success message  
+        $this->reset(['selected', 'selectAll', 'selectedAnalis']);  
+        session()->flash('success', 'Laporan berhasil di-assign ke analis.');  
     }
 
     public function pelimpahan(Request $request)
@@ -331,7 +378,7 @@ class Pelimpahan extends Component
                     'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
                     'assignee_id' => $assigneeId,                        // ID penerima notifikasi (deputi)
                     'laporan_id' => $laporanId,                           // ID laporan yang dipilih
-                    'message' => 'Pelimpahan data ke ' . $deputiName,     // Pesan notifikasi
+                    'message' => 'Pelimpahan data ke ' . $this->selectedDisposisi,     // Pesan notifikasi
                     'role' => $deputiName,                                // Isi role dengan nama kedeputian
                     'is_read' => false,                                   // Status notifikasi belum dibaca
                 ]);
@@ -347,11 +394,18 @@ class Pelimpahan extends Component
                     'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
                     'assignee_id' => $asdep->id_admins,                  // ID penerima notifikasi (asdep)
                     'laporan_id' => $laporanId,                           // ID laporan yang dipilih
-                    'message' => 'Pelimpahan data ke ' . $deputiName,     // Pesan notifikasi
+                    'message' => 'Pelimpahan data ke ' . $this->selectedDisposisi,     // Pesan notifikasi
                     'role' => $deputiName,                                // Isi role dengan nama kedeputian
                     'is_read' => false,                                   // Status notifikasi belum dibaca
                 ]);
             }
+
+            // Menyimpan log pelimpahan
+            Log::create([
+                'laporan_id' => $laporanId,
+                'activity' => 'Laporan dilimpahkan ke deputi ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
         }
 
         // Reset pilihan dan tampilkan pesan sukses

@@ -247,21 +247,21 @@
             <span class="fw-bold">{{ $data->count() }}</span> Data
         </p>
 
-        @if ($selected)
+        @if($selected)
             <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#modalKategori">
-                Update Kategori
+                Ubah Kategori
             </button>
             <!-- <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
                 Update Disposisi
             </button> -->
-        @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+            @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#assignModal">
                 Disposisi ke Analis
             </button>
             <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#pelimpahanModal">
                 Limpahkan
             </button>
-        @endif
+            @endif
         @endif
 
         @if ($data->hasPages())
@@ -303,16 +303,15 @@
                 <div class="modal-body">
                     <select wire:model="selectedKategori" class="form-control">
                         <option value="" selected>Pilih Kategori</option>
-                        <optgroup label="SP4N Lapor">
-                            @foreach ($kategoriSP4NLapor as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
-                        </optgroup>
-                        <optgroup label="Kategori Baru">
-                            @foreach ($kategoriBaru as $item)
-                                <option value="{{ $item }}">{{ $item }}</option>
-                            @endforeach
-                        </optgroup>
+                        @foreach ($kategoriDeputi as $deputi => $kategoris)
+                            @if(isset($namaDeputi[$deputi]))
+                                <optgroup label="{{ $namaDeputi[$deputi] }}">
+                                    @foreach ($kategoris as $kategori)
+                                        <option value="{{ $kategori }}">{{ $kategori }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
+                        @endforeach
                     </select>
                 </div>
                 <div class="modal-footer">

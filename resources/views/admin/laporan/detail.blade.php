@@ -127,7 +127,7 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Analisis:</p>
-                    <p><span class="badge bg-primary">{{ $data->status_analisis }}</span> Catatan: {{ $data->catatan_analisis ?? 'Tidak ada catatan' }}</p>
+                    <p><span class="badge bg-primary">{{ $data->status_analisis }}</span> {{ $data->catatan_analisis ?? '' }}</p>
 
                     @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Perbaiki Analisis</button>
@@ -153,10 +153,41 @@
             @endif
         </div>
     </div>
-    <div class="mt-3 text-end">
+    <div class="mb-3 mt-3 text-end">
         <a href="{{ route('admin.laporan.download', $data->nomor_tiket) }}" class="btn btn-success">
             Download Bukti Pengaduan (PDF)
         </a>
+    </div>
+    <div class="d-block rounded bg-white shadow">
+        <div class="p-3 border-bottom">
+            <p class="fs-4 fw-bold mb-0">Aktivitas terkait</p>
+        </div>
+        <div class="d-block p-3">
+            @if ($logs->isEmpty())
+                <p>Tidak ada log aktivitas.</p>
+            @else
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Aktivitas</th>
+                                <th>Pengguna</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($logs as $log)
+                                <tr>
+                                    <td>{{ $log->created_at->format('d-m-Y H:i:s') }}</td>
+                                    <td>{{ $log->activity }}</td>
+                                    <td>{{ $log->user->nama }}</td> <!-- Asumsi setiap log memiliki relasi 'user' yang terisi -->
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
     </div>
 </div>
 

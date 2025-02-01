@@ -202,9 +202,9 @@
         </p>
 
         @if ($selected)
-            <!-- <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#modalKategori">
-                Update Kategori
-            </button> -->
+            <button type="button" class="btn btn-primary ms-3" data-bs-toggle="modal" data-bs-target="#modalKategori">
+                Ubah Kategori
+            </button>
             <!-- <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal" data-bs-target="#modalDisposisi">
                 Update Disposisi
             </button> -->
@@ -223,6 +223,35 @@
             {{ $data->links('admin.layouts.paginations') }}
         </nav>
         @endif
+    </div>
+
+    <div class="modal fade" id="modalKategori" tabindex="-1" aria-labelledby="modalKategoriLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalKategoriLabel">Pilih Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <select wire:model="selectedKategori" class="form-control">
+                        <option value="" selected>Pilih Kategori</option>
+                        @foreach ($kategoriDeputi as $deputi => $kategoris)
+                            @if(isset($namaDeputi[$deputi]))
+                                <optgroup label="{{ $namaDeputi[$deputi] }}">
+                                    @foreach ($kategoris as $kategori)
+                                        <option value="{{ $kategori }}">{{ $kategori }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" wire:click="updateKategoriMassal">Simpan</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal Assign to Analis -->

@@ -114,14 +114,34 @@
 
                 <!-- Tanggal Kejadian dan Dokumen -->
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="tanggal_kejadian" class="form-label fw-bold">Tanggal Kejadian</label>
                         <input type="date" name="tanggal_kejadian" id="tanggal_kejadian" class="form-control @error('tanggal_kejadian') is-invalid @enderror" value="{{ old('tanggal_kejadian') }}">
                         @error('tanggal_kejadian')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="form-group col-md-4">
+                        <label for="kategori" class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
+                        <select name="kategori" id="kategori" class="form-control @error('kategori') is-invalid @enderror">
+                            <option disabled selected>Pilih Kategori</option>
+                            @foreach ($kategoriDeputi as $deputi => $kategoris)
+                                @if(isset($namaDeputi[$deputi]))
+                                    <optgroup label="{{ $namaDeputi[$deputi] }}">
+                                        @foreach ($kategoris as $kategori)
+                                            <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endif
+                            @endforeach
+                        </select>
+                        @error('kategori')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                    <div class="col-md-4">
                         <label for="dokumen_pendukung" class="form-label fw-bold">Dokumen Pendukung <span class="text-danger">*</span></label>
                         <input type="file" name="dokumen_pendukung" id="dokumen_pendukung" class="form-control @error('dokumen_pendukung') is-invalid @enderror">
                         @error('dokumen_pendukung')
@@ -130,45 +150,14 @@
                     </div>
                 </div>
 
-                <!-- Kategori dan Disposisi-->
-                <div class="row mb-3">
-                    <div class="form-group col-md-6">
-                        <label for="kategori" class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
-                        <select name="kategori" id="kategori" class="form-control @error('kategori') is-invalid @enderror">
-                                <option disabled selected>Pilih Kategori</option>
-                                <optgroup label="SP4N Lapor">
-                                    @foreach ($kategoriSP4NLapor as $kategori)
-                                        <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
-                                    @endforeach
-                                </optgroup>
-                                <optgroup label="Kategori Baru">
-                                    @foreach ($kategoriBaru as $kategori)
-                                        <option value="{{ $kategori }}" {{ old('kategori') == $kategori ? 'selected' : '' }}>{{ $kategori }}</option>
-                                    @endforeach
-                                </optgroup>
-                        </select>
-                        @error('kategori')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="disposisi" class="form-label fw-bold">Deputi <span class="text-danger">*</span></label>
-                        <select name="disposisi" id="disposisi" class="form-control @error('disposisi') is-invalid @enderror">
-                                <option disabled selected>Pilih Disposisi Deputi</option>
-                            @foreach($namaDeputi as $key => $value)
-                                <option value="{{ $key }}" {{ old('disposisi') == $key ? 'selected' : '' }}>{{ $value }}</option>
-                            @endforeach
-                        </select>
-                        @error('disposisi')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
+                <div class="mb-3 d-block rounded bg-secondary shadow">
+                    <p class="text-white p-3">
+                        1. Perhatikan Kolom yang wajib diisi. <br>
+                        2. Dokumen Pendukung berupa file PDF/Document/JPG/PNG. <br>
+                        3. Disposisi Otomatis ketika Kategori sudah dipilih. <br>
+                        4. Jangan Lupa Download Bukti Pengaduan di Halaman Detail Pengaduan (otomatis ke halaman Detail Pengaduan setelah Buat Pengaduan).
+                    </p>
                 </div>
-
                 <!-- Submit -->
                 <div class="mb-3">
                     <button type="submit" class="btn btn-primary form-control">Buat Pengaduan</button>
@@ -177,4 +166,7 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+
 @endsection
