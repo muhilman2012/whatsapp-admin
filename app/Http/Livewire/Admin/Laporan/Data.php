@@ -348,10 +348,13 @@ class Data extends Component
                 'message' => "telah ditugaskan kepada Anda.", // Notification message  
             ]);
 
+            // Retrieve the analyst's name
+            $analyst = admins::find($this->selectedAnalis);
+
             // Log aktivitas penugasan ke analis
             Log::create([
                 'laporan_id' => $laporanId,
-                'activity' => 'Laporan ditugaskan ke analis ' . $this->selectedAnalis,
+                'activity' => 'Laporan ditugaskan ke analis ' . ($analyst->nama ?? 'Unknown'),
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
         }  
@@ -420,7 +423,7 @@ class Data extends Component
             // Menyimpan log pelimpahan
             Log::create([
                 'laporan_id' => $laporanId,
-                'activity' => 'Laporan dilimpahkan ke deputi ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
+                'activity' => 'Laporan dilimpahkan ke ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
         }
