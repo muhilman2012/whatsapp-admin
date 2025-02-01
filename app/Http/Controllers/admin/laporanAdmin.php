@@ -127,7 +127,7 @@ class laporanAdmin extends Controller
             'alamat_lengkap' => 'required',  
             'judul' => 'required|max:255',  
             'detail' => 'required',  
-            'dokumen_pendukung' => 'required|file|mimes:pdf|max:2048',
+            'dokumen_pendukung' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
             'kategori' => 'required',
             'lokasi' => 'nullable',
             'tanggal_kejadian' => 'nullable|date'
