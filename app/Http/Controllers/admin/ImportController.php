@@ -85,6 +85,7 @@ class ImportController extends Controller
                         'status' => "Proses verifikasi dan telaah",
                         'tanggapan' => "Laporan pengaduan Saudara dalam proses verifikasi & penelaahan.",
                         'sumber_pengaduan' => "tatap muka",
+                        'disposisi' => $row[17] ?? null,
                     ]);
 
                     $successCount++;

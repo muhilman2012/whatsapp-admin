@@ -40,7 +40,7 @@ class Laporan extends Model
         'updated_at',
     ];
 
-    // public $timestamps = false; Nonaktifkan timestamps otomatis
+    public $timestamps = false; //Nonaktifkan timestamps otomatis
     
     protected $casts = [
         'tanggal_kejadian' => 'datetime',
