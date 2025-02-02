@@ -94,7 +94,24 @@
                                 @endif  
                             @else  
                                 <span>Tidak ada Dokumen Pengaduan</span>  
-                            @endif  
+                            @endif
+
+                            <!-- Menampilkan dokumen tambahan jika ada -->
+                            @if($data->dokumen_tambahan)  
+                                @php  
+                                    $additionalDocuments = is_array($data->dokumen_tambahan) ? $data->dokumen_tambahan : [$data->dokumen_tambahan];  
+                                @endphp
+                                    @foreach($additionalDocuments as $additionalDocument)  
+                                        @if(filter_var($additionalDocument, FILTER_VALIDATE_URL))  
+                                            <a href="{{ $additionalDocument }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
+                                        @elseif(pathinfo($additionalDocument, PATHINFO_EXTENSION) === 'pdf')  
+                                            <a href="{{ asset('storage/dokumen/' . $additionalDocument) }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
+                                        @endif  
+                                    @endforeach  
+                                    @if(count($additionalDocuments) === 0)  
+                                        <span>Tidak ada Dokumen Tambahan</span>  
+                                    @endif
+                            @endif
                         </div>  
                     @else  
                         <!-- Jika sumber pengaduan tidak diketahui -->  

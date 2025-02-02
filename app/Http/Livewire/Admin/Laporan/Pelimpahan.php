@@ -403,7 +403,7 @@ class Pelimpahan extends Component
             // Menyimpan log pelimpahan
             Log::create([
                 'laporan_id' => $laporanId,
-                'activity' => 'Laporan dilimpahkan ke deputi ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
+                'activity' => 'Laporan dilimpahkan ke ' . $deputiName, // Menggunakan variabel $deputiName secara langsung
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
         }

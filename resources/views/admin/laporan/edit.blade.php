@@ -199,7 +199,7 @@
                 <!-- Tombol Update -->
                 <div>
                     <button type="submit" class="btn btn-primary form-control">
-                        Update Pengaduan
+                        Perbarui Pengaduan
                     </button>
                 </div>
             </div>
