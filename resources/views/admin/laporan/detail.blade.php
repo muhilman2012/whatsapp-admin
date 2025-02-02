@@ -54,19 +54,23 @@
                         <!-- Jika sumber pengaduan adalah WhatsApp -->  
                         <div>  
                             @if($data->dokumen_ktp)  
-                                <a href="{{ $data->dokumen_ktp }}" target="_blank">Lihat Identitas , </a>  
+                                <a href="{{ $data->dokumen_ktp }}" target="_blank"><span class="badge bg-primary">Lihat Identitas</span></a>  
                             @endif  
                 
                             @if($data->dokumen_kk)  
-                                <a href="{{ $data->dokumen_kk }}" target="_blank">Lihat KK , </a>  
+                                <a href="{{ $data->dokumen_kk }}" target="_blank"><span class="badge bg-primary">Lihat KK</span></a>  
                             @endif  
                 
                             @if($data->dokumen_skuasa)  
-                                <a href="{{ $data->dokumen_skuasa }}" target="_blank">Lihat Surat Kuasa , </a>  
+                                <a href="{{ $data->dokumen_skuasa }}" target="_blank"><span class="badge bg-primary">Lihat Surat Kuasa</span></a>  
                             @endif  
                 
                             @if($data->dokumen_pendukung)  
-                                <a href="{{ $data->dokumen_pendukung }}" target="_blank">Lihat Dokumen Pengaduan</a>  
+                                <a href="{{ $data->dokumen_pendukung }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
+                            @endif
+
+                            @if($data->dokumen_tambahan)
+                                <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Tambahan</span></a>
                             @else  
                                 <span>Tidak ada Dokumen Pengaduan</span>  
                             @endif  
@@ -80,9 +84,9 @@
                                 @endphp  
                                 @foreach($documents as $document)  
                                     @if(filter_var($document, FILTER_VALIDATE_URL))  
-                                        <a href="{{ $document }}" target="_blank">Lihat Dokumen Pengaduan</a>  
+                                        <a href="{{ $document }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
                                     @elseif(pathinfo($document, PATHINFO_EXTENSION) === 'pdf')  
-                                        <a href="{{ asset('storage/dokumen/' . $document) }}" target="_blank">Lihat Dokumen Pengaduan</a>  
+                                        <a href="{{ asset('storage/dokumen/' . $document) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
                                     @endif  
                                 @endforeach  
                                 @if(count($documents) === 0)  
