@@ -181,7 +181,7 @@
     <script>
         Swal.fire({
             icon: 'success',
-            title: 'Good Jobs!',
+            title: 'Sukses!',
             text: '{{ session()->get("success") }}',
         })
     </script>
@@ -189,7 +189,7 @@
     <script>
         Swal.fire({
             icon: 'error',
-            title: 'Opps...!',
+            title: 'Maaf..',
             text: '{{ session()->get("error") }}',
         })
     </script>
