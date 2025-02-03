@@ -33,7 +33,7 @@
                 <td>{{ $laporan->email }}</td>
                 <td>{{ $laporan->jenis_kelamin }}</td>
                 <td>{{ $laporan->alamat_lengkap }}</td>
-                <td>{{ $laporan->tanggal_kejadian->format('d-m-Y') }}</td>
+                <td>{{ \Carbon\Carbon::parse($laporan->tanggal_kejadian)->format('d-m-Y') }}</td>
                 <td>{{ $laporan->lokasi }}</td>
                 <td>{{ $laporan->judul }}</td>
                 <td>{{ $laporan->detail }}</td>
