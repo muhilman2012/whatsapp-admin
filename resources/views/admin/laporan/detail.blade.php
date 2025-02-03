@@ -71,8 +71,6 @@
 
                             @if($data->dokumen_tambahan)
                                 <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
-                            @else  
-                                <span>Tidak ada Dokumen Pengaduan</span>  
                             @endif  
                         </div>  
                     @elseif($data->sumber_pengaduan === 'tatap muka')  
