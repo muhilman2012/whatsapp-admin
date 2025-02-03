@@ -316,7 +316,25 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" wire:click="updateKategoriMassal">Simpan</button>
+                    <button type="button" class="btn btn-primary" wire:click="confirmUpdateKategori">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi Perubahan Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Anda akan merubah kategori menjadi "{{ $selectedKategori }}" dan akan terdisposisi ke "{{ $namaDeputi[$selectedDeputi] ?? 'Tidak diketahui' }}". Apakah Anda yakin?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" wire:click="updateKategoriMassal">Konfirmasi</button>
                 </div>
             </div>
         </div>
@@ -514,6 +532,11 @@
                     alert('Terjadi kesalahan saat melakukan ekspor PDF.');
                 }
             });
+        });
+    </script>
+    <script>
+        window.addEventListener('show-confirmation-modal', event => {
+            $('#confirmationModal').modal('show');
         });
     </script>
 

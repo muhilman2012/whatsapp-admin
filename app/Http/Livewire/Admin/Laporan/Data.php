@@ -267,23 +267,80 @@ class Data extends Component
     public function updateKategoriMassal()
     {
         if (!empty($this->selected) && !empty($this->selectedKategori)) {
-            Laporan::whereIn('id', $this->selected)
-                ->update(['kategori' => $this->selectedKategori]);
+            $kategoriDeputi = Laporan::getKategoriDeputi2();
+            $deputiBaru = null;
 
-            // Log aktivitas
-            foreach ($this->selected as $laporanId) {
-                Log::create([
-                    'laporan_id' => $laporanId,
-                    'activity' => 'Kategori diperbarui menjadi ' . $this->selectedKategori,
-                    'user_id' => auth('admin')->user()->id_admins,
-                ]);
+            // Mencari deputi yang sesuai berdasarkan kategori yang dipilih
+            foreach ($kategoriDeputi as $deputi => $kategoris) {
+                if (in_array($this->selectedKategori, $kategoris)) {
+                    $deputiBaru = $deputi;
+                    break;
+                }
             }
 
-            $this->reset(['selected', 'selectAll', 'selectedKategori']);
-            session()->flash('success', 'Kategori berhasil diperbarui.');
+            if ($deputiBaru) {
+                Laporan::whereIn('id', $this->selected)
+                    ->update([
+                        'kategori' => $this->selectedKategori,
+                        'disposisi_terbaru' => $deputiBaru
+                    ]);
+
+                // Ambil nama kedeputian berdasarkan disposisi yang dipilih
+                $deputiName = $this->getNamaKedeputian($deputiBaru); // Asumsikan fungsi ini ada dan mengembalikan nama kedeputian
+
+                foreach ($this->selected as $laporanId) {
+                    // Kirim notifikasi ke asdep yang relevan
+                    $asdepUsers = admins::where('role', 'asdep')
+                                        ->where('deputi', $deputiName) // Filter berdasarkan nama deputi yang sesuai
+                                        ->get();
+
+                    foreach ($asdepUsers as $asdep) {
+                        Notification::create([
+                            'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim notifikasi
+                            'assignee_id' => $asdep->id_admins,                  // ID penerima notifikasi (asdep)
+                            'laporan_id' => $laporanId,                          // ID laporan yang dipilih
+                            'message' => 'Perubahan kategori ke ' . $this->selectedKategori,     // Pesan notifikasi
+                            'role' => $deputiName,                               // Isi role dengan nama kedeputian
+                            'is_read' => false,                                  // Status notifikasi belum dibaca
+                        ]);
+                    }
+
+                    // Log aktivitas
+                    Log::create([
+                        'laporan_id' => $laporanId,
+                        'activity' => 'Kategori diperbarui menjadi ' . $this->selectedKategori . ', disposisi terbaru diperbarui menjadi ' . $deputiBaru,
+                        'user_id' => auth('admin')->user()->id_admins,
+                    ]);
+                }
+
+                $this->reset(['selected', 'selectAll', 'selectedKategori']);
+                session()->flash('success', 'Kategori dan disposisi berhasil diperbarui.');
+            } else {
+                session()->flash('error', 'Disposisi yang sesuai tidak ditemukan untuk kategori yang dipilih.');
+            }
         } else {
             session()->flash('error', 'Pilih kategori dan data terlebih dahulu.');
         }
+    }
+
+    public function confirmUpdateKategori()
+    {
+        if (empty($this->selectedKategori)) {
+            session()->flash('error', 'Pilih kategori terlebih dahulu.');
+            return;
+        }
+
+        // Menentukan deputi terkait berdasarkan kategori yang dipilih
+        $kategoriDeputi = Laporan::getKategoriDeputi2();
+        foreach ($kategoriDeputi as $deputi => $kategoris) {
+            if (in_array($this->selectedKategori, $kategoris)) {
+                $this->selectedDeputi = $deputi;
+                break;
+            }
+        }
+
+        // Munculkan modal konfirmasi
+        $this->dispatchBrowserEvent('show-confirmation-modal');
     }
 
     public function updateDisposisiMassal()
