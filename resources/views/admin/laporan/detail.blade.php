@@ -88,10 +88,10 @@
                                     @endif  
                                 @endforeach  
                                 @if(count($documents) === 0)  
-                                    <span>Tidak ada Dokumen Pengaduan</span>  
+                                    <span class="badge bg-primary">Tidak ada Dokumen Pengaduan</span>  
                                 @endif  
                             @else  
-                                <span>Tidak ada Dokumen Pengaduan</span>  
+                                <span class="badge bg-primary">Tidak ada Dokumen Pengaduan</span>  
                             @endif
 
                             <!-- Menampilkan dokumen tambahan jika ada -->
