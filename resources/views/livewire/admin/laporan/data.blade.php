@@ -116,6 +116,13 @@
                     </ul>
                 </div>
             </div>
+            <div class="ms-2">
+                <select wire:model="sumber_pengaduan" class="form-select">
+                    <option value="">Sumber</option>
+                    <option value="whatsapp">WA</option>
+                    <option value="tatap muka">TM</option>
+                </select>
+            </div>
             <!-- Select Jumlah Halaman -->
             <div class="ms-2">
                 <select wire:model="pages" class="form-select">

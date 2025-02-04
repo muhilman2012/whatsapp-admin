@@ -86,6 +86,10 @@ class ExportController extends Controller
             $data->whereDate('created_at', $request->tanggal);
         }
 
+        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)) {
+            $data->where('sumber_pengaduan', $request->sumber_pengaduan);
+        }
+
         $data = $data->get();
 
         if ($data->isEmpty()) {
@@ -101,6 +105,9 @@ class ExportController extends Controller
         }
         if ($request->has('tanggal') && !empty($request->tanggal)) {
             $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+        }
+        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)){
+            $fileName .= '_by_sumber_pengaduan_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->sumber_pengaduan));
         }
         $fileName .= '.xlsx';
 

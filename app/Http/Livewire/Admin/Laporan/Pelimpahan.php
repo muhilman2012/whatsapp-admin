@@ -36,6 +36,7 @@ class Pelimpahan extends Component
     public $kategoriUnit;
     public $currentPageData = [];
     public $filterStatusAnalisis = ''; // Untuk filter status analisis
+    public $sumber_pengaduan = ''; // Untuk filter sumber pengaduan
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -211,6 +212,11 @@ class Pelimpahan extends Component
             $data->whereDate('created_at', $this->tanggal);
         }
 
+        // Filter berdasarkan sumber pengaduan
+        if (!empty($this->sumber_pengaduan)) {
+            $data->where('sumber_pengaduan', $this->sumber_pengaduan);
+        }
+        
         // Filter berdasarkan disposisi dan disposisi_terbaru  
         $data->whereNotNull('disposisi')  
              ->whereNotNull('disposisi_terbaru'); 

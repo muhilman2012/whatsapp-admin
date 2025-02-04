@@ -37,6 +37,7 @@ class Data extends Component
     public $currentPageData = [];
     public $filterPelimpahan = false; // Untuk filter pelimpahan
     public $filterStatusAnalisis = ''; // Untuk filter status analisis
+    public $sumber_pengaduan = ''; // Untuk filter sumber pengaduan
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -226,7 +227,12 @@ class Data extends Component
         // Filter berdasarkan tanggal  
         if (!empty($this->tanggal)) {  
             $data->whereDate('created_at', $this->tanggal);  
-        }  
+        }
+
+        // Filter berdasarkan sumber pengaduan
+        if (!empty($this->sumber_pengaduan)) {
+            $data->where('sumber_pengaduan', $this->sumber_pengaduan);
+        }
     
         // Urutkan data berdasarkan status  
         $data->orderByRaw("
