@@ -137,6 +137,7 @@
                         @endif
                     </th>
                     <th>Sumber</th>
+                    <th>Status</th>
                     <th>Dikirim</th>
                     <th>Aksi</th>
                 </tr>
@@ -176,6 +177,7 @@
                             <span class="badge bg-secondary">{{ $item->sumber_pengaduan }}</span>
                         @endif
                     </td>
+                    <td>{{ $item->status }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <td class="text-nowrap">
                         <a href="{{ route('admin.laporan.detail', ['nomor_tiket' => $item->nomor_tiket]) }}" class="btn btn-outline-secondary btn-sm">

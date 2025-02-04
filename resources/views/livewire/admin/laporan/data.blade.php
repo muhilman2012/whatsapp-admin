@@ -171,6 +171,7 @@
                         @endif
                     </th>
                     <th>Sumber</th>
+                    <th>Status</th>
                     <th>Dikirim</th>
                     <!-- <th>Sisa Hari</th> -->
                     <th>Aksi</th>
@@ -221,6 +222,7 @@
                             <span class="badge bg-secondary">{{ $item->sumber_pengaduan }}</span>
                         @endif
                     </td>
+                    <td>{{ $item->status }}</td>
                     <td>{{ $item->created_at->format('d/m/Y') }}</td>
                     <!-- <td>{{ $item->sisa_hari }}</td> -->
                     <td class="text-nowrap">
