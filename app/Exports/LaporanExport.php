@@ -65,7 +65,8 @@ class LaporanExport implements FromView, WithStyles, WithColumnWidths
             'Dokumen KTP',
             'Dokumen KK',
             'Dokumen Surat Kuasa',
-            'Dokumen Pendukung'
+            'Dokumen Pendukung',
+            'Sumber Pengaduan'
         ];
     }
 
@@ -126,6 +127,7 @@ class LaporanExport implements FromView, WithStyles, WithColumnWidths
             'Q' => 15, // Dokumen KK
             'R' => 15, // Dokumen Pendukung
             'S' => 15, // Dokumen Surat Kuasa
+            'T' => 10, // Sumber Pengaduan
         ];
     }
 

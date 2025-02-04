@@ -63,6 +63,13 @@
             <div class="col-auto ms-2">
                 <input wire:model="tanggal" type="date" name="tanggal" id="tanggal" class="form-control" required>
             </div>
+            <div class="ms-2">
+                <select wire:model="sumber_pengaduan" class="form-select">
+                    <option value="">Sumber</option>
+                    <option value="whatsapp">WA</option>
+                    <option value="tatap muka">TM</option>
+                </select>
+            </div>
             <!-- Export Filtered Data -->
             <div class="ms-2">
                 <div class="dropdown">
@@ -92,13 +99,6 @@
                         </li>
                     </ul>
                 </div>
-            </div>
-            <div class="ms-2">
-                <select wire:model="sumber_pengaduan" class="form-select">
-                    <option value="">Sumber</option>
-                    <option value="whatsapp">WA</option>
-                    <option value="tatap muka">TM</option>
-                </select>
             </div>
             <!-- Select Jumlah Halaman -->
             <div class="ms-2">

@@ -20,6 +20,7 @@
             <th>Dokumen KK</th>
             <th>Dokumen Pendukung</th>
             <th>Dokumen Surat Kuasa</th>
+            <th>Sumber Pengaduan</th>
         </tr>
     </thead>
     <tbody>
@@ -44,6 +45,7 @@
                 <td>{{ $laporan->dokumen_kk }}</td>
                 <td>{{ $laporan->dokumen_pendukung }}</td>
                 <td>{{ $laporan->dokumen_skuasa }}</td>
+                <td>{{ $laporan->sumber_pengaduan }}</td>
             </tr>
         @endforeach
 

@@ -86,6 +86,13 @@
             <div class="col-auto ms-2">
                 <input wire:model="tanggal" type="date" name="tanggal" id="tanggal" class="form-control" required>
             </div>
+            <div class="ms-2">
+                <select wire:model="sumber_pengaduan" class="form-select">
+                    <option value="">Sumber</option>
+                    <option value="whatsapp">WA</option>
+                    <option value="tatap muka">TM</option>
+                </select>
+            </div>
             <!-- Export Filtered Data -->
             <div class="ms-2">
                 <div class="dropdown">
@@ -100,6 +107,7 @@
                                 <input type="hidden" name="search" value="{{ $search }}">
                                 <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
                                 <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                                <input type="hidden" name="sumber_pengaduan" value="{{ $sumber_pengaduan }}">
                                 <button type="submit" class="dropdown-item">Export to Excel</button>
                             </form>
                         </li>
@@ -110,18 +118,12 @@
                                 <input type="hidden" name="search" value="{{ $search }}">
                                 <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
                                 <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                                <input type="hidden" name="sumber_pengaduan" value="{{ $sumber_pengaduan }}">
                                 <button type="submit" class="dropdown-item">Export to PDF</button>
                             </form>
                         </li>
                     </ul>
                 </div>
-            </div>
-            <div class="ms-2">
-                <select wire:model="sumber_pengaduan" class="form-select">
-                    <option value="">Sumber</option>
-                    <option value="whatsapp">WA</option>
-                    <option value="tatap muka">TM</option>
-                </select>
             </div>
             <!-- Select Jumlah Halaman -->
             <div class="ms-2">

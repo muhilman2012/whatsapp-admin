@@ -107,7 +107,7 @@ class ExportController extends Controller
             $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
         }
         if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)){
-            $fileName .= '_by_sumber_pengaduan_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->sumber_pengaduan));
+            $fileName .= '_by_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->sumber_pengaduan));
         }
         $fileName .= '.xlsx';
 
