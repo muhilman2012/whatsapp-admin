@@ -125,7 +125,7 @@
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'all']) }}">
                             <i class="fas fa-newspaper box-icon text-center"></i>Semua Pengaduan
                         </a>
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep', 'analis']))
                         <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                             <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
                         </a>

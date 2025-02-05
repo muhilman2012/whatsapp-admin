@@ -452,6 +452,11 @@
             });
         });
     </script>
+    <script>
+        window.addEventListener('show-confirmation-modal', event => {
+            $('#confirmationModal').modal('show');
+        });
+    </script>
 
 @if(session()->has('success'))
     <script>

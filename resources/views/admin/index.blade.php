@@ -451,34 +451,41 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('statusPieChart').getContext('2d');
+        const canvas = document.getElementById('statusPieChart');
+        if (!canvas) {
+            console.error('Canvas dengan ID "statusPieChart" tidak ditemukan!');
+            return;
+        }
+        const ctx = canvas.getContext('2d');
 
-        // Data dari controller
+        // Ambil data dari controller
         const chartData = @json($chartData);
+        const labels = chartData.map(item => item.label);
+        const values = chartData.map(item => item.value);
 
-        // Pisahkan label dan nilai
-        const labels = chartData.map(data => data.label); // Ambil label yang sudah diformat
-        const values = chartData.map(data => data.value); // Ambil nilai
+        // Tambahkan warna untuk masing-masing status
+        const backgroundColors = [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(75, 192, 192, 0.5)'
+        ];
+        const borderColors = [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(75, 192, 192, 1)'
+        ];
 
         new Chart(ctx, {
-            type: 'pie', // Jenis chart
+            type: 'pie',
             data: {
-                labels: labels, // Label status singkat + jumlah
+                labels: labels,
                 datasets: [{
                     label: 'Status Laporan',
-                    data: values, // Data jumlah laporan
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.5)', // Warna untuk status 1
-                        'rgba(54, 162, 235, 0.5)', // Warna untuk status 2
-                        'rgba(255, 206, 86, 0.5)', // Warna untuk status 3
-                        'rgba(75, 192, 192, 0.5)'  // Warna untuk status 4
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)'
-                    ],
+                    data: values,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
                     borderWidth: 1
                 }]
             },
@@ -491,7 +498,20 @@
                         position: 'top'
                     },
                     tooltip: {
-                        enabled: true
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                let index = tooltipItem.dataIndex;
+                                let label = chartData[index].label;
+                                let whatsappCount = chartData[index].whatsapp;
+                                let tatapMukaCount = chartData[index].tatap_muka;
+
+                                return [
+                                    `${label}`,
+                                    `Whatsapp: ${whatsappCount}`,
+                                    `Tatap Muka: ${tatapMukaCount}`
+                                ];
+                            }
+                        }
                     }
                 }
             }

@@ -129,27 +129,7 @@ class indexAdmin extends Controller
         // Hitung total laporan yang belum di-assign
         $totalNotAssigned = $totalLaporan - $totalAssignedToAnalis; // Ini sekarang harus berfungsi
 
-        // Definisikan status secara eksplisit
-        $allStatuses = [
-            'Penanganan Selesai',
-            'Menunggu kelengkapan data dukung dari Pelapor',
-            'Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut',
-            'Proses verifikasi dan telaah'
-        ];
-
-        // Pastikan status data juga diambil dengan benar
-        $statusData = Laporan::selectRaw('status, COUNT(*) as total')
-            ->when($admin->role === 'asdep', function ($query) use ($kategoriByUnit) {
-                $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori
-            })
-            ->when(!in_array($admin->role, ['superadmin', 'admin', 'asdep']), function ($query) use ($admin) {
-                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin, admin, atau asdep
-            })
-            ->groupBy('status')
-            ->get()
-            ->keyBy('status');
-
-        // Label singkat untuk status
+        // Short labels untuk setiap status
         $shortLabels = [
             'Penanganan Selesai' => 'Selesai',
             'Menunggu kelengkapan data dukung dari Pelapor' => 'Kelengkapan',
@@ -157,18 +137,52 @@ class indexAdmin extends Controller
             'Proses verifikasi dan telaah' => 'Verifikasi'
         ];
 
-        // Pastikan semua status muncul, meskipun datanya kosong
-        $statusCounts = [];
-        foreach ($allStatuses as $status) {
-            $statusCounts[$status] = $statusData[$status]->total ?? 0;
+        // Query dasar untuk menghindari penulisan berulang
+        $queryBase = Laporan::query();
+        if ($admin->role === 'asdep') {
+            $queryBase->whereIn('kategori', $kategoriByUnit);
+        } elseif (!in_array($admin->role, ['superadmin', 'admin', 'asdep'])) {
+            $queryBase->where(function ($query) use ($admin) {
+                $query->where('disposisi', $admin->role)
+                    ->orWhere('disposisi_terbaru', $admin->role);
+            });
         }
 
-        // Format data untuk chart
+        // Ambil jumlah total laporan berdasarkan status
+        $statusData = (clone $queryBase)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->get()
+            ->keyBy('status');
+
+        // Ambil jumlah laporan berdasarkan status & sumber_pengaduan
+        $statusBySource = (clone $queryBase)
+            ->selectRaw('status, sumber_pengaduan, COUNT(*) as total')
+            ->groupBy('status', 'sumber_pengaduan')
+            ->get()
+            ->groupBy('status');
+
         $chartData = [];
-        foreach ($statusCounts as $status => $count) {
+
+        foreach ($shortLabels as $fullStatus => $shortLabel) {
+            // Total laporan untuk status ini
+            $totalStatus = $statusData[$fullStatus]->total ?? 0;
+
+            // Ambil jumlah laporan berdasarkan sumber_pengaduan
+            $whatsappCount = isset($statusBySource[$fullStatus]) 
+                ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'whatsapp')->first()->total ?? 0) 
+                : 0;
+
+            $tatapMukaCount = isset($statusBySource[$fullStatus]) 
+                ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'tatap muka')->first()->total ?? 0) 
+                : 0;
+
+            // Tambahkan data untuk chart
             $chartData[] = [
-                'label' => "{$shortLabels[$status]} = {$count}",
-                'value' => $count
+                'label' => "{$shortLabel} = {$totalStatus}",
+                'value' => $totalStatus,
+                'whatsapp' => $whatsappCount,
+                'tatap_muka' => $tatapMukaCount
             ];
         }
 

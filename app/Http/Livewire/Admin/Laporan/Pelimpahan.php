@@ -394,10 +394,13 @@ class Pelimpahan extends Component
                 'message' => "telah ditugaskan kepada Anda.", // Notification message  
             ]);
 
+            // Retrieve the analyst's name
+            $analyst = admins::find($this->selectedAnalis);
+
             // Log aktivitas penugasan ke analis
             Log::create([
                 'laporan_id' => $laporanId,
-                'activity' => 'Laporan ditugaskan ke analis ' . $this->selectedAnalis,
+                'activity' => 'Laporan ditugaskan ke analis ' . ($analyst->nama ?? 'Unknown'),
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
         }  
@@ -484,6 +487,31 @@ class Pelimpahan extends Component
         return self::$deputiMapping[$disposisi] ?? null;  
     }
 
+    // Fungsi untuk mendapatkan role berdasarkan disposisi
+    private function getRoleByDisposisi($disposisi)
+    {
+        return $disposisi;  
+    }
+    
+    private function getUserIdByRole($role)  
+    {  
+        // Retrieve the user ID based on the role  
+        return admins::where('role', $role)->first()->id_admins ?? null;  
+    }  
+    
+    private function sendNotification($assignerId, $assigneeId, $laporanId, $message)  
+    {  
+        if ($assigneeId) {  
+            Notification::create([  
+                'assigner_id' => $assignerId,  
+                'assignee_id' => $assigneeId,  
+                'laporan_id' => $laporanId,  
+                'is_read' => false, // Set as unread  
+                'message' => $message, // Add the message for the notification  
+            ]);  
+        }  
+    }
+    
     public function loadAnalisByDeputi()    
     {    
         $user = auth()->guard('admin')->user(); // Ambil data pengguna yang sedang login    
@@ -495,12 +523,18 @@ class Pelimpahan extends Component
                 ->get(['id_admins', 'username', 'deputi']);    
         } elseif ($user->role === 'asdep') {    
             // Role asdep hanya dapat melihat analis berdasarkan kolom deputi yang sama  
-            $deputiName = $user->deputi; // Ambil nama deputi dari pengguna yang sedang login  
+            // $deputiName = $user->deputi; // Ambil nama deputi dari pengguna yang sedang login  
     
+            // $this->analisList = admins::where('role', 'analis')    
+            //     ->where('deputi', $deputiName) // Filter berdasarkan nama deputi yang sama    
+            //     ->orderBy('username', 'asc') // Urutkan berdasarkan abjad    
+            //     ->get(['id_admins', 'username', 'deputi']);
+
+            // Role asdep hanya melihat analis berdasarkan unit yang sesuai
             $this->analisList = admins::where('role', 'analis')    
-                ->where('deputi', $deputiName) // Filter berdasarkan nama deputi yang sama    
-                ->orderBy('username', 'asc') // Urutkan berdasarkan abjad    
-                ->get(['id_admins', 'username', 'deputi']);    
+                ->where('unit', $user->unit)    
+                ->orderBy('username', 'asc')    
+                ->get(['id_admins', 'username', 'unit']);
         } else {    
             // Role deputi hanya dapat melihat analis dengan deputi yang sesuai    
             $deputiName = self::$deputiMapping[$user->role] ?? null;    
