@@ -172,14 +172,14 @@
                 </div>
 
                 <!-- Bar Chart Laporan Harian -->
-                <div class="col-6">
+                <div class="col-lg-6 col-sm-6">
                     <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
                         <canvas id="laporanHarianChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Pie Chart Status untuk Deputi -->
-                <div class="col-6">
+                <div class="col-lg-6">
                     <div class="card border-0 shadow-sm p-3 align-items-center">
                         <div class="pie-container">
                             <canvas id="statusPieChart"></canvas>

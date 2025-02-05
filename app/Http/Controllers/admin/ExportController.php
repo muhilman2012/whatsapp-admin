@@ -91,6 +91,7 @@ class ExportController extends Controller
         }
 
         $data = $data->get();
+        // dd($data);
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
@@ -179,7 +180,7 @@ class ExportController extends Controller
 
     private function getKategoriByRole($role, $unit = null)
     {
-        $kategoriDeputi = Laporan::getKategoriDeputi();
+        $kategoriDeputi = Laporan::getKategoriDeputi2();
         $kategoriKataKunci = Laporan::getKategoriKataKunci();
 
         if ($role === 'admin' || $role === 'superadmin') {
