@@ -116,7 +116,7 @@
                     </a>
                     <hr class="soft my-1 text-white">
                     <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'all']) }}">
-                        <i class="fas fa-newspaper box-icon text-center"></i>Kelola Semua Pengaduan
+                        <i class="fas fa-newspaper box-icon text-center"></i>Kelola Pengaduan
                     </a>
                     <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                         <i class="fas fa-bookmark box-icon text-center fa-fw "></i>Pelimpahan
