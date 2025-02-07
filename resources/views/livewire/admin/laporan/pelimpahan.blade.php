@@ -78,7 +78,7 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="exportFilteredDropdown">
                         <li>
-                            <form action="{{ route('admin.laporan.export.filtered.excel') }}" method="GET">
+                            <form action="{{ route('admin.laporan.export.pelimpahan') }}" method="GET">
                                 <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
                                 <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
                                 <input type="hidden" name="search" value="{{ $search }}">
@@ -87,7 +87,7 @@
                                 <button type="submit" class="dropdown-item">Export to Excel</button>
                             </form>
                         </li>
-                        <li>
+                        <!-- <li>
                             <form action="{{ route('admin.laporan.export.filtered.pdf') }}" method="GET">
                                 <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
                                 <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
@@ -96,7 +96,7 @@
                                 <input type="hidden" name="tanggal" value="{{ $tanggal }}">
                                 <button type="submit" class="dropdown-item">Export to PDF</button>
                             </form>
-                        </li>
+                        </li> -->
                     </ul>
                 </div>
             </div>

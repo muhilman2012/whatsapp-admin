@@ -115,36 +115,12 @@
                         <i class="fas fa-user box-icon" aria-hidden="true"></i>Profile
                     </a>
                     <hr class="soft my-1 text-white">
-                    <a class="nav-link collapse" href="#laporan" type="button" data-bs-toggle="collapse" data-bs-target="#laporan">
-                        <i class="fas fa-newspaper box-icon"></i>Kelola Pengaduan
-                        <span class="indications">
-                            <i class="fas fa-angle-up fa-sm fa-fw"></i>
-                        </span>
+                    <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'all']) }}">
+                        <i class="fas fa-newspaper box-icon text-center"></i>Kelola Semua Pengaduan
                     </a>
-                    <div id="laporan" class="accordion-collapse collapse" data-bs-parent="#nav-accordion">
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'all']) }}">
-                            <i class="fas fa-newspaper box-icon text-center"></i>Semua Pengaduan
-                        </a>
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep', 'analis']))
-                        <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Pelimpahan
-                        </a>
-                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'terdisposisi']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Terdisposisi
-                        </a> -->
-                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Review Tanggapan
-                        </a> -->
-                        @endif
-                        <!-- @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'analis'])) -->
-                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'pending']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Buat Tanggapan
-                        </a> -->
-                        <!-- @endif -->
-                        <!-- <a class="nav-link nav-link-child" href="{{ route('admin.laporan', ['type' => 'rejected']) }}">
-                            <i class="fas fa-newspaper box-icon text-center fa-fw "></i>Revisi Tanggapan
-                        </a> -->
-                    </div>
+                    <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
+                        <i class="fas fa-bookmark box-icon text-center fa-fw "></i>Pelimpahan
+                    </a>
                     <a class="nav-link px-3" href="{{ route('admin.laporan.create') }}">
                         <i class="fas fa-newspaper box-icon" aria-hidden="true"></i>Tambah Pengaduan
                     </a>

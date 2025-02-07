@@ -43,6 +43,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/dashboard/laporan/{nomor_tiket}', [laporanAdmin::class, 'show'])->name('admin.laporan.detail');
         Route::get('/dashboard/laporan/edit/{nomor_tiket}', [laporanAdmin::class, 'edit'])->name('admin.laporan.edit');
         Route::put('/dashboard/laporan/update/{nomor_tiket}', [laporanAdmin::class, 'update'])->name('admin.laporan.update');
+        Route::post('/dashboard/laporan/{nomor_tiket}/teruskan-ke-instansi', [laporanAdmin::class, 'teruskanKeInstansi'])->name('admin.laporan.teruskanKeInstansi');
         Route::post('/dashboard/laporan/update/{nomor_tiket}/analis', [laporanAdmin::class, 'storeAnalis'])->name('admin.laporan.analis.store');
         Route::post('/dashboard/laporan/upload/editor', [laporanAdmin::class, 'editor'])->name('admin.laporan.upload.editor');
         Route::put('/admin/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');
@@ -60,7 +61,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
     });
 
     // Export/Import untuk Admin, Deputi, dan Asdep
-    Route::group(['middleware' => 'role.access:superadmin|admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep'], function () {
+    Route::group(['middleware' => 'role.access:superadmin|admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep|analis'], function () {
         Route::post('/admin/laporan/import', [ImportController::class, 'import'])->name('admin.laporan.import');
         Route::get('/laporan/export', [laporanAdmin::class, 'export'])->name('admin.laporan.export');
         Route::get('admin/laporan/export/tanggal', [ExportController::class, 'exportByDate'])->name('admin.laporan.export.tanggal');
@@ -70,6 +71,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::post('admin/laporan/checkExportStatus', [ExportController::class, 'checkExportStatus'])->name('admin.laporan.checkExportStatus');
         Route::get('admin/laporan/export/filtered/excel', [ExportController::class, 'exportFilteredData'])->name('admin.laporan.export.filtered.excel');
         Route::get('admin/laporan/export/filtered/pdf', [ExportController::class, 'exportFilteredPdf'])->name('admin.laporan.export.filtered.pdf');
+        Route::get('admin/laporan/export/pelimpahan', [ExportController::class, 'exportPelimpahan'])->name('admin.laporan.export.pelimpahan');
     });
 
     Route::get('/dashboard/user-management', [UserManagementController::class, 'index'])->name('admin.user_management.index');

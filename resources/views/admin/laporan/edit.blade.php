@@ -139,6 +139,29 @@
         </form>
     </div>
     @endif
+    @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
+    <!-- @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep'])) -->
+    <div class="d-block rounded bg-white shadow mb-3 p-5">
+        <form action="{{ route('admin.laporan.teruskanKeInstansi', $data->nomor_tiket) }}" method="post">
+            @csrf
+            <div class="mb-3">
+                <label for="institution" class="form-label fw-bold">Instansi Tujuan</label>
+                <select name="institution" id="institution" class="form-control select2">
+                    <option value="" selected>Pilih Institusi Tujuan</option>
+                    <option value="10290">Kantor Staf Presiden</option>
+                    <option value="151354">Kantor Staf Presiden Development</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="reason" class="form-label fw-bold">Keterangan untuk Instansi Tujuan</label>
+                <textarea name="reason" id="reason" rows="6" class="form-control">{{ old('reason') }}</textarea>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Teruskan ke Instansi Tujuan</button>
+            </div>
+        </form>
+    </div>
+    @endif
     <!-- Bagian Form Edit -->
     <div class="d-block rounded bg-white shadow p-5">
         <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">

@@ -209,8 +209,8 @@
                             {{ $assignedBy->assignedBy->nama ?? 'Tidak diketahui' }}
                         @endif
                     </td>
-                    <td>  
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))  
+                    <td>
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                             <!-- Menampilkan nama analis yang diberi tugas -->  
                             @php  
                                 $assignedTo = $item->assignments->where('laporan_id', $item->id)->first();  

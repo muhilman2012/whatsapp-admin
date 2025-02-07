@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Http;
 
 class laporanAdmin extends Controller
 {
@@ -323,6 +324,194 @@ class laporanAdmin extends Controller
 
         // Redirect ke halaman detail dengan pesan sukses
         return redirect()->route('admin.laporan.detail', $nomor_tiket)->with('success', 'Data pengaduan berhasil diperbarui.');
+    }
+
+    public function teruskanKeInstansi(Request $request, $nomor_tiket)
+    {
+        $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Kirim ke API pertama
+        $apiFirstResponse = $this->sendToApi($laporan);
+        if ($apiFirstResponse['success']) {
+            $complaintId = $apiFirstResponse['data']['complaint_id'];
+            $laporan->complaint_id = $complaintId;
+            $laporan->save();
+
+            // Kirim ke API kedua
+            $apiSecondResponse = $this->sendRejectRequest($complaintId, $request->institution, $request->reason);
+            if ($apiSecondResponse['success']) {
+                // Log pembaruan data
+                logger('Pengaduan #' . $laporan->nomor_tiket . ' diteruskan ke instansi tujuan.', [
+                    'complaint_id' => $complaintId,
+                    'updated_by' => auth('admin')->user()->username
+                ]);
+
+                // Menyimpan log aktivitas
+                Log::create([
+                    'laporan_id' => $laporan->id,
+                    'activity' => 'Pengaduan diteruskan ke instansi tujuan oleh ' . auth('admin')->user()->nama,
+                    'user_id' => auth('admin')->user()->id_admins,
+                ]);
+
+                // Kirim notifikasi kepada pengguna
+                Notification::create([
+                    'assigner_id' => auth('admin')->user()->id_admins,
+                    'assignee_id' => auth('admin')->user()->id_admins,
+                    'laporan_id' => $laporan->id,
+                    'message' => 'Pengaduan Anda berhasil diteruskan ke instansi tujuan',
+                    'is_read' => false
+                ]);
+
+                return back()->with('success', 'Pengaduan berhasil diteruskan ke instansi tujuan.');
+            } else {
+                return back()->with('error', 'Gagal saat meneruskan ke instansi tujuan: ' . $apiSecondResponse['error']);
+            }
+        } else {
+            return back()->with('error', 'Gagal saat pengiriman ke API pertama: ' . $apiFirstResponse['error']);
+        }
+    }
+
+    private function sendToApi($laporan)
+    {
+        // Konfigurasi API eksternal Production
+        // $url = 'https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint';
+        // $authToken = '$2y$10$pmK5OG3pcupgnJYms4WNPO1Cy6XYEFIhFIJfccSddBEM039k6eqhW';
+        // $token = '{PXVQSRQT-RI4I-VDRL-WLH8-UWSCXCUZXV39}';
+
+        // Konfigurasi API eksternal Development
+        $url = 'https://latihan-api.lapor.go.id/integration/api/v3/complaints/complaint';
+        $authToken = '$2y$10$WA37wRbkj.B9ZR1278y.pusNRsM/62fJkHLhweru6qUrep5n0URD6';
+        $token = '{HXEUA01Z-NXCG-S54K-OWMV-BAJJ3TYEEOUF}';
+    
+        // Siapkan data yang akan dikirim    
+        $data = [    
+            'title' => $laporan->judul,    
+            'content' =>"Nomor Tiket pada Aplikasi LMW: " . $laporan->nomor_tiket .
+                        " , Nama Lengkap: " . $laporan->nama_lengkap .   
+                        " , NIK: " . $laporan->nik .
+                        " , Alamat Lengkap: " . $laporan->alamat_lengkap .  
+                        " , Detail Laporan: " . $laporan->detail .  
+                        " , Lokasi: " . $laporan->lokasi .
+                        " , Dokumen KTP: " . $laporan->dokumen_ktp .  
+                        " , Dokumen KK: " . $laporan->dokumen_kk .  
+                        " , Dokumen Kuasa: " . $laporan->dokumen_skuasa .  
+                        " , Dokumen Pendukung: " . $laporan->dokumen_pendukung,    
+            'channel' => 13,
+            'is_new_user_slider' => false,
+            'user_id' => 5218120,
+            // 'emailUser' => $laporan->email,
+            // 'nameUser' => $laporan->nama_lengkap,
+            // 'phoneUser' => $laporan->nomor_pengadu,
+            'is_disposisi_slider' => true,
+            'classification_id' => 6,
+            'disposition_id' => 151345,
+            'category_id' => 436, //apakah boleh bebas
+            'priority_program_id' => null,
+            'location_id' => 34, //apakah boleh bebas (34 Nasional)
+            'community_id' => null, //apakah boleh bebas
+            'date_of_incident' => $laporan->tanggal_kejadian,
+            'copy_externals' => null, // Apakah ini harus?
+            'info_disposition' => 'Ini keterangan disposisi.', 
+            'info_attachments' => '[66]',
+            'tags_raw' => '#pengaduanwhatsapp', //apakah boleh bebas
+            'is_approval' => true,
+            'is_anonymous' => true,
+            'is_secret' => true,
+            'is_priority' => true,
+            'attachments' => '[4199656]',
+        ];
+    
+        try {
+            // Kirim permintaan POST ke API eksternal
+            $response = Http::withHeaders([
+                'auth' => 'Bearer ' . $authToken,
+                'token' => $token,
+                'Content-Type' => 'application/json',
+            ])->post($url, $data);
+    
+            // Periksa apakah respons berhasil
+            if ($response->successful()) {
+                $responseData = $response->json();
+
+                // Tangani jika API mengembalikan error
+                logger()->info('Mengirim Data ke API External Berhasil.', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                // Menyimpan log aktivitas
+                Log::create([
+                    'laporan_id' => $laporan->id,
+                    'activity' => 'Pengaduan dikirim ke Lapor oleh ' . auth('admin')->user()->nama,
+                    'user_id' => auth('admin')->user()->id_admins,
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $responseData,
+                ];
+            } else {
+                // Tangani jika API mengembalikan error
+                logger()->info('API eksternal mengembalikan error.', [
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+    
+                return [
+                    'success' => false,
+                    'error' => $response->body(),
+                ];
+            }
+        } catch (\Exception $e) {
+            // Tangani jika ada kesalahan saat mengirim permintaan
+            logger()->info('Terjadi kesalahan saat mengirim data ke API eksternal.', [
+                'exception' => $e->getMessage(),
+            ]);
+    
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    private function sendRejectRequest($apiTicketNumber, $institution, $reason)
+    {
+        // Endpoint API untuk reject Prod
+        // $url = "https://api-splp.layanan.go.id/lapor/3.0.0/complaints/process/{$apiTicketNumber}/reject";
+
+        // Endpoint API untuk reject Dev
+        $url = "https://latihan-api.lapor.go.id/integration/api/v3/complaints/process/{$apiTicketNumber}/reject";
+
+        // Header autentikasi Prod
+        // $headers = [
+        //     'auth' => 'Bearer $2y$10$pmK5OG3pcupgnJYms4WNPO1Cy6XYEFIhFIJfccSddBEM039k6eqhW',
+        //     'token' => '{PXVQSRQT-RI4I-VDRL-WLH8-UWSCXCUZXV39}',
+        //     'Content-Type' => 'application/json'
+        // ];
+
+        // Header autentikasi Dev
+        $headers = [
+            'auth' => 'Bearer $2y$10$WA37wRbkj.B9ZR1278y.pusNRsM/62fJkHLhweru6qUrep5n0URD6',
+            'token' => '{HXEUA01Z-NXCG-S54K-OWMV-BAJJ3TYEEOUF}',
+            'Content-Type' => 'application/json'
+        ];
+
+        // Body request
+        $data = [
+            'is_request' => 1,
+            'reason' => $institution,
+            'reason_description' => $reason
+        ];
+
+        // Kirim permintaan POST ke API
+        $response = Http::withHeaders($headers)->post($url, $data);
+
+        if ($response->successful()) {
+            return ['success' => true, 'data' => $response->json()];
+        } else {
+            return ['success' => false, 'error' => $response->body()];
+        }
     }
 
     public function storeAnalis(Request $request, $nomor_tiket)

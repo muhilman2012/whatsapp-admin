@@ -103,8 +103,8 @@ class Laporan extends Model
         'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
         'Energi dan Sumber Daya Alam' => ['energi','minyak','gas','pertambangan','sumber daya alam','sda','listrik','pembangkit','bbm','pln','ebt','smelter','hilirisasi', 'tambang', 'pasir'],
         'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan','bullying','pelecehan','lembaga diklat','kampus','sekolah','pendidikan','bully','dosen','mahasiswa','siswa'],
-        'Kependudukan' => ['penduduk', 'kependudukan', 'ktp', 'nik', 'domisili', 'data', 'dukcapil', 'kartu keluarga', 'pernikahan'],
-        'Ketenagakerjaan' => ['pekerja','migran','tenaga kerja','buruh','karyawan','phk','upah','gaji','tunjangan','pensiun','jaminan kerja','outsourcing','hubungan industrial','kesempatan kerja','cuti','bpjs ketenagakerjaan','serikat pekerja','lowongan','pengangguran','pecat', 'kerja', 'rekrutmen', 'recruitment', 'pkwt', 'putus kontrak', 'loker', 'umk', 'thr', 'pesangon'],
+        'Kependudukan' => ['penduduk', 'kependudukan', 'ktp', 'nik', 'domisili', 'dukcapil', 'kartu keluarga', 'pernikahan', 'akta kelahiran', 'kia'],
+        'Ketenagakerjaan' => ['pekerja','migran','tenaga kerja','buruh','karyawan','phk','upah','gaji','tunjangan','pensiun','jaminan kerja','outsourcing','hubungan industrial','kesempatan kerja','cuti','bpjs ketenagakerjaan','serikat pekerja','lowongan','pengangguran','pecat', 'kerja', 'rekrutmen', 'recruitment', 'pkwt', 'putus kontrak', 'loker', 'umk', 'thr', 'pesangon', 'pekerja migran', 'ump', 'umr'],
         'Netralitas ASN' => ['asn','pns','netralitas','politik','pegawai negeri','pilkada','kampanye'],
         'Pemulihan Ekonomi Nasional' => ['pemulihan','ekonomi','nasional','program','recovery','dampak pandemi','modal usaha'],
         'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)' => ['narkoba','p4gn','peredaran','penyalahgunaan','narkotika','obat'],
@@ -123,9 +123,9 @@ class Laporan extends Model
         'Bantuan Masyarakat' => ['tunggakan sekolah', 'modal usaha', 'bantuan', 'tunggakan spp', 'tunggakan', 'proposal', 'proposal masjid', 'tebus ijazah', 'ambil ijazah', 'gereja', 'proposal desa', 'tunggak', 'spp'],
         'Luar Negeri' => ['imigran', 'kekonsuleran', 'pengungsi', 'migran', 'deportan', 'pencari suaka', 'tppo', 'paspor', 'wna', 'tkw', 'tki', 'imigrasi', 'kitas', 'trafficking'],
         'Pariwisata dan Ekonomi Kreatif' => ['pariwisata', 'kreatif', 'wisata', 'turis', 'visa', 'turis lokal', 'turis asing', 'tiket pesawat', 'tiket masuk', 'wisata', 'akomodasi', 'hotel', 'wisatawan', 'pemandu wisata', 'souvenir', 'budaya', 'tari', 'performence', 'konser', 'musik', 'hiburan', 'film', 'entertainment', 'penyanyi', 'penari', 'pelawak', 'komedi', 'lagu', 'kreatif', 'okupansi', 'destinasi', 'desa wisata', 'cagar budaya', 'penulis', 'lukisan', 'anyaman', 'tenun', 'batik', 'atraksi', 'hospitaliti', 'trip', 'travel', 'festival'],
-        'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm', 'koperasi', 'usaha kecil', 'usaha mikro', 'modal usaha', 'pemberdayaan masyarakat', 'kur', 'kredit macet', 'jaminan kur', 'usaha menengah', 'blacklist bank'],
+        'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm', 'koperasi', 'usaha kecil', 'usaha mikro', 'modal usaha', 'pemberdayaan masyarakat', 'kur', 'kredit macet', 'jaminan kur', 'usaha menengah', 'blacklist bank', 'keringanan bunga', 'penghapusan hutang', 'cicilan', 'angsuran'],
         'Industri dan Perdagangan' => ['industri', 'perdagangan', 'ekspor', 'impor', 'barang', 'online', 'beli', 'dagang', 'jual', 'jasa', 'produsen', 'distributor', 'harga', 'toko', 'koperasi', 'pemasok', 'industri', 'tekstil', 'otomotif', 'konsumen', 'mesin', 'gudang', 'logistik', 'industri pengolahan', 'restoran', 'rumah makan', 'warung', 'pabrik', 'manufaktur', 'bahan baku', 'pasar', 'retail', 'supermarket', 'usaha', 'grosir', 'harga', 'bahan pokok', 'monopoli', 'kuota ekspor', 'dumping', 'e-commerce', 'bea masuk', 'profit', 'komoditi', 'komoditas', 'produk', 'perindag'],
-        'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air'],
+        'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air', 'tpa'],
         'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli', 'tanah', 'bangunan', 'bpn', 'waris'],
         'Pelayanan Publik' => ['samsat', 'pelayanan', 'sim', 'birokrasi'],
         'TNI' => ['tni'],
@@ -153,8 +153,8 @@ class Laporan extends Model
         'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
         'Energi dan Sumber Daya Alam' => ['energi','minyak','gas','pertambangan','sumber daya alam','sda','listrik','pembangkit','bbm','pln','ebt','smelter','hilirisasi', 'tambang', 'pasir'],
         'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan','bullying','pelecehan','lembaga diklat','kampus','sekolah','pendidikan','bully','dosen','mahasiswa','siswa'],
-        'Kependudukan' => ['penduduk', 'kependudukan', 'ktp', 'nik', 'domisili', 'data', 'dukcapil', 'kartu keluarga', 'pernikahan'],
-        'Ketenagakerjaan' => ['pekerja','migran','tenaga kerja','buruh','karyawan','phk','upah','gaji','tunjangan','pensiun','jaminan kerja','outsourcing','hubungan industrial','kesempatan kerja','cuti','bpjs ketenagakerjaan','serikat pekerja','lowongan','pengangguran','pecat', 'kerja', 'rekrutmen', 'recruitment', 'pkwt', 'putus kontrak', 'loker', 'umk', 'thr', 'pesangon'],
+        'Kependudukan' => ['penduduk', 'kependudukan', 'ktp', 'nik', 'domisili', 'dukcapil', 'kartu keluarga', 'pernikahan', 'akta kelahiran', 'kia'],
+        'Ketenagakerjaan' => ['pekerja','migran','tenaga kerja','buruh','karyawan','phk','upah','gaji','tunjangan','pensiun','jaminan kerja','outsourcing','hubungan industrial','kesempatan kerja','cuti','bpjs ketenagakerjaan','serikat pekerja','lowongan','pengangguran','pecat', 'kerja', 'rekrutmen', 'recruitment', 'pkwt', 'putus kontrak', 'loker', 'umk', 'thr', 'pesangon', 'pekerja migran', 'ump', 'umr'],
         'Netralitas ASN' => ['asn','pns','netralitas','politik','pegawai negeri','pilkada','kampanye'],
         'Pemulihan Ekonomi Nasional' => ['pemulihan','ekonomi','nasional','program','recovery','dampak pandemi','modal usaha'],
         'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)' => ['narkoba','p4gn','peredaran','penyalahgunaan','narkotika','obat'],
@@ -176,9 +176,9 @@ class Laporan extends Model
         'Bantuan Masyarakat' => ['tunggakan sekolah', 'modal usaha', 'bantuan', 'tunggakan spp', 'tunggakan', 'proposal', 'proposal masjid', 'tebus ijazah', 'ambil ijazah', 'gereja', 'proposal desa', 'tunggak', 'spp'],
         'Luar Negeri' => ['imigran', 'kekonsuleran', 'pengungsi', 'migran', 'deportan', 'pencari suaka', 'tppo', 'paspor', 'wna', 'tkw', 'tki', 'imigrasi', 'kitas', 'trafficking'],
         'Pariwisata dan Ekonomi Kreatif' => ['pariwisata', 'kreatif', 'wisata', 'turis', 'visa', 'turis lokal', 'turis asing', 'tiket pesawat', 'tiket masuk', 'wisata', 'akomodasi', 'hotel', 'wisatawan', 'pemandu wisata', 'souvenir', 'budaya', 'tari', 'performence', 'konser', 'musik', 'hiburan', 'film', 'entertainment', 'penyanyi', 'penari', 'pelawak', 'komedi', 'lagu', 'kreatif', 'okupansi', 'destinasi', 'desa wisata', 'cagar budaya', 'penulis', 'lukisan', 'anyaman', 'tenun', 'batik', 'atraksi', 'hospitaliti', 'trip', 'travel', 'festival'],
-        'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm', 'koperasi', 'usaha kecil', 'usaha mikro', 'modal usaha', 'pemberdayaan masyarakat', 'kur', 'kredit macet', 'jaminan kur', 'usaha menengah', 'blacklist bank'],
+        'Pemberdayaan Masyarakat, Koperasi, dan UMKM' => ['umkm', 'koperasi', 'usaha kecil', 'usaha mikro', 'modal usaha', 'pemberdayaan masyarakat', 'kur', 'kredit macet', 'jaminan kur', 'usaha menengah', 'blacklist bank', 'keringanan bunga', 'penghapusan hutang', 'cicilan', 'angsuran'],
         'Industri dan Perdagangan' => ['industri', 'perdagangan', 'ekspor', 'impor', 'barang', 'online', 'beli', 'dagang', 'jual', 'jasa', 'produsen', 'distributor', 'harga', 'toko', 'koperasi', 'pemasok', 'industri', 'tekstil', 'otomotif', 'konsumen', 'mesin', 'gudang', 'logistik', 'industri pengolahan', 'restoran', 'rumah makan', 'warung', 'pabrik', 'manufaktur', 'bahan baku', 'pasar', 'retail', 'supermarket', 'usaha', 'grosir', 'harga', 'bahan pokok', 'monopoli', 'kuota ekspor', 'dumping', 'e-commerce', 'bea masuk', 'profit', 'komoditi', 'komoditas', 'produk', 'perindag'],
-        'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air'],
+        'Penanggulangan Bencana' => ['bencana', 'gempa', 'banjir', 'kebakaran', 'gunung meletus', 'tsunami', 'tanah longsor', 'relokasi', 'hunian tetap', 'hunian sementara', 'bnpb', 'rehabilitasi', 'rekonstruksi', 'bantuan korban bencana', 'bpbd', 'dana siap pakai', 'early warning system', 'kebakaran hutan dan lahan', 'pasca bencana', 'perubahan iklim', 'dana hibah', 'erupsi', 'mitigasi bencana', 'tanggap darurat', 'desa tangguh bencana', 'logistik bantuan', 'kekeringan', 'bencana non alam', 'pra bencana', 'krisis air', 'tpa'],
         'Pertanahan' => ['tanah', 'agraria', 'sertifikat', 'pembebasan lahan', 'pungutan', 'pungli', 'tanah', 'bangunan', 'bpn', 'waris'],
         'Pelayanan Publik' => ['samsat', 'pelayanan', 'sim', 'birokrasi'],
         'TNI' => ['tni'],
@@ -217,7 +217,8 @@ class Laporan extends Model
             'Perlindungan Konsumen',
             'Pariwisata dan Ekonomi Kreatif',
             'Industri dan Perdagangan',
-            'Perumahan'
+            'Perumahan',
+            'Perpajakan'
         ];
 
         // Deputi 2
@@ -232,11 +233,10 @@ class Laporan extends Model
             'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)',
             'Penanggulangan Bencana',
             'Ketenagakerjaan',
-            'Kependudukan',
             'Pemberdayaan Masyarakat, Koperasi, dan UMKM',
             'Kepemudaan dan Olahraga',
             'Keluarga Berencana',
-            'Penanggulangan Bencana'
+            'Pembangunan Keluarga'
         ];
 
         // Deputi 3
@@ -253,7 +253,8 @@ class Laporan extends Model
             'Daerah Perbatasan',
             'Pelayanan Publik',
             'TNI',
-            'Polri'
+            'Polri',
+            'Kependudukan'
         ];
 
         // Deputi 4
@@ -267,23 +268,23 @@ class Laporan extends Model
     }
 
     private static $kategoriDeputi = [
-        'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan'],
-        'deputi_2' => ['Agama', 'Corona Virus', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Penanggulangan Bencana', 'Ketenagakerjaan', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Kepemudaan dan Olahraga', 'Keluarga Berencana', 'Penanggulangan Bencana'],
-        'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat','Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan', 'Daerah Perbatasan', 'Pelayanan Publik', 'TNI', 'Polri'],
+        'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan', 'Perpajakan'],
+        'deputi_2' => ['Agama', 'Corona Virus', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Ketenagakerjaan', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Kepemudaan dan Olahraga', 'Keluarga Berencana', 'Penanggulangan Bencana', 'Pembangunan Keluarga'],
+        'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat','Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan', 'Daerah Perbatasan', 'Pelayanan Publik', 'TNI', 'Polri', 'Kependudukan'],
         'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
     ];
 
     private static $kategoriUnit = [
-        'Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional', 'Teknologi Informasi dan Komunikasi'],
+        'Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional', 'Teknologi Informasi dan Komunikasi', 'Perpajakan'],
         'Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif' => ['Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan'],
         'Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan' => ['Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Perumahan'],
         'Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa' => ['Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Sosial dan Kesejahteraan'],
-        'Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga' => ['Corona Virus', 'Kesehatan', 'Kependudukan', 'Keluarga Berencana'],
+        'Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga' => ['Corona Virus', 'Kesehatan', 'Keluarga Berencana', 'Pembangunan Keluarga'],
         'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana', 'Ketenagakerjaan'],
         'Asisten Deputi Pendidikan, Agama, Kebudayaan, Pemuda, dan Olahraga' => ['Agama', 'Kesetaraan Gender dan Sosial Inklusif', 'Pendidikan dan Kebudayaan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Kepemudaan dan Olahraga'],
         'Asisten Deputi Hubungan Luar Negeri dan Pertahanan' => ['Luar Negeri', 'TNI'],
         'Asisten Deputi Politik, Keamanan, Hukum, dan Hak Asasi Manusia' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat', 'Politik dan Hukum', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Pertanahan', 'Polri'],
-        'Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah' => ['SP4N Lapor', 'Manajemen ASN', 'Pelayanan Publik', 'Politisasi ASN', 'Netralitas ASN', 'Daerah Perbatasan'],
+        'Asisten Deputi Tata Kelola Pemerintahan dan Percepatan Pembangunan Daerah' => ['SP4N Lapor', 'Manajemen ASN', 'Pelayanan Publik', 'Politisasi ASN', 'Netralitas ASN', 'Daerah Perbatasan', 'Kependudukan'],
         'Biro Perencanaan dan Keuangan' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
         'Biro Tata Usaha dan Sumber Daya Manusia' => [],
         'Biro Umum' => [],

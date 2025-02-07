@@ -5,6 +5,9 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Laporan;
+use App\Models\admins;
+use App\Models\Assignment;
+use App\Models\Notification;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -60,7 +63,79 @@ class ExportController extends Controller
 
         $data = Laporan::query();
 
-        if ($user->role !== 'admin' && $user->role !== 'superadmin') {
+        if ($user->role === 'analis') {
+            $data->whereHas('assignments', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins);  // Pastikan hanya mengambil laporan yang ditugaskan kepada analis yang login
+            });
+        } else if ($user->role !== 'admin' && $user->role !== 'superadmin') {
+            $data->whereIn('kategori', $kategori);
+        }
+
+        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
+            $data->where('kategori', $request->filterKategori);
+        }
+
+        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
+            $data->where('status', $request->filterStatus);
+        }
+
+        if ($request->has('search') && !empty($request->search)) {
+            $data->where(function ($query) use ($request) {
+                $query->where('nomor_tiket', 'like', '%' . $request->search . '%')
+                    ->orWhere('nama_lengkap', 'like', '%' . $request->search . '%')
+                    ->orWhere('nik', 'like', '%' . $request->search . '%')
+                    ->orWhere('status', 'like', '%' . $request->search . '%')
+                    ->orWhere('judul', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $data->whereDate('created_at', $request->tanggal);
+        }
+
+        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)) {
+            $data->where('sumber_pengaduan', $request->sumber_pengaduan);
+        }
+
+        $data = $data->get();
+        // dd($data);
+
+        if ($data->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
+        }
+
+        $fileName = 'laporan_all';
+        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
+            $fileName .= '_by_kategori_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterKategori));
+        }
+        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
+            $fileName .= '_by_status_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterStatus));
+        }
+        if ($request->has('tanggal') && !empty($request->tanggal)) {
+            $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+        }
+        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)){
+            $fileName .= '_by_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->sumber_pengaduan));
+        }
+        $fileName .= '.xlsx';
+
+        return Excel::download(new LaporanExport($data), $fileName);
+    }
+
+    public function exportPelimpahan(Request $request)
+    {
+        $user = auth()->guard('admin')->user();
+        $kategori = $this->getKategoriByRole($user->role, $user->unit);
+
+        $data = Laporan::query()
+            ->whereNotNull('disposisi')  // Memastikan kolom disposisi diisi
+            ->whereNotNull('disposisi_terbaru');  // Memastikan kolom disposisi terbaru diisi
+
+        if ($user->role === 'analis') {
+            $data->whereHas('assignments', function ($query) use ($user) {
+                $query->where('analis_id', $user->id_admins);  // Pastikan hanya mengambil laporan yang ditugaskan kepada analis yang login
+            });
+        } else if ($user->role !== 'admin' && $user->role !== 'superadmin') {
             $data->whereIn('kategori', $kategori);
         }
 
