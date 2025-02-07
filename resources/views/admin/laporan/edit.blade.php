@@ -139,8 +139,7 @@
         </form>
     </div>
     @endif
-    @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
-    <!-- @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep'])) -->
+    <!-- @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
     <div class="d-block rounded bg-white shadow mb-3 p-5">
         <form action="{{ route('admin.laporan.teruskanKeInstansi', $data->nomor_tiket) }}" method="post">
             @csrf
@@ -161,7 +160,7 @@
             </div>
         </form>
     </div>
-    @endif
+    @endif -->
     <!-- Bagian Form Edit -->
     <div class="d-block rounded bg-white shadow p-5">
         <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">
