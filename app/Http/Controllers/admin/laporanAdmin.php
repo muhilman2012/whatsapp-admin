@@ -238,7 +238,7 @@ class laporanAdmin extends Controller
             return back()->with('error', 'Tidak ada data institusi yang tersedia.');
         }
 
-        return view('admin.laporan.edit', compact('data', 'kategoriSP4NLapor', 'kategoriBaru', 'semuaDisposisi', 'namaDeputi', 'institutions'));
+        return view('admin.laporan.edit', compact('data', 'kategoriSP4NLapor', 'kategoriBaru', 'semuaDisposisi', 'namaDeputi')); //, 'institutions'
     }
 
     public function update(Request $request, $nomor_tiket)
