@@ -147,8 +147,9 @@
                 <label for="institution" class="form-label fw-bold">Instansi Tujuan</label>
                 <select name="institution" id="institution" class="form-control select2">
                     <option value="" selected>Pilih Institusi Tujuan</option>
-                    <option value="10290">Kantor Staf Presiden</option>
-                    <option value="151354">Kantor Staf Presiden Development</option>
+                    @foreach ($institutions->sortBy('name') as $institution)
+                        <option value="{{ $institution->id }}">{{ $institution->name }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="mb-3">
@@ -156,7 +157,7 @@
                 <textarea name="reason" id="reason" rows="6" class="form-control">{{ old('reason') }}</textarea>
             </div>
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-success">Teruskan ke Instansi Tujuan</button>
+                <button type="button" class="btn btn-success" onclick="showConfirmationModal()">Teruskan ke Instansi Tujuan</button>
             </div>
         </form>
     </div>
@@ -272,6 +273,24 @@
         </div>
     </div>
 </div>
+<!-- Modal Konfirmasi -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi Pengiriman</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin meneruskan pengaduan ke instansi tujuan?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="confirmSubmit">Ya, Teruskan</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('script')
@@ -297,6 +316,18 @@
         document.getElementById('confirmUpdateButton').addEventListener('click', function () {
             modalKonfirmasi.hide(); // Tutup modal
             formEditLaporan.submit(); // Submit ulang form
+        });
+    });
+</script>
+<script>
+    function showConfirmationModal() {
+        $('#confirmationModal').modal('show');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        document.getElementById('confirmSubmit').addEventListener('click', function () {
+            form.submit();
         });
     });
 </script>

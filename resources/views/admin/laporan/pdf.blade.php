@@ -44,7 +44,19 @@
     </div>
 
     <div class="box">
-        <p><strong>Nama Pengadu:</strong> {{ $laporan->nama_lengkap }}</p>
+        <p>
+            <strong>Nama Pengadu:</strong> {{ $laporan->nama_lengkap }} / {{ $laporan->nik }} / 
+            @if(!empty($laporan->no_hp))
+                {{ $laporan->no_hp }}
+            @else
+                <span class="text-danger">Tidak ada Nomor HP</span>
+            @endif / 
+            @if(!empty($laporan->email))
+                {{ $laporan->email }}
+            @else
+                <span class="text-danger">Tidak ada <i>email</i></span>
+            @endif
+        </p>
         <p><strong>Judul Aduan:</strong> {{ $laporan->judul }}</p>
         <p><strong>Isi Laporan:</strong></p>
         <p>{{ $laporan->detail }}</p>

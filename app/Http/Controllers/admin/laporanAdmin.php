@@ -8,6 +8,7 @@ use App\Models\admins;
 use App\Models\Log;
 use App\Models\Assignment;
 use App\Models\Notification;
+use App\Models\Institution;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -230,7 +231,14 @@ class laporanAdmin extends Controller
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        return view('admin.laporan.edit', compact('data', 'kategoriSP4NLapor', 'kategoriBaru', 'semuaDisposisi', 'namaDeputi'));
+        // Mengambil data institusi dari database
+        $institutions = Institution::orderBy('name')->get();
+
+        if ($institutions->isEmpty()) {
+            return back()->with('error', 'Tidak ada data institusi yang tersedia.');
+        }
+
+        return view('admin.laporan.edit', compact('data', 'kategoriSP4NLapor', 'kategoriBaru', 'semuaDisposisi', 'namaDeputi', 'institutions'));
     }
 
     public function update(Request $request, $nomor_tiket)
@@ -379,8 +387,8 @@ class laporanAdmin extends Controller
         // $token = '{PXVQSRQT-RI4I-VDRL-WLH8-UWSCXCUZXV39}';
 
         // Konfigurasi API eksternal Development
-        $url = 'https://latihan-api.lapor.go.id/integration/api/v3/complaints/complaint';
-        $authToken = '$2y$10$WA37wRbkj.B9ZR1278y.pusNRsM/62fJkHLhweru6qUrep5n0URD6';
+        $url = 'https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint';
+        $authToken = 'Bearer $2y$10$FGR.uEITvC782D5VwXqEjekU6HxaRqbqdwCjHKHFxSfP65sQn.U3O';
         $token = '{HXEUA01Z-NXCG-S54K-OWMV-BAJJ3TYEEOUF}';
     
         // Siapkan data yang akan dikirim    
@@ -481,7 +489,7 @@ class laporanAdmin extends Controller
         // $url = "https://api-splp.layanan.go.id/lapor/3.0.0/complaints/process/{$apiTicketNumber}/reject";
 
         // Endpoint API untuk reject Dev
-        $url = "https://latihan-api.lapor.go.id/integration/api/v3/complaints/process/{$apiTicketNumber}/reject";
+        $url = "https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/process/{$apiTicketNumber}/reject";
 
         // Header autentikasi Prod
         // $headers = [
@@ -492,7 +500,7 @@ class laporanAdmin extends Controller
 
         // Header autentikasi Dev
         $headers = [
-            'auth' => 'Bearer $2y$10$WA37wRbkj.B9ZR1278y.pusNRsM/62fJkHLhweru6qUrep5n0URD6',
+            'auth' => 'Bearer $2y$10$FGR.uEITvC782D5VwXqEjekU6HxaRqbqdwCjHKHFxSfP65sQn.U3O',
             'token' => '{HXEUA01Z-NXCG-S54K-OWMV-BAJJ3TYEEOUF}',
             'Content-Type' => 'application/json'
         ];
@@ -501,7 +509,8 @@ class laporanAdmin extends Controller
         $data = [
             'is_request' => 1,
             'reason' => $institution,
-            'reason_description' => $reason
+            'reason_description' => $reason,
+            'not_authority' => 1
         ];
 
         // Kirim permintaan POST ke API
