@@ -46,8 +46,8 @@
     <div class="box">
         <p>
             <strong>Nama Pengadu:</strong> {{ $laporan->nama_lengkap }} / {{ $laporan->nik }} / 
-            @if(!empty($laporan->no_hp))
-                {{ $laporan->no_hp }}
+            @if(!empty($laporan->nomor_pengadu))
+                {{ $laporan->nomor_pengadu }}
             @else
                 <span class="text-danger">Tidak ada Nomor HP</span>
             @endif / 
