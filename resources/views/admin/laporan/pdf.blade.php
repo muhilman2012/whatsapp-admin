@@ -45,7 +45,7 @@
 
     <div class="box">
         <p>
-            <strong>Nama Pengadu:</strong> {{ $laporan->nama_lengkap }} / {{ $laporan->nik }} / 
+            <strong>Identitas Pengadu:</strong> {{ $laporan->nama_lengkap }} / {{ $laporan->nik }} / 
             @if(!empty($laporan->nomor_pengadu))
                 {{ $laporan->nomor_pengadu }}
             @else
