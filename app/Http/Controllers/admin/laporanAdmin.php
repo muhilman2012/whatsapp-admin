@@ -232,11 +232,11 @@ class laporanAdmin extends Controller
         ];
 
         // Mengambil data institusi dari database
-        $institutions = Institution::orderBy('name')->get();
+        // $institutions = Institution::orderBy('name')->get();
 
-        if ($institutions->isEmpty()) {
-            return back()->with('error', 'Tidak ada data institusi yang tersedia.');
-        }
+        // if ($institutions->isEmpty()) {
+        //     return back()->with('error', 'Tidak ada data institusi yang tersedia.');
+        // }
 
         return view('admin.laporan.edit', compact('data', 'kategoriSP4NLapor', 'kategoriBaru', 'semuaDisposisi', 'namaDeputi')); //, 'institutions'
     }
