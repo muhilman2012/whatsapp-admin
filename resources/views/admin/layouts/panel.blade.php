@@ -235,21 +235,22 @@
                     item.className = 'dropdown-item py-2 overflow-hidden text-truncate bg-light';
 
                     item.innerHTML = `
-                        <a href="/admin/dashboard/laporan/${notification.laporan.nomor_tiket}" class="d-block text-decoration-none text-dark">
+                        <a href="#" class="d-block text-decoration-none text-dark notification-link" data-id="${notification.id}" data-url="/admin/dashboard/laporan/${notification.laporan.nomor_tiket}">
                             <p class="lh-1 mb-0 fw-bold">${titlePrefix} #${notification.laporan.nomor_tiket}</p>
                             <small class="content-text">${notification.message}</small><br>
                             <small class="content-text">Dari: ${notification.assigner.nama}</small>
                         </a>
-                        <small class="text-primary d-block mt-1 tandai-sudah-dibaca" style="cursor: pointer;" data-id="${notification.id}">Tandai sudah dibaca</small>
                     `;
 
-                    const markAsReadButton = item.querySelector('.tandai-sudah-dibaca');
-                    markAsReadButton.addEventListener('click', async function (e) {
-                        e.stopPropagation();
+                    // Tambahkan event listener ke notifikasi agar menandai sebagai sudah dibaca saat diklik
+                    const notificationLink = item.querySelector('.notification-link');
+                    notificationLink.addEventListener('click', async function (e) {
                         e.preventDefault();
+                        const notifId = this.getAttribute('data-id');
+                        const url = this.getAttribute('data-url');
 
-                        await markNotificationAsRead(notification.id);
-                        updateNotifications(); // Refresh setelah menandai sebagai dibaca
+                        await markNotificationAsRead(notifId);
+                        window.location.href = url; // Redirect ke halaman tujuan setelah notifikasi ditandai dibaca
                     });
 
                     notificationList.appendChild(item);

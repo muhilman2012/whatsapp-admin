@@ -172,14 +172,14 @@
                 </div>
 
                 <!-- Bar Chart Laporan Harian -->
-                <div class="col-lg-6 col-sm-6">
+                <div class="col-lg-6 col-sm-12">
                     <div class="card border-0 shadow-sm p-3 h-100 justify-content-center">
                         <canvas id="laporanHarianChart"></canvas>
                     </div>
                 </div>
 
                 <!-- Pie Chart Status untuk Deputi -->
-                <div class="col-lg-6">
+                <div class="col-lg-6 col-sm-12">
                     <div class="card border-0 shadow-sm p-3 align-items-center">
                         <div class="pie-container">
                             <canvas id="statusPieChart"></canvas>
@@ -188,6 +188,50 @@
                 </div>
 
                 <div class="col-12">
+                    <div class="row">
+                        <!-- Pie Chart Deputi 1 -->
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card border-0 shadow-sm p-3 align-items-center">
+                                <h6 class="fw-bold text-center">Deputi 1</h6>
+                                <div class="pie-container">
+                                    <canvas id="statusPieChartDeputi1"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart Deputi 2 -->
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card border-0 shadow-sm p-3 align-items-center">
+                                <h6 class="fw-bold text-center">Deputi 2</h6>
+                                <div class="pie-container">
+                                    <canvas id="statusPieChartDeputi2"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart Deputi 3 -->
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card border-0 shadow-sm p-3 align-items-center">
+                                <h6 class="fw-bold text-center">Deputi 3</h6>
+                                <div class="pie-container">
+                                    <canvas id="statusPieChartDeputi3"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pie Chart Deputi 4 -->
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="card border-0 shadow-sm p-3 align-items-center">
+                                <h6 class="fw-bold text-center">Deputi 4</h6>
+                                <div class="pie-container">
+                                    <canvas id="statusPieChartDeputi4"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-lg-12 col-sm-12">
                     <div class="card border-0 shadow-sm p-3">
                         <canvas id="kategoriChart"></canvas>
                     </div>
@@ -451,71 +495,80 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const canvas = document.getElementById('statusPieChart');
-        if (!canvas) {
-            console.error('Canvas dengan ID "statusPieChart" tidak ditemukan!');
-            return;
-        }
-        const ctx = canvas.getContext('2d');
+        // Pastikan data dari controller tersedia
+        const chartDataAll = @json($chartData);
+        const chartDataDeputi = @json($chartDataDeputi);
 
-        // Ambil data dari controller
-        const chartData = @json($chartData);
-        const labels = chartData.map(item => item.label);
-        const values = chartData.map(item => item.value);
+        function createPieChart(canvasId, data) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                console.error(`Canvas dengan ID "${canvasId}" tidak ditemukan!`);
+                return;
+            }
 
-        // Tambahkan warna untuk masing-masing status
-        const backgroundColors = [
-            'rgba(255, 99, 132, 0.5)',
-            'rgba(54, 162, 235, 0.5)',
-            'rgba(255, 206, 86, 0.5)',
-            'rgba(75, 192, 192, 0.5)'
-        ];
-        const borderColors = [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)'
-        ];
+            const ctx = canvas.getContext('2d');
+            const labels = data.map(item => item.label);
+            const values = data.map(item => item.value);
 
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Status Laporan',
-                    data: values,
-                    backgroundColor: backgroundColors,
-                    borderColor: borderColors,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                let index = tooltipItem.dataIndex;
-                                let label = chartData[index].label;
-                                let whatsappCount = chartData[index].whatsapp;
-                                let tatapMukaCount = chartData[index].tatap_muka;
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Status Laporan',
+                        data: values,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.5)',
+                            'rgba(54, 162, 235, 0.5)',
+                            'rgba(255, 206, 86, 0.5)',
+                            'rgba(75, 192, 192, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    let index = tooltipItem.dataIndex;
+                                    let label = data[index].label;
+                                    let whatsappCount = data[index].whatsapp ?? 0;
+                                    let tatapMukaCount = data[index].tatap_muka ?? 0;
 
-                                return [
-                                    `${label}`,
-                                    `Whatsapp: ${whatsappCount}`,
-                                    `Tatap Muka: ${tatapMukaCount}`
-                                ];
+                                    return [
+                                        `${label}`,
+                                        `Whatsapp: ${whatsappCount}`,
+                                        `Tatap Muka: ${tatapMukaCount}`
+                                    ];
+                                }
                             }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+
+        // **Inisialisasi pie chart untuk Semua Data (ALL DATA)**
+        createPieChart('statusPieChart', chartDataAll);
+
+        // **Inisialisasi pie chart untuk masing-masing deputi**
+        createPieChart('statusPieChartDeputi1', chartDataDeputi.deputi_1);
+        createPieChart('statusPieChartDeputi2', chartDataDeputi.deputi_2);
+        createPieChart('statusPieChartDeputi3', chartDataDeputi.deputi_3);
+        createPieChart('statusPieChartDeputi4', chartDataDeputi.deputi_4);
     });
 </script>
 @endsection

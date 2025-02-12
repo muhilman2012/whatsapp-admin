@@ -281,21 +281,21 @@ class laporanAdmin extends Controller
         ]);
 
         // Mengambil ID analis yang ditugaskan pada laporan ini
-        $assignments = Assignment::where('laporan_id', $laporan->id)->get();
+        // $assignments = Assignment::where('laporan_id', $laporan->id)->get();
         
-        // Kirimkan notifikasi kepada analis yang terlibat
-        foreach ($assignments as $assignment) {
-            $analis = $assignment->assignedTo;
+        // // Kirimkan notifikasi kepada analis yang terlibat
+        // foreach ($assignments as $assignment) {
+        //     $analis = $assignment->assignedTo;
 
-            // Kirim notifikasi kepada analis
-            Notification::create([
-                'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim
-                'assignee_id' => $analis->id_admins,  // ID penerima (analis)
-                'laporan_id' => $laporan->id,  // ID laporan
-                'message' => 'Anda telah memperbarui status/tanggapan',
-                'is_read' => false,  // Notifikasi belum dibaca
-            ]);
-        }
+        //     // Kirim notifikasi kepada analis
+        //     Notification::create([
+        //         'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim
+        //         'assignee_id' => $analis->id_admins,  // ID penerima (analis)
+        //         'laporan_id' => $laporan->id,  // ID laporan
+        //         'message' => 'Anda telah memperbarui status/tanggapan',
+        //         'is_read' => false,  // Notifikasi belum dibaca
+        //     ]);
+        // }
 
         // Tentukan nama deputi berdasarkan disposisi atau disposisi_terbaru
         $deputiName = $laporan->disposisi_terbaru ?: $laporan->disposisi; // Pilih disposisi_terbaru jika ada, jika tidak pilih disposisi
@@ -383,13 +383,13 @@ class laporanAdmin extends Controller
     {
         // Konfigurasi API eksternal Production
         // $url = 'https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint';
-        // $authToken = '$2y$10$pmK5OG3pcupgnJYms4WNPO1Cy6XYEFIhFIJfccSddBEM039k6eqhW';
-        // $token = '{PXVQSRQT-RI4I-VDRL-WLH8-UWSCXCUZXV39}';
+        // $authToken = '$2y$10$FAuB2fWJIJD/WcWoNOK5eukwca4TH.VUDUAbiateNlrci2e0QNgKG';
+        // $token = '{9VV7PWYE-G1IA-6UQP-HEMK-ONOCILDSC7WP}';
 
         // Konfigurasi API eksternal Development
         $url = 'https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint';
-        $authToken = 'Bearer $2y$10$FGR.uEITvC782D5VwXqEjekU6HxaRqbqdwCjHKHFxSfP65sQn.U3O';
-        $token = '{HXEUA01Z-NXCG-S54K-OWMV-BAJJ3TYEEOUF}';
+        $authToken = '$2y$10$zUVBCgRxSDnAa5uMMdLZ5Ohz0dSreTiDrF.SxG7apFewcVrP/Sfom';
+        $token = '{Z6BTTJ18-OFMK-LZ4U-ZAAG-JAAWOB1DVW8P}';
     
         // Siapkan data yang akan dikirim    
         $data = [    
@@ -493,15 +493,15 @@ class laporanAdmin extends Controller
 
         // Header autentikasi Prod
         // $headers = [
-        //     'auth' => 'Bearer $2y$10$pmK5OG3pcupgnJYms4WNPO1Cy6XYEFIhFIJfccSddBEM039k6eqhW',
-        //     'token' => '{PXVQSRQT-RI4I-VDRL-WLH8-UWSCXCUZXV39}',
+        //     'auth' => 'Bearer $2y$10$FAuB2fWJIJD/WcWoNOK5eukwca4TH.VUDUAbiateNlrci2e0QNgKG',
+        //     'token' => '{9VV7PWYE-G1IA-6UQP-HEMK-ONOCILDSC7WP}',
         //     'Content-Type' => 'application/json'
         // ];
 
         // Header autentikasi Dev
         $headers = [
-            'auth' => 'Bearer $2y$10$FGR.uEITvC782D5VwXqEjekU6HxaRqbqdwCjHKHFxSfP65sQn.U3O',
-            'token' => '{HXEUA01Z-NXCG-S54K-OWMV-BAJJ3TYEEOUF}',
+            'auth' => 'Bearer $2y$10$zUVBCgRxSDnAa5uMMdLZ5Ohz0dSreTiDrF.SxG7apFewcVrP/Sfom',
+            'token' => '{Z6BTTJ18-OFMK-LZ4U-ZAAG-JAAWOB1DVW8P}',
             'Content-Type' => 'application/json'
         ];
 
@@ -713,7 +713,7 @@ class laporanAdmin extends Controller
         // Menyimpan log aktivitas dengan pesan yang sesuai
         Log::create([
             'laporan_id' => $laporan->id,
-            'activity' => $logMessage . auth('admin')->user()->nama,
+            'activity' => $logMessage,
             'user_id' => auth('admin')->user()->id_admins,
         ]);
 

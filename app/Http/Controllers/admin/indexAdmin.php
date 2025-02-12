@@ -148,17 +148,17 @@ class indexAdmin extends Controller
             });
         }
 
-        // Ambil jumlah total laporan berdasarkan status
+        // Ambil jumlah total laporan per status
         $statusData = (clone $queryBase)
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
+            ->selectRaw('laporans.status, COUNT(*) as total')
+            ->groupBy('laporans.status')
             ->get()
             ->keyBy('status');
 
-        // Ambil jumlah laporan berdasarkan status & sumber_pengaduan
+        // Ambil jumlah laporan per status dan sumber_pengaduan menggunakan LEFT JOIN
         $statusBySource = (clone $queryBase)
-            ->selectRaw('status, sumber_pengaduan, COUNT(*) as total')
-            ->groupBy('status', 'sumber_pengaduan')
+            ->selectRaw('laporans.status, laporans.sumber_pengaduan, COUNT(laporans.id) as total')
+            ->groupBy('laporans.status', 'laporans.sumber_pengaduan')
             ->get()
             ->groupBy('status');
 
@@ -169,21 +169,47 @@ class indexAdmin extends Controller
             $totalStatus = $statusData[$fullStatus]->total ?? 0;
 
             // Ambil jumlah laporan berdasarkan sumber_pengaduan
-            $whatsappCount = isset($statusBySource[$fullStatus]) 
-                ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'whatsapp')->first()->total ?? 0) 
+            $whatsappCount = isset($statusBySource[$fullStatus])
+                ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'whatsapp')->first()->total ?? 0)
                 : 0;
 
-            $tatapMukaCount = isset($statusBySource[$fullStatus]) 
-                ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'tatap muka')->first()->total ?? 0) 
+            $tatapMukaCount = isset($statusBySource[$fullStatus])
+                ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'tatap muka')->first()->total ?? 0)
                 : 0;
 
-            // Tambahkan data untuk chart
+            // Simpan data untuk Chart.js
             $chartData[] = [
                 'label' => "{$shortLabel} = {$totalStatus}",
                 'value' => $totalStatus,
                 'whatsapp' => $whatsappCount,
                 'tatap_muka' => $tatapMukaCount
             ];
+        }
+
+        // **PERHITUNGAN DATA UNTUK TIAP DEPUTI**
+        $deputiRoles = ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'];
+        $chartDataDeputi = [];
+
+        foreach ($deputiRoles as $deputi) {
+            // Ambil jumlah laporan berdasarkan status untuk masing-masing deputi
+            $deputiStatuses = Laporan::selectRaw('status, COUNT(*) as total')
+                ->where(function ($query) use ($deputi) {
+                    $query->where('disposisi', $deputi)
+                        ->orWhere('disposisi_terbaru', $deputi);
+                })
+                ->groupBy('status')
+                ->get()
+                ->keyBy('status');
+
+            $chartDataDeputi[$deputi] = [];
+
+            foreach ($shortLabels as $fullStatus => $shortLabel) {
+                $totalStatus = $deputiStatuses[$fullStatus]->total ?? 0;
+                $chartDataDeputi[$deputi][] = [
+                    'label' => "{$shortLabel} = {$totalStatus}",
+                    'value' => $totalStatus
+                ];
+            }
         }
 
         // Query untuk laporan harian  
@@ -241,7 +267,8 @@ class indexAdmin extends Controller
             'provinsiData' => $provinsiData,
             'judulFrequencies' => $judulFrequencies,
             'laporanPerKategori' => $laporanPerKategori,
-            'chartData' => $chartData
+            'chartData' => $chartData,
+            'chartDataDeputi' => $chartDataDeputi
         ]);
     }
 

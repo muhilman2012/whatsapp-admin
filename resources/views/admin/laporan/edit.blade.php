@@ -145,7 +145,7 @@
             @csrf
             <div class="mb-3">
                 <label for="institution" class="form-label fw-bold">Instansi Tujuan</label>
-                <select name="institution" id="institution" class="form-control select2">
+                <select name="institution" id="institution" class="form-control select2" data-live-search="true">
                     <option value="" selected>Pilih Institusi Tujuan</option>
                     @foreach ($institutions->sortBy('name') as $institution)
                         <option value="{{ $institution->id }}">{{ $institution->name }}</option>
@@ -296,11 +296,18 @@
 @section('script')
 <script>
     $(document).ready(function() {
-        $('.select2').select2();
+        $('#institution').select2({
+            placeholder: "Pilih Institusi Tujuan",
+            allowClear: true,
+            width: '100%'
+        });
     });
 </script>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const formEditLaporan = document.getElementById('formEditLaporan');
@@ -331,5 +338,4 @@
         });
     });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

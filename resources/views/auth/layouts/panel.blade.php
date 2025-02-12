@@ -48,7 +48,7 @@
     <script>
         Swal.fire({
             icon: 'success',
-            title: 'Good Jobs!',
+            title: 'Sukses!',
             text: '{{ session()->get("success") }}',
             showConfirmButton: false,
             timer: 2500
@@ -58,7 +58,7 @@
     <script>
         Swal.fire({
             icon: 'error',
-            title: 'Opps...!',
+            title: 'Maaf...',
             text: '{{ session()->get("error") }}',
             showConfirmButton: false,
             timer: 2500
