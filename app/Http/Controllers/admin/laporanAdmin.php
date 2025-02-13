@@ -281,7 +281,7 @@ class laporanAdmin extends Controller
         ]);
 
         // Mengambil ID analis yang ditugaskan pada laporan ini
-        // $assignments = Assignment::where('laporan_id', $laporan->id)->get();
+        $assignments = Assignment::where('laporan_id', $laporan->id)->get();
         
         // // Kirimkan notifikasi kepada analis yang terlibat
         // foreach ($assignments as $assignment) {
