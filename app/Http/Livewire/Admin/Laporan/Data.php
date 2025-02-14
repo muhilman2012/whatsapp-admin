@@ -359,15 +359,15 @@ class Data extends Component
             foreach ($this->selected as $laporanId) {
                 Log::create([
                     'laporan_id' => $laporanId,
-                    'activity' => 'Disposisi diperbarui menjadi ' . $this->selectedDisposisi,
+                    'activity' => 'Distribusi diperbarui menjadi ' . $this->selectedDisposisi,
                     'user_id' => auth('admin')->user()->id_admins,
                 ]);
             }
 
             $this->reset(['selected', 'selectAll', 'selectedDisposisi']);
-            session()->flash('success', 'Disposisi berhasil diperbarui.');
+            session()->flash('success', 'Distribusi berhasil diperbarui.');
         } else {
-            session()->flash('error', 'Pilih disposisi dan data terlebih dahulu.');
+            session()->flash('error', 'Pilih data terlebih dahulu.');
         }
     }
 

@@ -375,7 +375,7 @@ class laporanAdmin extends Controller
                 return back()->with('error', 'Gagal saat meneruskan ke instansi tujuan: ' . $apiSecondResponse['error']);
             }
         } else {
-            return back()->with('error', 'Gagal saat pengiriman ke API pertama: ' . $apiFirstResponse['error']);
+            return back()->with('error', 'Gagal saat pengiriman ke LAPOR!: ' . $apiFirstResponse['error']);
         }
     }
 

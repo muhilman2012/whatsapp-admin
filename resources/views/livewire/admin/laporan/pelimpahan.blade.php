@@ -156,7 +156,13 @@
                         <input type="checkbox" wire:model="selected" value="{{ $item->id }}">
                     </td>
                     <th scope="row">{{ $index + 1 }}</th>
-                    <td>{{ $item->nomor_tiket }}</td>
+                    <td>
+                        @if($item->dokumen_tambahan)  <!-- Cek apakah ada dokumen tambahan -->
+                            <span class="badge bg-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Pengadu telah mengirimkan Dokumen Tambahan">{{ $item->nomor_tiket }}</span>
+                        @else
+                            {{ $item->nomor_tiket }}
+                        @endif
+                    </td>
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
@@ -455,6 +461,14 @@
     <script>
         window.addEventListener('show-confirmation-modal', event => {
             $('#confirmationModal').modal('show');
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
         });
     </script>
 
