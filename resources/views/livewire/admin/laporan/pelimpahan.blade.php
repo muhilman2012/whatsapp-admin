@@ -32,6 +32,7 @@
                     <option value="Menunggu kelengkapan data dukung dari Pelapor">Kurang Berkas</option>
                     <option value="Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut">Tindak Lanjut K/L</option>
                     <option value="Proses verifikasi dan telaah">Verifikasi</option>
+                    <option value="dokumen_tambahan_not_empty">Data dukung dikirim Pengadu</option>
                 </select>
             </div>
             @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))

@@ -129,7 +129,7 @@ class indexAdmin extends Controller
         // Hitung total laporan yang belum di-assign
         $totalNotAssigned = $totalLaporan - $totalAssignedToAnalis; // Ini sekarang harus berfungsi
 
-        // Short labels untuk setiap status
+        // Definisi status dengan label pendek
         $shortLabels = [
             'Penanganan Selesai' => 'Selesai',
             'Menunggu kelengkapan data dukung dari Pelapor' => 'Kelengkapan',
@@ -137,7 +137,10 @@ class indexAdmin extends Controller
             'Proses verifikasi dan telaah' => 'Verifikasi'
         ];
 
-        // Query dasar untuk menghindari penulisan berulang
+        // Daftar kedeputian yang valid
+        $deputiRoles = ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'];
+
+        // Query dasar untuk filter role
         $queryBase = Laporan::query();
         if ($admin->role === 'asdep') {
             $queryBase->whereIn('kategori', $kategoriByUnit);
@@ -148,27 +151,25 @@ class indexAdmin extends Controller
             });
         }
 
-        // Ambil jumlah total laporan per status
+        // Ambil jumlah total laporan berdasarkan status
         $statusData = (clone $queryBase)
-            ->selectRaw('laporans.status, COUNT(*) as total')
-            ->groupBy('laporans.status')
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
             ->get()
             ->keyBy('status');
 
-        // Ambil jumlah laporan per status dan sumber_pengaduan menggunakan LEFT JOIN
+        // Ambil jumlah laporan berdasarkan status & sumber_pengaduan
         $statusBySource = (clone $queryBase)
-            ->selectRaw('laporans.status, laporans.sumber_pengaduan, COUNT(laporans.id) as total')
-            ->groupBy('laporans.status', 'laporans.sumber_pengaduan')
+            ->selectRaw('status, sumber_pengaduan, COUNT(*) as total')
+            ->groupBy('status', 'sumber_pengaduan')
             ->get()
             ->groupBy('status');
 
         $chartData = [];
 
         foreach ($shortLabels as $fullStatus => $shortLabel) {
-            // Total laporan untuk status ini
-            $totalStatus = $statusData[$fullStatus]->total ?? 0;
+            $totalStatus = isset($statusData[$fullStatus]) ? $statusData[$fullStatus]->total : 0;
 
-            // Ambil jumlah laporan berdasarkan sumber_pengaduan
             $whatsappCount = isset($statusBySource[$fullStatus])
                 ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'whatsapp')->first()->total ?? 0)
                 : 0;
@@ -177,7 +178,6 @@ class indexAdmin extends Controller
                 ? ($statusBySource[$fullStatus]->where('sumber_pengaduan', 'tatap muka')->first()->total ?? 0)
                 : 0;
 
-            // Simpan data untuk Chart.js
             $chartData[] = [
                 'label' => "{$shortLabel} = {$totalStatus}",
                 'value' => $totalStatus,
@@ -186,28 +186,45 @@ class indexAdmin extends Controller
             ];
         }
 
-        // **PERHITUNGAN DATA UNTUK TIAP DEPUTI**
-        $deputiRoles = ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'];
+        // **Perhitungan Data untuk Tiap Deputi dengan Breakdown WA/TM**
         $chartDataDeputi = [];
 
         foreach ($deputiRoles as $deputi) {
-            // Ambil jumlah laporan berdasarkan status untuk masing-masing deputi
-            $deputiStatuses = Laporan::selectRaw('status, COUNT(*) as total')
-                ->where(function ($query) use ($deputi) {
+            // Ambil jumlah laporan berdasarkan status dan sumber_pengaduan hanya untuk deputi terkait
+            $deputiStatuses = Laporan::selectRaw('status, sumber_pengaduan, COUNT(*) as total')
+                ->where(function ($query) use ($deputi, $deputiRoles) {
                     $query->where('disposisi', $deputi)
-                        ->orWhere('disposisi_terbaru', $deputi);
+                        ->whereNull('disposisi_terbaru'); // Jika tidak ada disposisi terbaru
                 })
-                ->groupBy('status')
+                ->orWhere(function ($query) use ($deputi, $deputiRoles) {
+                    $query->where('disposisi_terbaru', $deputi)
+                        ->whereIn('disposisi_terbaru', $deputiRoles); // Hanya hitung jika disposisi terbaru masih deputi
+                })
+                ->groupBy('status', 'sumber_pengaduan')
                 ->get()
-                ->keyBy('status');
+                ->groupBy('status');
 
+            // Pastikan semua status ada, meskipun nilainya 0
             $chartDataDeputi[$deputi] = [];
-
             foreach ($shortLabels as $fullStatus => $shortLabel) {
-                $totalStatus = $deputiStatuses[$fullStatus]->total ?? 0;
+                // Total laporan untuk status ini
+                $totalStatus = isset($deputiStatuses[$fullStatus]) ? $deputiStatuses[$fullStatus]->sum('total') : 0;
+
+                // Breakdown jumlah laporan berdasarkan sumber_pengaduan
+                $whatsappCount = isset($deputiStatuses[$fullStatus]) 
+                    ? ($deputiStatuses[$fullStatus]->where('sumber_pengaduan', 'whatsapp')->sum('total') ?? 0) 
+                    : 0;
+
+                $tatapMukaCount = isset($deputiStatuses[$fullStatus]) 
+                    ? ($deputiStatuses[$fullStatus]->where('sumber_pengaduan', 'tatap muka')->sum('total') ?? 0) 
+                    : 0;
+
+                // Tambahkan data untuk chart
                 $chartDataDeputi[$deputi][] = [
                     'label' => "{$shortLabel} = {$totalStatus}",
-                    'value' => $totalStatus
+                    'value' => $totalStatus,
+                    'whatsapp' => $whatsappCount,
+                    'tatap_muka' => $tatapMukaCount
                 ];
             }
         }

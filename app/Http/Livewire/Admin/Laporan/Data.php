@@ -196,10 +196,14 @@ class Data extends Component
             $data->where('kategori', $this->filterKategori);  
         }  
     
-        // Filter berdasarkan status  
-        if (!empty($this->filterStatus)) {  
-            $data->where('status', $this->filterStatus);  
-        }  
+        // Filter berdasarkan status
+        if (!empty($this->filterStatus)) {
+            if ($this->filterStatus === 'dokumen_tambahan_not_empty') {
+                $data->whereNotNull('dokumen_tambahan')->where('dokumen_tambahan', '!=', '');
+            } else {
+                $data->where('status', $this->filterStatus);
+            }
+        }
     
         // Filter berdasarkan status assignment  
         if ($this->filterAssignment === 'unassigned') {  

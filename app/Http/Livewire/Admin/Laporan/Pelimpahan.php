@@ -192,7 +192,11 @@ class Pelimpahan extends Component
 
         // Filter berdasarkan status
         if (!empty($this->filterStatus)) {
-            $data->where('status', $this->filterStatus);
+            if ($this->filterStatus === 'dokumen_tambahan_not_empty') {
+                $data->whereNotNull('dokumen_tambahan')->where('dokumen_tambahan', '!=', '');
+            } else {
+                $data->where('status', $this->filterStatus);
+            }
         }
 
         // Filter berdasarkan status assignment

@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="{{ url('/assets/dist/css/color.css') }}">
     <link rel="stylesheet" href="{{ url('/assets/dist/css/animated.css') }}">
     <link rel="stylesheet" href="{{ url('/assets/dist/css/admin/panel.css') }}">
-    <link rel="stylesheet" href="{{ url('/assets/dist/css/admin/color.css') }}">
     @livewireStyles
 </head>
 

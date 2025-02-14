@@ -187,47 +187,19 @@
                     </div>
                 </div>
 
+                <!-- Pie Chart Per Deputi -->
                 <div class="col-12">
                     <div class="row">
-                        <!-- Pie Chart Deputi 1 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card border-0 shadow-sm p-3 align-items-center">
-                                <h6 class="fw-bold text-center">Deputi 1</h6>
-                                <div class="pie-container">
-                                    <canvas id="statusPieChartDeputi1"></canvas>
+                        @foreach (['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'] as $deputi)
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <div class="card border-0 shadow-sm p-3 align-items-center">
+                                    <h6 class="fw-bold text-center">Status Laporan {{ ucfirst(str_replace('_', ' ', $deputi)) }}</h6>
+                                    <div class="pie-container">
+                                        <canvas id="statusPieChart{{ $deputi }}"></canvas>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Pie Chart Deputi 2 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card border-0 shadow-sm p-3 align-items-center">
-                                <h6 class="fw-bold text-center">Deputi 2</h6>
-                                <div class="pie-container">
-                                    <canvas id="statusPieChartDeputi2"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pie Chart Deputi 3 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card border-0 shadow-sm p-3 align-items-center">
-                                <h6 class="fw-bold text-center">Deputi 3</h6>
-                                <div class="pie-container">
-                                    <canvas id="statusPieChartDeputi3"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pie Chart Deputi 4 -->
-                        <div class="col-lg-3 col-md-6 col-sm-12">
-                            <div class="card border-0 shadow-sm p-3 align-items-center">
-                                <h6 class="fw-bold text-center">Deputi 4</h6>
-                                <div class="pie-container">
-                                    <canvas id="statusPieChartDeputi4"></canvas>
-                                </div>
-                            </div>
-                        </div>
+                        @endforeach
                     </div>
                 </div>
 
@@ -279,7 +251,7 @@
                 <div class="col-6">
                     <div class="card border-0 shadow-sm p-3 align-items-center">
                         <div class="pie-container">
-                            <canvas id="statusPieChart"></canvas>
+                            <canvas id="statusPieChart{{ auth('admin')->user()->role }}"></canvas>
                         </div>
                     </div>
                 </div>
@@ -502,7 +474,12 @@
         function createPieChart(canvasId, data) {
             const canvas = document.getElementById(canvasId);
             if (!canvas) {
-                console.error(`Canvas dengan ID "${canvasId}" tidak ditemukan!`);
+                console.warn(`Canvas dengan ID "${canvasId}" tidak ditemukan.`);
+                return;
+            }
+
+            if (!data || data.length === 0) {
+                console.warn(`Data kosong untuk "${canvasId}".`);
                 return;
             }
 
@@ -550,8 +527,8 @@
 
                                     return [
                                         `${label}`,
-                                        `Whatsapp: ${whatsappCount}`,
-                                        `Tatap Muka: ${tatapMukaCount}`
+                                        `📲 WhatsApp: ${whatsappCount}`,
+                                        `🤝 Tatap Muka: ${tatapMukaCount}`
                                     ];
                                 }
                             }
@@ -561,14 +538,24 @@
             });
         }
 
-        // **Inisialisasi pie chart untuk Semua Data (ALL DATA)**
+        // **Inisialisasi pie chart untuk Semua Data (Superadmin & Admin)**
         createPieChart('statusPieChart', chartDataAll);
 
-        // **Inisialisasi pie chart untuk masing-masing deputi**
-        createPieChart('statusPieChartDeputi1', chartDataDeputi.deputi_1);
-        createPieChart('statusPieChartDeputi2', chartDataDeputi.deputi_2);
-        createPieChart('statusPieChartDeputi3', chartDataDeputi.deputi_3);
-        createPieChart('statusPieChartDeputi4', chartDataDeputi.deputi_4);
+        // **Inisialisasi pie chart untuk masing-masing deputi (Admin & Superadmin)**
+        ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'].forEach(deputi => {
+            createPieChart(`statusPieChart${deputi}`, chartDataDeputi[deputi]);
+        });
+
+        // **Inisialisasi pie chart untuk Deputi yang login**
+        const userRole = @json(auth('admin')->user()->role);
+        if (['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'].includes(userRole)) {
+            createPieChart(`statusPieChart${userRole}`, chartDataDeputi[userRole]);
+        }
+
+        // **Inisialisasi pie chart untuk Asdep**
+        if (userRole === 'asdep') {
+            createPieChart('statusPieChartAsdep', chartDataDeputi['asdep']);
+        }
     });
 </script>
 @endsection
