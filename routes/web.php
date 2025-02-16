@@ -46,8 +46,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::post('/dashboard/laporan/{nomor_tiket}/teruskan-ke-instansi', [laporanAdmin::class, 'teruskanKeInstansi'])->name('admin.laporan.teruskanKeInstansi');
         Route::post('/dashboard/laporan/update/{nomor_tiket}/analis', [laporanAdmin::class, 'storeAnalis'])->name('admin.laporan.analis.store');
         Route::post('/dashboard/laporan/upload/editor', [laporanAdmin::class, 'editor'])->name('admin.laporan.upload.editor');
-        Route::put('/admin/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');
-        Route::get('/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
+        Route::put('/dashboard/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');
+        Route::get('/dashboard/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
+        Route::get('/dashboard/laporan/{nomor_tiket}/downloadtandaterima', [laporanAdmin::class, 'tandaterimaPDF'])->name('admin.laporan.tandaterima');
         Route::put('/laporan/{nomorTiket}/approval', [laporanAdmin::class, 'approval'])->name('admin.laporan.approval');
 
         // Assign to Analis

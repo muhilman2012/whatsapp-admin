@@ -465,6 +465,12 @@
                     <div class="mb-3">
                         <strong>Judul Pengaduan :</strong> {{ $item->judul }}
                     </div>
+                    <div class="mb-3">
+                        <strong>Status Tindak Lanjut K/L/D :</strong>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tanggapan K/L/D :</strong> 
+                    </div>
                     <!-- <div class="mb-3">
                         <strong>Detail Pengaduan :</strong>
                         <p>{{ $item->detail }}</p>

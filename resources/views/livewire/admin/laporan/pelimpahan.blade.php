@@ -159,9 +159,11 @@
                     <th scope="row">{{ $index + 1 }}</th>
                     <td>
                         @if($item->dokumen_tambahan)  <!-- Cek apakah ada dokumen tambahan -->
-                            <span class="badge bg-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Pengadu telah mengirimkan Dokumen Tambahan">{{ $item->nomor_tiket }}</span>
+                            <span class="badge bg-warning" data-bs-toggle="tooltip" data-bs-placement="top" title="Pengadu telah mengirimkan Dokumen Tambahan">
+                                <a href="#" class="text-white" data-bs-toggle="modal" data-bs-target="#complaintModal{{ $item->id }}">{{ $item->nomor_tiket }}</a>
+                            </span>
                         @else
-                            {{ $item->nomor_tiket }}
+                            <a href="#" style="text-decoration: none;" class="text-blue" data-bs-toggle="modal" data-bs-target="#complaintModal{{ $item->id }}">{{ $item->nomor_tiket }}</a>
                         @endif
                     </td>
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
@@ -348,6 +350,46 @@
             </form>
         </div>
     </div>
+    @foreach($data as $item)
+    <div class="modal fade" id="complaintModal{{ $item->id }}" tabindex="-1" aria-labelledby="complaintModalLabel{{ $item->id }}" aria-hidden="undifined" wire:ignore.self>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="complaintModalLabel{{ $item->id }}">Detail Pengaduan - {{ $item->nomor_tiket }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Identitas Pengadu :</strong> {{ $item->nama_lengkap }} - {{ $item->nik }} - {{ $item->nomor_pengadu }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status Pengaduan :</strong> {{ $item->status }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tanggapan :</strong> {{ $item->tanggapan }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Judul Pengaduan :</strong> {{ $item->judul }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status Tindak Lanjut K/L/D :</strong>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tanggapan K/L/D :</strong> 
+                    </div>
+                    <!-- <div class="mb-3">
+                        <strong>Detail Pengaduan :</strong>
+                        <p>{{ $item->detail }}</p>
+                    </div> -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='{{ route('admin.laporan.edit', ['nomor_tiket' => $item->nomor_tiket]) }}'">Perbarui Pengaduan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 
 
     <script>

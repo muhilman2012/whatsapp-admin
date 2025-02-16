@@ -672,7 +672,27 @@ class laporanAdmin extends Controller
         $pdf->setPaper('A4', 'portrait');
 
         // Download file PDF
-        return $pdf->download('Bukti_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
+        return $pdf->download('Tanda_Terima_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
+    }
+
+    public function tandaterimaPDF($nomor_tiket)
+    {
+        // Cari laporan berdasarkan nomor tiket
+        $laporan = \App\Models\Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Data yang akan dikirim ke view PDF
+        $data = [
+            'laporan' => $laporan,
+        ];
+
+        // Generate PDF
+        $pdf = Pdf::loadView('admin.laporan.tandaterima', $data);
+
+        // Tambahkan watermark jika diperlukan
+        $pdf->setPaper('A5', 'landscape');
+
+        // Download file PDF
+        return $pdf->download('Tanda_Terima_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
     }
 
     public function approval(Request $request, $nomorTiket)

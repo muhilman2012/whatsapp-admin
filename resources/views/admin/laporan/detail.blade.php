@@ -170,8 +170,11 @@
         </div>
     </div>
     <div class="mb-3 mt-3 text-end">
+        <a href="{{ route('admin.laporan.tandaterima', $data->nomor_tiket) }}" class="btn btn-primary">
+            Unduh Tanda Terima Pengaduan (untuk Pengadu)
+        </a>
         <a href="{{ route('admin.laporan.download', $data->nomor_tiket) }}" class="btn btn-success">
-            Download Bukti Pengaduan (PDF)
+            Unduh Tanda Terima (untuk TL K/L/D)
         </a>
     </div>
     <div class="d-block rounded bg-white shadow">
