@@ -17,6 +17,7 @@ class Pelimpahan extends Component
     use WithPagination;
 
     public $nomor_tiket;
+    public $laporanId;
     public $search, $pages;
     public $filterKategori = '';
     public $sortField = 'created_at'; // Default field untuk sorting
@@ -27,9 +28,11 @@ class Pelimpahan extends Component
     public $selectAll = false; // Untuk status checkbox "Select All"
     public $selected = [];    // Array ID laporan yang dipilih
     public $selectedAnalis = null; // ID Analis yang dipilih
+    public $selectedNewAnalis = null; // ID Analis yang baru dipilih
     public $selectedDeputi; // Properti untuk menyimpan deputi yang 
     public $analisList = []; // Daftar analis yang akan ditampilkan
     public $assignNotes; // Catatan untuk analis
+    public $reassignNotes; // Catatan untuk analis
     public $filterAssignment = ''; // Properti untuk menyimpan filter
     public $filterStatus = ''; // Untuk filter status
     public $tanggal; // Properti untuk menyimpan tanggal yang dipilih
@@ -411,7 +414,72 @@ class Pelimpahan extends Component
     
         // Reset selections and show success message  
         $this->reset(['selected', 'selectAll', 'selectedAnalis']);  
-        session()->flash('success', 'Laporan berhasil di-assign ke analis.');  
+        session()->flash('success', 'Laporan berhasil disposisi ke analis.');  
+    }
+
+    // Buka modal dan set laporan_id serta analis_id
+    public function openReassignModal($laporanId, $analisId)
+    {
+        $this->laporanId = $laporanId;
+        $this->selectedAnalis = $analisId;
+        $this->selectedNewAnalis = null;
+        $this->reassignNotes = null;
+    }
+
+    // Fungsi untuk melakukan reassign
+    public function reassignToAnalis()
+    {
+        // Validasi
+        $this->validate([
+            'selectedNewAnalis' => 'required|exists:admins,id_admins',
+            'reassignNotes' => 'nullable|string|max:255',
+        ]);
+
+        // Pastikan laporanId valid
+        if (!$this->laporanId) {
+            $this->emit('alert', ['type' => 'error', 'message' => 'ID Laporan tidak ditemukan.']);
+            return;
+        }
+
+        // Cari tugas berdasarkan laporan_id
+        $existingAssignment = Assignment::where('laporan_id', $this->laporanId)->first();
+
+        if (!$existingAssignment) {
+            $this->emit('alert', ['type' => 'error', 'message' => 'Data assignment tidak ditemukan.']);
+            return;
+        }
+
+        // Hapus tugas lama
+        $existingAssignment->delete();
+
+        // Buat tugas baru
+        Assignment::create([
+            'laporan_id' => $this->laporanId,
+            'analis_id' => $this->selectedNewAnalis,
+            'notes' => $this->reassignNotes,
+            'assigned_by' => auth('admin')->user()->id_admins,
+        ]);
+
+        // Kirim notifikasi ke analis baru
+        Notification::create([
+            'assigner_id' => auth('admin')->user()->id_admins,
+            'assignee_id' => $this->selectedNewAnalis,
+            'laporan_id' => $this->laporanId,
+            'message' => 'Anda telah ditugaskan untuk menangani laporan baru.',
+            'is_read' => false,
+        ]);
+
+        // Log aktivitas
+        Log::create([
+            'laporan_id' => $this->laporanId,
+            'activity' => 'Perubahan disposisi analis',
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
+        session()->flash('success', 'Laporan berhasil disposisi ulang ke analis.');
+
+        // Tutup modal
+        $this->dispatchBrowserEvent('close-modal');
     }
 
     public function pelimpahan(Request $request)

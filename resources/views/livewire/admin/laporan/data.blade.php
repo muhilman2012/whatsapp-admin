@@ -226,7 +226,7 @@
                             @if ($assignedTo)
                                 @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
                                     <!-- Link untuk membuka modal re-assign -->
-                                    <a href="#" class="text-primary" data-bs-toggle="modal" data-bs-target="#reassignAnalisModal"
+                                    <a href="#" class="text-primary" style="text-decoration: none;" data-bs-toggle="modal" data-bs-target="#reassignAnalisModal"
                                     wire:click="openReassignModal({{ $item->id }}, {{ $assignedTo->assignedTo->id_admins }})">
                                         {{ $assignedTo->assignedTo->nama }}
                                     </a>

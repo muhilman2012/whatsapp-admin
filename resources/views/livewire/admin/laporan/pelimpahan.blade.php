@@ -171,18 +171,25 @@
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
                     <td>{{ $item->disposisi }}</td>
                     <td>{{ $item->disposisi_terbaru}}</td>
-                    <td>  
-                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))  
-                            <!-- Menampilkan nama analis yang diberi tugas -->  
-                            @php  
-                                $assignedTo = $item->assignments->where('laporan_id', $item->id)->first();  
-                            @endphp  
-                            @if ($assignedTo)  
-                                <span>{{ $assignedTo->assignedTo->nama }}</span> <!-- Nama analis ditampilkan dalam warna hitam -->  
-                            @else  
-                                <span class="text-danger">Belum terdisposisi</span> <!-- Teks merah jika belum terdisposisi -->  
-                            @endif  
-                        @endif  
+                    <td>
+                        @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
+                            @php
+                                $assignedTo = $item->assignments->where('laporan_id', $item->id)->first();
+                            @endphp
+                            @if ($assignedTo)
+                                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
+                                    <!-- Link untuk membuka modal re-assign -->
+                                    <a href="#" class="text-primary" style="text-decoration: none;" data-bs-toggle="modal" data-bs-target="#reassignAnalisModal"
+                                    wire:click="openReassignModal({{ $item->id }}, {{ $assignedTo->assignedTo->id_admins }})">
+                                        {{ $assignedTo->assignedTo->nama }}
+                                    </a>
+                                @else
+                                    <span>{{ $assignedTo->assignedTo->nama }}</span>
+                                @endif
+                            @else
+                                <span class="text-danger">Belum terdisposisi</span>
+                            @endif
+                        @endif
                     </td>
                     <td>
                         @if($item->sumber_pengaduan === 'tatap muka')
@@ -326,6 +333,40 @@
         </div>
     </div>
 
+    <!-- Modal Re-Assign Analis -->
+    <div class="modal fade" id="reassignAnalisModal" tabindex="-1" aria-labelledby="reassignAnalisModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Disposisi Ulang ke Analis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Pilih Analis Baru -->
+                    <div class="mb-3">
+                        <label class="form-label">Pilih Analis Baru</label>
+                        <select wire:model="selectedNewAnalis" class="form-select">
+                            <option value="">Pilih Analis</option>
+                            @foreach($analisList as $analis)
+                                <option value="{{ $analis->id_admins }}">{{ $analis->username }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Catatan -->
+                    <div class="mb-3">
+                        <label class="form-label">Catatan</label>
+                        <textarea wire:model="reassignNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" wire:click="reassignToAnalis" class="btn btn-primary">Disposisikan Ulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="modal fade" id="pelimpahanModal" tabindex="-1" aria-labelledby="pelimpahanModalLabel" aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog">
             <form wire:submit.prevent="pelimpahan">
