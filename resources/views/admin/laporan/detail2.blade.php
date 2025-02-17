@@ -1,14 +1,14 @@
 @extends('admin.layouts.panel')
 
 @section('head')
-<title>LaporMasWapres! - Detail Data Pengaduan</title>
+<title>LaporMasWapres! - Detail Pengaduan</title>
 @endsection
 
 @section('pages')
 <div class="container-fluid">
     <div class="d-block rounded bg-white shadow">
         <div class="p-3 border-bottom">
-            <p class="fs-4 fw-bold mb-0">Detail Data Pengaduan</p>
+            <p class="fs-4 fw-bold mb-0">Detail Pengaduan</p>
         </div>
         <div class="d-block p-3">
             <div class="mb-3 row">
@@ -113,52 +113,13 @@
                     <p class="text-label fw-bold mb-1">Tanggapan:</p>
                     <p>{{ $data->tanggapan ?? 'Belum ada tanggapan' }}</p>
                 </div>
-                <div class="col-md-6">  
-                    <p class="text-label fw-bold mb-1">Diposisi dari:</p>  
-                    @if ($data->assignments && $data->assignments->isNotEmpty())  
-                        @foreach ($data->assignments as $assignment)  
-                            <p>{{ $assignment->assignedBy->nama ?? 'Tidak diketahui' }}</p>  
-                        @endforeach
-                    @else  
-                        <p>Tidak ada disposisi</p>  
-                    @endif  
-                </div>  
-                <div class="col-md-6">  
-                    <p class="text-label fw-bold mb-1">Catatan Disposisi:</p>  
-                    @if ($data->assignments && $data->assignments->isNotEmpty())  
-                        @foreach ($data->assignments as $assignment)  
-                            <p>{{ $assignment->notes ?? 'Tidak ada catatan' }}</p>  
-                        @endforeach  
-                    @else  
-                        <p>Tidak ada catatan disposisi</p>  
-                    @endif  
-                </div>
-                <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Status Analisis:</p>
-                    <p><span class="badge bg-primary">{{ $data->status_analisis }}</span> {{ $data->catatan_analisis ?? '' }}</p>
-
-                    @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Perbaiki Analisis</button>
-                    @endif
-                </div>
-                <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Analisis dari JF:</p>
-                    <p>{{ $data->lembar_kerja_analis ?? 'Belum ada analisis' }}</p>
-                </div>
             </div>
-            <button class="btn btn-secondary mt-3" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
-            @if (auth()->user()->hasRole(['analis']))
-                @if($data->status_analisis !== 'Disetujui') 
-                    <!-- Jika status analisis bukan Disetujui, tampilkan tombol Analisis -->
-                    <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Analisis</a>
-                @else
-                    <!-- Jika status analisis sudah Disetujui, tampilkan tombol Perbarui Pengaduan -->
-                    <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
-                @endif
-            @endif
-            @if (auth()->user()->hasRole(['superadmin','admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
-                <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
-            @endif
+            <div class="mb-3 mt-3 text-end">
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPengaduanModal">
+                    Ubah Data
+                </button>
+                <button class="btn btn-secondary" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
+            </div>
         </div>
     </div>
     <div class="mb-3 mt-3 text-end">
@@ -200,30 +161,61 @@
             @endif
         </div>
     </div>
-</div>
-
-<!-- Modal Catatan untuk Approval atau Revisi -->
-<div class="modal fade" id="approvalModal" tabindex="-1" aria-labelledby="approvalModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form action="{{ route('admin.laporan.approval', $data->nomor_tiket) }}" method="POST">
-            @csrf
-            @method('PUT')
+    <!-- Modal Edit Pengaduan -->
+    <div class="modal fade" id="editPengaduanModal" tabindex="-1" aria-labelledby="editPengaduanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="approvalModalLabel">Persetujuan Analisis</h5>
+                    <h5 class="modal-title" id="editPengaduanModalLabel">Ubah Data Pengaduan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <label for="catatan">Catatan (Opsional):</label>
-                    <textarea class="form-control" name="catatan" id="catatan" rows="4"></textarea>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    <button type="submit" name="approval_action" value="approved" class="btn btn-success">Setujui</button>
-                    <button type="submit" name="approval_action" value="rejected" class="btn btn-danger">Perbaiki</button>
+                    <form action="{{ route('admin.laporan.ubah', $data->nomor_tiket) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3 row">
+                            <div class="col-md-6">
+                                <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap</label>
+                                <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ $data->nama_lengkap }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nik" class="form-label fw-bold">NIK</label>
+                                <input type="text" class="form-control" id="nik" name="nik" value="{{ $data->nik }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ $data->email ?? 'Tidak diisi' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="nomor_pengadu" class="form-label fw-bold">Nomor Pengadu</label>
+                                <input type="text" class="form-control" id="nomor_pengadu" name="nomor_pengadu" value="{{ $data->nomor_pengadu }}">
+                            </div>
+                            <div class="col-md-12">
+                                <label for="alamat_lengkap" class="form-label fw-bold">Alamat Lengkap</label>
+                                <textarea class="form-control" id="alamat_lengkap" name="alamat_lengkap" rows="2">{{ $data->alamat_lengkap }}</textarea>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="judul" class="form-label fw-bold">Judul Laporan</label>
+                                <input type="text" class="form-control" id="judul" name="judul" value="{{ $data->judul }}">
+                            </div>
+                            <div class="col-md-12">
+                                <label for="detail" class="form-label fw-bold">Detail Laporan</label>
+                                <textarea class="form-control" id="detail" name="detail" rows="5">{{ $data->detail }}</textarea>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="dokumen_pendukung" class="form-label fw-bold">Dokumen Pendukung</label>
+                                <input type="file" class="form-control" id="dokumen_pendukung" name="dokumen_pendukung[]" multiple accept=".pdf, .docx, .jpg, .jpeg, .png">
+                                <small class="text-muted">Maximal 4MB per file. Hanya PDF, DOCX, JPG, PNG, JPEG.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 @endsection

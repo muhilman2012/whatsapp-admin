@@ -11,6 +11,30 @@
     #detail {
         min-height: 200px; /* Memperbesar field detail */
     }
+    #previewDokumen li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    }
+
+    #previewDokumen img {
+        margin-right: 10px;
+    }
+
+    #previewDokumen .file-name {
+        flex-grow: 1;
+    }
+
+    #previewDokumen i {
+        font-size: 24px;
+        color: #666;
+        margin-right: 10px;
+    }
 </style>
 @endsection
 
@@ -26,7 +50,7 @@
                     {{ session('success') }}
                 </div>
             @endif
-            <form action="{{ route('admin.laporan.store') }}" method="POST" enctype="multipart/form-data">
+            <form id="pengaduanForm" action="{{ route('admin.laporan.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 
                 <!-- Nama dan NIK -->
@@ -143,11 +167,17 @@
                     </div>
                     <div class="col-md-4">
                         <label for="dokumen_pendukung" class="form-label fw-bold">Dokumen Pendukung <span class="text-danger">*</span></label>
-                        <input type="file" name="dokumen_pendukung" id="dokumen_pendukung" class="form-control @error('dokumen_pendukung') is-invalid @enderror">
+                        <input type="file" name="dokumen_pendukung[]" id="dokumen_pendukung" class="form-control @error('dokumen_pendukung') is-invalid @enderror" multiple>
                         @error('dokumen_pendukung')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                </div>
+
+                <!-- Preview Dokumen -->
+                <div class="mb-3">
+                    <label for="previewDokumen" class="form-label fw-bold">Pratinjau Dokumen</label>
+                    <ul id="previewDokumen" class="list-unstyled"></ul>
                 </div>
 
                 <div class="mb-3 d-block rounded bg-secondary shadow">
@@ -168,5 +198,134 @@
 </div>
 @endsection
 @section('script')
+<script>
+    let selectedFiles = []; // Array untuk menyimpan file yang dipilih
 
+    document.getElementById('dokumen_pendukung').addEventListener('change', function(event) {
+        const files = event.target.files;
+        const maxFileSize = 4 * 1024 * 1024; // 4 MB
+
+        for (let i = 0; i < files.length; i++) {
+            if (files[i].size > maxFileSize) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Terlalu Besar',
+                    text: 'File ' + files[i].name + ' melebihi batas ukuran 4 MB.',
+                });
+                // Kosongkan input file
+                event.target.value = '';
+                return; // Hentikan proses jika ada file yang terlalu besar
+            }
+        }
+    });
+    document.getElementById('dokumen_pendukung').addEventListener('change', function(event) {
+        const fileInput = event.target;
+        const files = fileInput.files;
+        const previewContainer = document.getElementById('previewDokumen');
+
+        // Kosongkan pratinjau sebelumnya
+        previewContainer.innerHTML = '';
+
+        // Tambahkan file baru ke array
+        for (let i = 0; i < files.length; i++) {
+            selectedFiles.push(files[i]);
+        }
+
+        selectedFiles.forEach((file, index) => {
+            const fileReader = new FileReader();
+            
+            fileReader.onload = function(e) {
+                const fileUrl = e.target.result;
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                
+                listItem.innerHTML = `
+                    <span class="file-name">${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeFile(this, ${index})">Remove</button>
+                `;
+                
+                if (file.type.startsWith('image/')) {
+                    const img = new Image();
+                    img.src = fileUrl;
+                    img.style.height = '30px';
+                    listItem.prepend(img);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-file-alt mr-2';
+                    listItem.prepend(icon);
+                }
+                
+                previewContainer.appendChild(listItem);
+            };
+
+            fileReader.readAsDataURL(file);
+        });
+
+        // Kosongkan input file agar bisa memilih file yang sama
+        fileInput.value = '';
+    });
+
+    // Fungsi untuk menghapus file dari pratinjau
+    function removeFile(button, index) {
+        button.parentElement.remove();
+        selectedFiles.splice(index, 1); // Hapus file dari array
+    }
+
+    // Mengirim formulir
+    document.getElementById('pengaduanForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Mencegah pengiriman formulir default
+
+        const formData = new FormData(this); // Mengambil data dari formulir
+
+        // Tambahkan semua file yang dipilih ke FormData
+        selectedFiles.forEach((file) => {
+            formData.append('dokumen_pendukung[]', file); // Pastikan menggunakan array
+        });
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}' // Jika menggunakan Laravel
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Menampilkan SweetAlert
+            Swal.fire({
+                icon: 'success',
+                title: 'Sukses!',
+                text: 'Laporan berhasil disimpan.',
+            }).then(() => {
+                // Redirect ke halaman detail pengaduan
+                window.location.href = data.redirect_url; // Pastikan server mengembalikan URL redirect
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Maaf..',
+                text: 'Terjadi kesalahan saat menyimpan Laporan.',
+            });
+        });
+    });
+</script>
+@if(session()->has('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Sukses!',
+            text: '{{ session()->get("success") }}',
+        });
+    </script>
+@elseif(session()->has('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Maaf..',
+            text: '{{ session()->get("error") }}',
+        });
+    </script>
+@endif
 @endsection

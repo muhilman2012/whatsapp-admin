@@ -64,8 +64,8 @@
         <p><strong>Catatan:</strong></p>
         <ol>
             <li>Tanda Terima Pengaduan ini digunakan hanya untuk kepentingan pelayanan pengaduan masyarakat dan tidak dapat digunakan untuk kepentingan peradilan hukum lainnya.</li>
-            <li>Pengadu dapat melacak status pengaduan <strong>secara berkala</strong> melalui nomor <i>whatsapp</i> 081117042204 tanpa perlu hadir langsung ke kantor Sekretariat Wakil Presiden.</li>
-            <li>Jika diminta untuk melengkapi kekurangan dokumen pendukung dapat dikirim melalui nomor <i>whatsapp</i> 081117042204.</li>
+            <li>Pengadu dapat melacak status pengaduan <strong>secara berkala</strong> melalui nomor <i>whatsapp</i> <strong>081117042204</strong> tanpa perlu hadir langsung ke kantor Sekretariat Wakil Presiden.</li>
+            <li>Jika diminta untuk melengkapi kekurangan dokumen pendukung dapat dikirim melalui nomor <i>whatsapp</i> <strong>081117042204</strong> pada jam kerja Senin - Jumat pukul 08.00 - 14.00 WIB.</li>
         </ol>
 
     <div class="watermark">

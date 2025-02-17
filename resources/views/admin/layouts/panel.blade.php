@@ -123,6 +123,9 @@
                     <a class="nav-link px-3" href="{{ route('admin.laporan.create') }}">
                         <i class="fas fa-newspaper box-icon" aria-hidden="true"></i>Tambah Pengaduan
                     </a>
+                    <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'pencarian']) }}">
+                        <i class="fas fa-search box-icon text-center"></i>Pencarian
+                    </a>
                     @if (auth('admin')->user()->role === 'superadmin')
                     <hr class="soft my-1 text-white">
                     <a class="nav-link px-3" href="{{ route('admin.user_management.index') }}">

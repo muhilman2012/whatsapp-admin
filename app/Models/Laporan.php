@@ -368,6 +368,11 @@ class Laporan extends Model
         return $this->hasMany(Notification::class, 'laporan_id');  
     }
 
+    public function dokumens()
+    {
+        return $this->hasMany(Dokumen::class, 'laporan_id');
+    }
+
     public function scopeFilterKategori($query, $filterKategori)
     {
         if (!empty($filterKategori)) {

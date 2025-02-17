@@ -23,8 +23,10 @@
             @livewire('admin.laporan.rejected', ['data' => $data])
         @elseif ($type === 'approved')
             @livewire('admin.laporan.approved', ['data' => $data])
-        @elseif ($type === 'terdisposisi') <!-- Tambahkan kondisi ini -->  
-            @livewire('admin.laporan.terdisposisi') <!-- Panggil komponen terdisposisi -->  
+        @elseif ($type === 'terdisposisi') 
+            @livewire('admin.laporan.terdisposisi')
+        @elseif ($type === 'pencarian') 
+            @livewire('admin.laporan.pencarian')
         @else
             @livewire('admin.laporan.data', ['data' => $data])
         @endif

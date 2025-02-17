@@ -9,6 +9,7 @@ use App\Models\Log;
 use App\Models\Assignment;
 use App\Models\Notification;
 use App\Models\Institution;
+use App\Models\Dokumen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -46,7 +47,7 @@ class laporanAdmin extends Controller
 
         // Ambil parameter `type` untuk menentukan jenis laporan
         $type = $request->query('type', 'all'); // Default ke `all`
-        $validTypes = ['all', 'pelimpahan', 'pending', 'revisi', 'approved', 'terdisposisi'];
+        $validTypes = ['all', 'pelimpahan', 'pending', 'revisi', 'approved', 'terdisposisi', 'pencarian'];
 
         if (!in_array($type, $validTypes)) {
             abort(404, 'Halaman tidak ditemukan.');
@@ -60,6 +61,7 @@ class laporanAdmin extends Controller
             'approved' => 'Laporan Approved',
             'terdisposisi' => 'Laporan Terdisposisi',
             'all' => 'Semua Data Laporan',
+            'pencarian' => 'Pencarian Data Laporan',
         };
 
         // Query data berdasarkan tipe laporan
@@ -117,56 +119,63 @@ class laporanAdmin extends Controller
         return view('admin.laporan.create', compact('namaDeputi', 'kategoriDeputi'));
     }
 
-    public function store(Request $request)  
+    public function store(Request $request)
     {
-        // Validasi data tanpa 'disposisi'
-        $validated = $request->validate([  
+        // Validasi input termasuk file multiple
+        $validated = $request->validate([
             'nomor_pengadu' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:255',
-            'nama_lengkap' => 'required|string|max:255',  
-            'nik' => 'required|digits:16',  
-            'jenis_kelamin' => 'required|in:L,P',  
-            'alamat_lengkap' => 'required',  
-            'judul' => 'required|max:255',  
-            'detail' => 'required',  
-            'dokumen_pendukung' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
+            'nama_lengkap' => 'required|string|max:255',
+            'nik' => 'required|digits:16',
+            'jenis_kelamin' => 'required|in:L,P',
+            'alamat_lengkap' => 'required',
+            'judul' => 'required|max:255',
+            'detail' => 'required',
+            'dokumen_pendukung.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
             'kategori' => 'required',
             'lokasi' => 'nullable',
             'tanggal_kejadian' => 'nullable|date'
-        ]);  
+        ]);
 
-        // Proses penyimpanan dokumen
-        $nomorTiket = $this->generateNomorTiket();  
-        $fileName = null;  
-        if ($request->hasFile('dokumen_pendukung')) {  
-            $file = $request->file('dokumen_pendukung');  
-            $fileName = $nomorTiket . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('public/dokumen', $fileName);
-            if (!$path) {
-                logger()->error('Gagal menyimpan dokumen:', $file);
-                return back()->withErrors(['dokumen_pendukung' => 'Gagal menyimpan dokumen']);
-            }
-        }
+        // Generate Nomor Tiket
+        $nomorTiket = $this->generateNomorTiket();
 
         try {
             // Menyimpan laporan baru
-            $laporan = Laporan::create([  
-                'nomor_tiket' => $nomorTiket,  
-                'nomor_pengadu' => $validated['nomor_pengadu'],  
-                'email' => $validated['email'],  
-                'nama_lengkap' => $validated['nama_lengkap'],  
-                'nik' => $validated['nik'],  
-                'jenis_kelamin' => $validated['jenis_kelamin'],  
-                'alamat_lengkap' => $validated['alamat_lengkap'],  
-                'judul' => $validated['judul'],  
+            $laporan = Laporan::create([
+                'nomor_tiket' => $nomorTiket,
+                'nomor_pengadu' => $validated['nomor_pengadu'],
+                'email' => $validated['email'],
+                'nama_lengkap' => $validated['nama_lengkap'],
+                'nik' => $validated['nik'],
+                'jenis_kelamin' => $validated['jenis_kelamin'],
+                'alamat_lengkap' => $validated['alamat_lengkap'],
+                'judul' => $validated['judul'],
                 'detail' => $validated['detail'],
-                'dokumen_pendukung' => $fileName,
                 'kategori' => $validated['kategori'],
                 'lokasi' => $validated['lokasi'],
                 'tanggal_kejadian' => $validated['tanggal_kejadian'],
                 'sumber_pengaduan' => 'tatap muka',
                 'petugas' => auth('admin')->user()->nama,
             ]);
+
+            // Proses penyimpanan file
+            if ($request->hasFile('dokumen_pendukung')) {
+                foreach ($request->file('dokumen_pendukung') as $index => $file) {
+                    $fileName = $nomorTiket . ($index > 0 ? "_{$index}" : '') . '.' . $file->getClientOriginalExtension();
+                    $filePath = $file->storeAs('public/dokumen', $fileName);
+
+                    // Log file yang diterima
+                    logger()->info('File diterima: ' . $fileName);
+
+                    // Simpan referensi file ke database Dokumen
+                    Dokumen::create([
+                        'laporan_id' => $laporan->id,
+                        'file_name' => $fileName,
+                        'file_path' => $filePath
+                    ]);
+                }
+            }
 
             // Menyimpan log aktivitas
             Log::create([
@@ -175,12 +184,12 @@ class laporanAdmin extends Controller
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
 
+            return response()->json(['redirect_url' => route('admin.laporan.detail2', ['nomor_tiket' => $laporan->nomor_tiket])]);
+
         } catch (\Exception $e) {
             logger()->error('Error saat menciptakan laporan: ' . $e->getMessage(), ['exception' => $e]);
-            return back()->withInput()->withErrors(['error' => 'Error saat menciptakan laporan: ' . $e->getMessage()]);
+            return response()->json(['error' => 'Error saat menciptakan laporan: ' . $e->getMessage()], 500);
         }
-
-        return redirect()->route('admin.laporan.detail', ['nomor_tiket' => $laporan->nomor_tiket])->with('success', 'Laporan berhasil ditambahkan.');
     }
 
     /**
@@ -208,10 +217,65 @@ class laporanAdmin extends Controller
         // Mendapatkan penugasan terakhir untuk laporan ini
         $latestAssignment = $data->assignments->last(); // Diasumsikan Anda ingin penugasan terakhir
 
+        $dokumen = $data->dokumen;
+
         // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
         $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
 
-        return view('admin.laporan.detail', compact('data', 'latestAssignment', 'logs'));
+        return view('admin.laporan.detail', compact('data', 'dokumen', 'latestAssignment', 'logs'));
+    }
+
+    public function detail($nomor_tiket)
+    {
+        // Mengambil data Laporan bersama dengan 'assignments' dan relasi terkait
+        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
+            ->where('nomor_tiket', $nomor_tiket)
+            ->firstOrFail();
+
+        // Mendapatkan penugasan terakhir untuk laporan ini
+        $latestAssignment = $data->assignments->last(); // Diasumsikan Anda ingin penugasan terakhir
+
+        $dokumen = $data->dokumen;
+
+        // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
+        $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
+
+        return view('admin.laporan.detail2', compact('data', 'dokumen', 'latestAssignment', 'logs'));
+    }
+
+    public function ubah(Request $request, $nomor_tiket)
+    {
+        $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Perbarui data pengaduan dengan mengabaikan 'dokumen_pendukung' dari request
+        $data->update($request->except(['dokumen_pendukung']));
+
+        // Handle file uploads
+        if ($request->hasFile('dokumen_pendukung')) {
+            foreach ($request->file('dokumen_pendukung') as $index => $file) {
+                $fileName = $data->nomor_tiket . ($index > 0 ? "_{$index}" : '') . '.' . $file->getClientOriginalExtension();
+                $filePath = $file->storeAs('public/dokumen', $fileName);
+
+                // Simpan referensi file ke database Dokumen
+                Dokumen::create([
+                    'laporan_id' => $data->id,
+                    'file_name' => $fileName,
+                    'file_path' => $filePath,
+                ]);
+
+                // Log file yang diterima
+                logger()->info('File diterima: ' . $fileName);
+            }
+        }
+
+        // Menyimpan log aktivitas
+        Log::create([
+            'laporan_id' => $data->id,
+            'activity' => 'Detail Laporan diperbarui',
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
+        return redirect()->back()->with('success', 'Data pengaduan berhasil diperbarui.');
     }
 
     public function edit($nomor_tiket)
@@ -251,34 +315,30 @@ class laporanAdmin extends Controller
             return redirect()->back()->with('error', 'Laporan tidak ditemukan!');
         }
 
-        // Menyimpan nilai sebelumnya untuk log
-        $oldData = $laporan->toArray();
-
-        // Validasi input
-        $request->validate([
-            'status' => 'nullable|string|max:255',
-            'tanggapan' => 'nullable|string',
-        ]);
+        // Simpan data lama untuk log
+        $oldStatus = $laporan->status;
+        $oldTanggapan = $laporan->tanggapan;
 
         // Update data laporan
-        $laporan->update([
-            'status' => $request->status,
-            'tanggapan' => $request->tanggapan,
-        ]);
+        $laporan->update($request->only(['status', 'tanggapan']));
 
-        // Log pembaruan data
-        logger('Laporan #'.$laporan->nomor_tiket.' diperbarui oleh '.auth('admin')->user()->username, [
-            'old_data' => $oldData,
-            'updated_data' => $laporan->toArray(),
-            'updated_by' => auth('admin')->user()->username
-        ]);
+        // Cek apakah status berubah dan log perubahan status
+        if ($laporan->wasChanged('status')) {
+            Log::create([
+                'laporan_id' => $laporan->id,
+                'activity' => 'Status diperbarui menjadi "' . $laporan->status . '"',
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+        }
 
-        // Menyimpan log aktivitas
-        Log::create([
-            'laporan_id' => $laporan->id,
-            'activity' => 'Laporan diperbarui oleh ' . auth('admin')->user()->nama,
-            'user_id' => auth('admin')->user()->id_admins,
-        ]);
+        // Cek apakah tanggapan berubah dan log perubahan tanggapan
+        if ($laporan->wasChanged('tanggapan')) {
+            Log::create([
+                'laporan_id' => $laporan->id,
+                'activity' => 'Tanggapan diperbarui menjadi "' . $laporan->tanggapan . '"',
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+        }
 
         // Mengambil ID analis yang ditugaskan pada laporan ini
         $assignments = Assignment::where('laporan_id', $laporan->id)->get();
@@ -689,7 +749,7 @@ class laporanAdmin extends Controller
         $pdf = Pdf::loadView('admin.laporan.tandaterima', $data);
 
         // Tambahkan watermark jika diperlukan
-        $pdf->setPaper('A5', 'landscape');
+        $pdf->setPaper('A4', 'portrait');
 
         // Download file PDF
         return $pdf->download('Tanda_Terima_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
