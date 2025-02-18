@@ -72,38 +72,40 @@
                             @if($data->dokumen_tambahan)
                                 <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
                             @endif  
+
+                            <!-- Tampilkan semua dokumen terkait dari tabel dokumens -->
+                            @foreach ($data->dokumens as $dokumen)
+                                <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
+                            @endforeach
                         </div>  
-                        @elseif($data->sumber_pengaduan === 'tatap muka')  
-                            <!-- Jika sumber pengaduan adalah Tatap Muka -->  
-                            <div>  
-                                <!-- Cek apakah ada dokumen yang disimpan di field dokumen_pendukung -->
+                        @elseif($data->sumber_pengaduan === 'tatap muka')
+                            <!-- Jika sumber pengaduan adalah Tatap Muka -->
+                            <div>
+                                <!-- Selalu tampilkan dokumen_pendukung jika ada, baik itu URL maupun file lokal -->
                                 @if (!empty($data->dokumen_pendukung))
-                                    <!-- Cek jika dokumen_pendukung adalah URL atau path lokal -->
                                     @if (filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
                                         <!-- Jika dokumen_pendukung adalah URL, tampilkan sebagai link -->
-                                        <a href="{{ $data->dokumen_pendukung }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
+                                        <a href="{{ $data->dokumen_pendukung }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan di Scloud</span></a>
                                     @else
                                         <!-- Jika dokumen_pendukung adalah file lokal, tampilkan menggunakan asset -->
                                         <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
                                     @endif
-                                @else
-                                    <!-- Jika tidak ada, tampilkan semua dokumen dari tabel dokumens -->
-                                    @forelse ($data->dokumens as $dokumen)
-                                        <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
-                                    @empty
-                                        <span class="badge bg-primary">Tidak ada Dokumen Pengaduan</span>
-                                    @endforelse
                                 @endif
+
+                                <!-- Tampilkan semua dokumen terkait dari tabel dokumens -->
+                                @foreach ($data->dokumens as $dokumen)
+                                    <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
+                                @endforeach
 
                                 <!-- Menampilkan dokumen tambahan jika ada -->
                                 @if($data->dokumen_tambahan)
                                     <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
                                 @endif
-                            </div>  
+                            </div>
                         @else
-                            <!-- Jika sumber pengaduan tidak diketahui -->  
-                            <p>Sumber pengaduan tidak valid</p>  
-                        @endif  
+                            <!-- Jika sumber pengaduan tidak diketahui -->
+                            <p>Sumber pengaduan tidak valid</p>
+                    @endif
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Laporan:</p>
@@ -184,7 +186,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="email" class="form-label fw-bold">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="{{ $data->email ?? 'Tidak diisi' }}">
+                                <input type="email" class="form-control" id="email" name="email" value="{{ $data->email }}">
                             </div>
                             <div class="col-md-6">
                                 <label for="nomor_pengadu" class="form-label fw-bold">Nomor Pengadu</label>

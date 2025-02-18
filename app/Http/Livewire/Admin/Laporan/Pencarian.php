@@ -26,6 +26,7 @@ class Pencarian extends Component
                                ->orWhere('detail', 'like', $searchTerm)
                                ->orWhere('nama_lengkap', 'like', $searchTerm)
                                ->orWhere('nik', 'like', $searchTerm)
+                               ->orWhere('nomor_tiket', 'like', $searchTerm)
                                ->get();
         }
 
