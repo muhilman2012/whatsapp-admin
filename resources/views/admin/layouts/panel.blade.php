@@ -283,6 +283,24 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pengecekan sesi setiap 5 menit
+            setInterval(function() {
+                fetch('{{ route('admin.check-session') }}')
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.session_active) {
+                        alert('Sesi Anda telah habis, silakan login kembali.');
+                        window.location.href = '{{ route('admin.login') }}'; // Redirect ke halaman login
+                    }
+                })
+                .catch(error => console.error('Error checking session:', error));
+            }, 300000); // 300000 milliseconds = 5 minutes
+        });
+    </script>
 </body>
 
 </html>

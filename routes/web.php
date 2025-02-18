@@ -26,6 +26,12 @@ use App\Http\Controllers\auth\authAdmin;
 // Admin Routing
 Route::get('/', [authAdmin::class, 'login'])->name('admin.login');
 Route::post('/store', [authAdmin::class, 'loginPost'])->name('admin.login.store');
+Route::get('/check-session', function () {
+    if (!auth('admin')->check()) {
+        return response()->json(['session_active' => false], 401); // Sesi tidak aktif
+    }
+    return response()->json(['session_active' => true]); // Sesi aktif
+})->name('admin.check-session');
 
 // Group routes untuk admin, deputi, asdep, dan analis
 Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
