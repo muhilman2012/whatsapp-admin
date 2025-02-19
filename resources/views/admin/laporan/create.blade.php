@@ -306,7 +306,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Maaf..',
-                text: 'Terjadi kesalahan saat menyimpan Laporan.',
+                text: 'Mohon Periksa ulang kolom Pengaduan.',
             });
         });
     });

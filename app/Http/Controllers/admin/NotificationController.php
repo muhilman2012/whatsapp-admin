@@ -59,4 +59,14 @@ class NotificationController extends Controller
 
         return response()->json(['success' => false, 'message' => 'Notifikasi tidak ditemukan atau tidak berhak'], 403);
     }
+
+    public function markAllAsRead()
+    {
+        $user = auth('admin')->user();
+
+        // Meng-update semua notifikasi yang belum dibaca menjadi sudah dibaca
+        $user->notifications()->where('is_read', false)->update(['is_read' => true]);
+
+        return response()->json(['success' => true]);
+    }
 }

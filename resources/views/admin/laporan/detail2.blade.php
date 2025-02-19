@@ -7,8 +7,9 @@
 @section('pages')
 <div class="container-fluid">
     <div class="d-block rounded bg-white shadow">
-        <div class="p-3 border-bottom">
-            <p class="fs-4 fw-bold mb-0">Detail Pengaduan</p>
+        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+            <p class="fs-4 fw-bold mb-0">Detail Data Pengaduan</p>
+            <p class="text-muted" style="font-size: 1rem;">Waktu Pengaduan : {{ $data->created_at->format('d M Y, H:i') }} - {{ $data->sumber_pengaduan }}</p>
         </div>
         <div class="d-block p-3">
             <div class="mb-3 row">
@@ -120,7 +121,6 @@
                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editPengaduanModal">
                     Ubah Data
                 </button>
-                <button class="btn btn-secondary" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
             </div>
         </div>
     </div>

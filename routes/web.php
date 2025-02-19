@@ -67,6 +67,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/dashboard/notifications/role-based', [NotificationController::class, 'roleBasedNotifications']);
         // Rute untuk menandai notifikasi sebagai sudah dibaca
         Route::post('/dashboard/notifications/mark-as-read', [NotificationController::class, 'markAsRead']);
+        // Route untuk menandai semua notifikasi sebagai sudah dibaca
+        Route::post('/dashboard/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
     });
 
     // Export/Import untuk Admin, Deputi, dan Asdep

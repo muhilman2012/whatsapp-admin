@@ -20,6 +20,15 @@
     <link rel="stylesheet" href="{{ url('/assets/dist/css/animated.css') }}">
     <link rel="stylesheet" href="{{ url('/assets/dist/css/admin/panel.css') }}">
     @livewireStyles
+    <style>
+        #mark-all-read {
+            font-size: 12px; /* Mengatur ukuran font */
+            color: #007bff; /* Warna teks, sesuaikan dengan tema Anda */
+            font-weight: normal; /* Mengatur ketebalan font */
+            margin-top: 5px; /* Menambahkan sedikit ruang di atas teks */
+            margin-left: 85px; /* Menambahkan sedikit ruang di sebelah kiri teks */
+        }
+    </style>
 </head>
 
 <body>
@@ -39,7 +48,8 @@
                         <div class="dropdown-menu mt-2 pt-0" aria-labelledby="navbarDropdown" id="notification-dropdown">  
                             <div class="d-flex p-3 border-bottom align-items-center mb-2">
                                 <i class="fa fa-bell me-3" aria-hidden="true"></i>  
-                                <span class="fw-bold lh-1">Notifikasi</span>  
+                                <span class="fw-bold lh-1">Notifikasi</span>
+                                <a href="#" id="mark-all-read" class="d-block text-small text-decoration-none">Tandai Semua<br>Sudah Dibaca</a>
                             </div>  
                             <div id="notification-list" style="max-height: 300px; overflow-y: auto;">  
                                 <!-- Notifications will be loaded here -->  
@@ -50,8 +60,7 @@
                         </div>  
                     </li>
                     <li class="nav-item dropstart">
-                        <a class="nav-link text-dark ps-3 pe-1" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown">
+                        <a class="nav-link text-dark ps-3 pe-1" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
                             @if (auth('admin')->user()->avatar == 'sample-images.png')
                             <img src="{{ url('images/avatar/' . auth('admin')->user()->avatar) }}"
                                 alt="{{auth('admin')->user()->username}}" class="img-user" width="64px" height="64px">
@@ -281,6 +290,23 @@
                     console.error('Error:', error);
                 }
             }
+        });
+
+        document.getElementById('mark-all-read').addEventListener('click', function() {
+            fetch('{{ route('notifications.markAllAsRead') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    window.location.reload();  // Refresh halaman setelah berhasil
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
     </script>
     <script>
