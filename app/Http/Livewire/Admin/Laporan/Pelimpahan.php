@@ -224,9 +224,14 @@ class Pelimpahan extends Component
             $data->where('sumber_pengaduan', $this->sumber_pengaduan);
         }
         
-        // Filter berdasarkan disposisi dan disposisi_terbaru  
-        $data->whereNotNull('disposisi')  
-             ->whereNotNull('disposisi_terbaru'); 
+        // Filter berdasarkan disposisi dan disposisi_terbaru
+        $data->where(function ($query) {
+            $query->whereNotNull('disposisi_terbaru')
+                ->orWhere(function($q) {
+                    $q->whereNotNull('disposisi')
+                        ->whereNotNull('disposisi_terbaru');
+                });
+        });
 
         // Urutkan data berdasarkan status
         $data->orderByRaw("

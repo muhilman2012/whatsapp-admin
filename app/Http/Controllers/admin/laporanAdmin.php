@@ -232,6 +232,13 @@ class laporanAdmin extends Controller
             ->where('nomor_tiket', $nomor_tiket)
             ->firstOrFail();
 
+        $namaDeputi = [
+            'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
+            'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
+            'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
+            'deputi_4' => 'Deputi Bidang Administrasi',
+        ];
+
         // Mendapatkan penugasan terakhir untuk laporan ini
         $latestAssignment = $data->assignments->last(); // Diasumsikan Anda ingin penugasan terakhir
 
@@ -240,7 +247,7 @@ class laporanAdmin extends Controller
         // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
         $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
 
-        return view('admin.laporan.detail2', compact('data', 'dokumen', 'latestAssignment', 'logs'));
+        return view('admin.laporan.detail2', compact('data', 'namaDeputi', 'dokumen', 'latestAssignment', 'logs'));
     }
 
     public function ubah(Request $request, $nomor_tiket)
