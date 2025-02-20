@@ -9,7 +9,7 @@
     <div class="d-block rounded bg-white shadow">
         <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
             <p class="fs-4 fw-bold mb-0">Detail Data Pengaduan</p>
-            <p class="text-muted" style="font-size: 1rem;">Waktu Pengaduan : {{ $data->created_at->format('d M Y, H:i') }} - {{ $data->sumber_pengaduan }}</p>
+            <p class="text-muted" style="font-size: 1rem;">Waktu Pengaduan : {{ $data->created_at->format('d M Y, H:i') }} <span class="badge bg-primary">{{ $data->sumber_pengaduan }}</span></p>
         </div>
         <div class="d-block p-3">
             <div class="mb-3 row">
@@ -38,7 +38,7 @@
                     <p>{{ $data->tanggal_kejadian ? $data->tanggal_kejadian->format('d-m-Y') : 'Tidak diisi' }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Judul Laporan:</p>
+                    <p class="text-label fw-bold mb-1">Kategori dan Judul Laporan: <span class="badge bg-primary">{{ $data->kategori }}</span></p>
                     <p>{{ $data->judul }}</p>
                 </div>
                 <div class="col-md-6">
@@ -84,9 +84,11 @@
                             <div>
                                 <!-- Selalu tampilkan dokumen_pendukung jika ada, baik itu URL maupun file lokal -->
                                 @if (!empty($data->dokumen_pendukung))
-                                    @if (filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
-                                        <!-- Jika dokumen_pendukung adalah URL, tampilkan sebagai link -->
-                                        <a href="{{ $data->dokumen_pendukung }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan di Scloud</span></a>
+                                    <!-- Jika dokumen_pendukung adalah URL, tampilkan sebagai link yang memicu modal -->
+                                    @if(filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#viewDocumentModal">
+                                            <span class="badge bg-primary">Lihat Dokumen Pengaduan di Scloud</span>
+                                        </a>
                                     @else
                                         <!-- Jika dokumen_pendukung adalah file lokal, tampilkan menggunakan asset -->
                                         <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
@@ -229,4 +231,44 @@
         </form>
     </div>
 </div>
+<!-- Modal untuk melihat dokumen di Scloud -->
+<div class="modal fade" id="viewDocumentModal" tabindex="-1" aria-labelledby="viewDocumentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewDocumentModalLabel">Dokumen Pengaduan di Scloud</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Anda dapat mengklik tombol di bawah ini untuk membuka dokumen di tab baru, atau copy link berikut untuk membuka secara manual jika ada kendala.</p>
+                <textarea readonly class="form-control mb-2">{{ $data->dokumen_pendukung }}</textarea>
+                <a href="{{ $data->dokumen_pendukung }}" target="_blank" class="btn btn-primary">Buka Dokumen</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
+@section('script')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyTextareaBtn = document.querySelector('#copyTextBtn');
+
+        copyTextareaBtn.addEventListener('click', function(event) {
+            const copyTextarea = document.querySelector('.link-textarea');
+            copyTextarea.select();
+            try {
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Copying text command was ' + msg);
+                alert('Link telah disalin!');
+            } catch (err) {
+                console.log('Oops, unable to copy');
+            }
+        });
+    });
+</script>
 @endsection
