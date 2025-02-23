@@ -48,34 +48,34 @@ class indexAdmin extends Controller
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
 
-        // Jika pengguna adalah superadmin atau admin, hitung semua laporan
         if (in_array($admin->role, ['superadmin', 'admin'])) {
+            // Jika pengguna adalah superadmin atau admin, hitung semua laporan
             $totalLaporan = $totalLaporanQuery->count();
         } elseif ($admin->role === 'analis') {
             // Jika pengguna adalah analis, hitung laporan yang di-assign ke mereka
             $totalLaporan = $totalLaporanQuery->whereHas('assignments', function ($query) use ($admin) {
-                $query->where('analis_id', $admin->id_admins); // Filter berdasarkan analis yang login
+                $query->where('analis_id', $admin->id_admins);
             })->count();
         } elseif ($admin->role === 'asdep') {
             // Jika pengguna adalah asdep, hitung laporan berdasarkan kategori unit
             $kategoriByUnit = Laporan::getKategoriByUnit($admin->unit);
             $totalLaporan = $totalLaporanQuery->whereIn('kategori', $kategoriByUnit)->count();
         } else {
-            // Jika pengguna adalah deputi atau role lainnya
+            // Jika pengguna adalah deputi
             $totalLaporan = $totalLaporanQuery->where(function ($query) use ($admin) {
-                $query->where('disposisi', $admin->role)
-                    ->orWhere('disposisi_terbaru', $admin->role); // Tambahkan kondisi untuk disposisi_terbaru
+                $query->where('disposisi', $admin->role)->whereNull('disposisi_terbaru')
+                    ->orWhere('disposisi_terbaru', $admin->role);
             })->count();
         }
 
-        // Hitung laporan whatsapp dan tatap muka
+        // Query untuk whatsapp dan tatap muka harus memperhatikan disposisi dan disposisi_terbaru
         $whatsappQuery = clone $totalLaporanQuery;
         $whatsapp = $whatsappQuery->where('sumber_pengaduan', 'whatsapp')->count();
 
         $tatapMukaQuery = clone $totalLaporanQuery;
         $tatapMuka = $tatapMukaQuery->where('sumber_pengaduan', 'tatap muka')->count();
 
-        // Hitung laporan laki-laki dan perempuan
+        // Query untuk laporan laki-laki dan perempuan
         $lakiLakiQuery = clone $totalLaporanQuery;
         $lakiLaki = $lakiLakiQuery->where('jenis_kelamin', 'L')->count();
 
@@ -91,17 +91,24 @@ class indexAdmin extends Controller
             ->count();
 
         // Hitung total laporan untuk setiap deputi berdasarkan sumber pengaduan
-        $deputi1WhatsApp = Laporan::where('disposisi', 'deputi_1')->where('sumber_pengaduan', 'whatsapp')->count();  
-        $deputi1TatapMuka = Laporan::where('disposisi', 'deputi_1')->where('sumber_pengaduan', 'tatap muka')->count();  
-        
-        $deputi2WhatsApp = Laporan::where('disposisi', 'deputi_2')->where('sumber_pengaduan', 'whatsapp')->count();  
-        $deputi2TatapMuka = Laporan::where('disposisi', 'deputi_2')->where('sumber_pengaduan', 'tatap muka')->count();  
-        
-        $deputi3WhatsApp = Laporan::where('disposisi', 'deputi_3')->where('sumber_pengaduan', 'whatsapp')->count();  
-        $deputi3TatapMuka = Laporan::where('disposisi', 'deputi_3')->where('sumber_pengaduan', 'tatap muka')->count();  
-        
-        $deputi4WhatsApp = Laporan::where('disposisi', 'deputi_4')->where('sumber_pengaduan', 'whatsapp')->count();  
-        $deputi4TatapMuka = Laporan::where('disposisi', 'deputi_4')->where('sumber_pengaduan', 'tatap muka')->count();
+        $deputiRoles = ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4'];
+        foreach ($deputiRoles as $deputi) {
+            ${"{$deputi}WhatsApp"} = Laporan::where(function ($query) use ($deputi) {
+                $query->where(function ($q) use ($deputi) {
+                    $q->where('disposisi', $deputi)->whereNull('disposisi_terbaru');
+                })->orWhere(function ($q) use ($deputi) {
+                    $q->where('disposisi_terbaru', $deputi);
+                });
+            })->where('sumber_pengaduan', 'whatsapp')->count();
+
+            ${"{$deputi}TatapMuka"} = Laporan::where(function ($query) use ($deputi) {
+                $query->where(function ($q) use ($deputi) {
+                    $q->where('disposisi', $deputi)->whereNull('disposisi_terbaru');
+                })->orWhere(function ($q) use ($deputi) {
+                    $q->where('disposisi_terbaru', $deputi);
+                });
+            })->where('sumber_pengaduan', 'tatap muka')->count();
+        }
         
         // Total laporan berdasarkan role
         $totalLaporan = $totalLaporanQuery->count(); // Total laporan untuk role tertentu
@@ -236,8 +243,16 @@ class indexAdmin extends Controller
             ->when($admin->role === 'asdep', function ($query) use ($kategoriByUnit) {  
                 $query->whereIn('kategori', $kategoriByUnit); // Filter berdasarkan kategori  
             })  
+            ->when($admin->role === 'superadmin' || $admin->role === 'admin', function ($query) {
+                // Tidak perlu filter untuk superadmin atau admin
+            })  
             ->when(!in_array($admin->role, ['superadmin', 'admin', 'asdep']), function ($query) use ($admin) {  
-                $query->where('disposisi', $admin->role); // Filter data berdasarkan disposisi jika bukan superadmin, admin, atau asdep  
+                $query->where(function($q) use ($admin) {
+                    $q->where('disposisi', $admin->role)
+                    ->whereNull('disposisi_terbaru'); // Hanya hitung jika tidak ada disposisi terbaru
+                })->orWhere(function($q) use ($admin) {
+                    $q->where('disposisi_terbaru', $admin->role); // Hitung jika disposisi terbaru sesuai dengan role
+                });
             })  
             ->groupBy('tanggal')  
             ->orderBy('tanggal', 'ASC')  
@@ -272,14 +287,14 @@ class indexAdmin extends Controller
             'belumTerdisposisi' => $belumTerdisposisi,
             'totalAssignedToAnalis' => $totalAssignedToAnalis,
             'totalNotAssigned' => $totalNotAssigned,
-            'deputi1WhatsApp' => $deputi1WhatsApp,
-            'deputi1TatapMuka' => $deputi1TatapMuka,
-            'deputi2WhatsApp' => $deputi2WhatsApp,
-            'deputi2TatapMuka' => $deputi2TatapMuka,
-            'deputi3WhatsApp' => $deputi3WhatsApp,
-            'deputi3TatapMuka' => $deputi3TatapMuka,
-            'deputi4WhatsApp' => $deputi4WhatsApp,
-            'deputi4TatapMuka' => $deputi4TatapMuka,
+            'deputi_1WhatsApp' => $deputi_1WhatsApp,
+            'deputi_1TatapMuka' => $deputi_1TatapMuka,
+            'deputi_2WhatsApp' => $deputi_2WhatsApp,
+            'deputi_2TatapMuka' => $deputi_2TatapMuka,
+            'deputi_3WhatsApp' => $deputi_3WhatsApp,
+            'deputi_3TatapMuka' => $deputi_3TatapMuka,
+            'deputi_4WhatsApp' => $deputi_4WhatsApp,
+            'deputi_4TatapMuka' => $deputi_4TatapMuka,
             'laporanHarian' => $laporanHarian,
             'provinsiData' => $provinsiData,
             'judulFrequencies' => $judulFrequencies,

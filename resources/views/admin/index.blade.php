@@ -80,38 +80,6 @@
                     </div>
                 </div>
 
-                <!-- Cards Deputi 1-4 untuk Admin -->
-                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
-                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                    <div class="card border-0 p-2 shadow-sm">
-                        <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-newspaper fa-3x"></i>
-                            <div class="card-body text-end">
-                                <p class="card-title mb-0">WA: {{ $deputi1WhatsApp }}</p>
-                                <p class="card-title mb-0">TM: {{ $deputi1TatapMuka }}</p>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Deputi 1</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-                    <div class="card border-0 p-2 shadow-sm">
-                        <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-newspaper fa-3x"></i>
-                            <div class="card-body text-end">
-                                <p class="card-title mb-0">WA: {{ $deputi2WhatsApp }}</p>
-                                <p class="card-title mb-0">TM: {{ $deputi2TatapMuka }}</p>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-white px-1">
-                            <small class="text-start fw-bold">Deputi 2</small>
-                        </div>
-                    </div>
-                </div>
-                @endif
-
                 @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
                 <!-- Jumlah Aduan yang Terdisposisi -->
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
@@ -141,14 +109,44 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
+                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">WA: {{ $deputi3WhatsApp }}</p>
-                                <p class="card-title mb-0">TM: {{ $deputi3TatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $deputi_1WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi_1TatapMuka }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Deputi 1</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-newspaper fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title mb-0">WA: {{ $deputi_2WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi_2TatapMuka }}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white px-1">
+                            <small class="text-start fw-bold">Deputi 2</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+                    <div class="card border-0 p-2 shadow-sm">
+                        <div class="d-flex align-items-center px-2">
+                            <i class="fas fa-newspaper fa-3x"></i>
+                            <div class="card-body text-end">
+                                <p class="card-title mb-0">WA: {{ $deputi_3WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi_3TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -161,8 +159,8 @@
                         <div class="d-flex align-items-center px-2">
                             <i class="fas fa-newspaper fa-3x"></i>
                             <div class="card-body text-end">
-                                <p class="card-title mb-0">WA: {{ $deputi4WhatsApp }}</p>
-                                <p class="card-title mb-0">TM: {{ $deputi4TatapMuka }}</p>
+                                <p class="card-title mb-0">WA: {{ $deputi_4WhatsApp }}</p>
+                                <p class="card-title mb-0">TM: {{ $deputi_4TatapMuka }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">

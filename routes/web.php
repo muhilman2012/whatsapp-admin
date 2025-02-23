@@ -58,6 +58,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/dashboard/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
         Route::get('/dashboard/laporan/{nomor_tiket}/downloadtandaterima', [laporanAdmin::class, 'tandaterimaPDF'])->name('admin.laporan.tandaterima');
         Route::put('/laporan/{nomorTiket}/approval', [laporanAdmin::class, 'approval'])->name('admin.laporan.approval');
+        Route::get('/laporan/laporan-harian', [laporanAdmin::class, 'laphar'])->name('admin.laporan.laphar');
+        Route::post('/laporan/laporan-harian/export-single', [laporanAdmin::class, 'exportSingle'])->name('admin.laporan.laphar.exportSingle');
+        Route::post('/laporan/laporan-harian/export-range', [laporanAdmin::class, 'exportRange'])->name('admin.laporan.laphar.exportRange');
 
         // Assign to Analis
         Route::post('/dashboard/laporan/assign', [laporanAdmin::class, 'assignToAnalis'])->name('admin.laporan.assign');

@@ -135,6 +135,11 @@
                     <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'pencarian']) }}">
                         <i class="fas fa-search box-icon text-center"></i>Pencarian
                     </a>
+                    @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
+                    <a class="nav-link px-3" href="{{ route('admin.laporan.laphar') }}">
+                        <i class="fas fa-file-export box-icon" aria-hidden="true"></i>Ekspor Laporan Harian
+                    </a>
+                    @endif
                     @if (auth('admin')->user()->role === 'superadmin')
                     <hr class="soft my-1 text-white">
                     <a class="nav-link px-3" href="{{ route('admin.user_management.index') }}">

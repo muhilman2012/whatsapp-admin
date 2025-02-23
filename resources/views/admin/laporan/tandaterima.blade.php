@@ -29,7 +29,7 @@
         }
         .watermark {
             position: fixed;
-            top: 16%;
+            top: 35%;
             left: 13%;
             opacity: 0.1;
             z-index: -1;

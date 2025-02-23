@@ -18,6 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class laporanAdmin extends Controller
 {
@@ -739,7 +740,7 @@ class laporanAdmin extends Controller
         $pdf->setPaper('A4', 'portrait');
 
         // Download file PDF
-        return $pdf->download('Tanda_Terima_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
+        return $pdf->download('Tanda_Terima_Pengaduan_untuk_K/L/D_' . $laporan->nomor_tiket . '.pdf');
     }
 
     public function tandaterimaPDF($nomor_tiket)
@@ -756,10 +757,10 @@ class laporanAdmin extends Controller
         $pdf = Pdf::loadView('admin.laporan.tandaterima', $data);
 
         // Tambahkan watermark jika diperlukan
-        $pdf->setPaper('A4', 'portrait');
+        $pdf->setPaper('A5', 'landscape');
 
         // Download file PDF
-        return $pdf->download('Tanda_Terima_Pengaduan_' . $laporan->nomor_tiket . '.pdf');
+        return $pdf->download('Tanda_Terima_untuk_Pengadu_' . $laporan->nomor_tiket . '.pdf');
     }
 
     public function approval(Request $request, $nomorTiket)
@@ -839,4 +840,51 @@ class laporanAdmin extends Controller
         'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
         'deputi_4' => 'Deputi Bidang Administrasi',
     ];
+
+    public function laphar()
+    {
+        // Menampilkan view untuk membuat laporan harian
+        return view('admin.laporan.laphar');
+    }
+
+    public function exportSingle(Request $request)
+    {
+        // Menghandle single date export
+        $date = $request->date;
+        return $this->exportReports($date, $date);
+    }
+
+    public function exportRange(Request $request)
+    {
+        // Menghandle range date export
+        $fromDate = $request->from_date;
+        $toDate = $request->to_date;
+        return $this->exportReports($fromDate, $toDate);
+    }
+
+    private function exportReports($startDate, $endDate)
+    {
+        $formattedStartDate = Carbon::parse($startDate)->format('d-m-Y');
+        $formattedEndDate = Carbon::parse($endDate)->format('d-m-Y');
+
+        // Mengambil data berdasarkan range tanggal
+        $reports = Laporan::whereDate('created_at', '>=', $startDate)
+                        ->whereDate('created_at', '<=', $endDate)
+                        ->get();
+
+        // Memformat data untuk disertakan dalam PDF
+        $data = [
+            'reports' => $reports,
+            'startDate' => $formattedStartDate,
+            'endDate' => $formattedEndDate
+        ];
+
+        // Membuat PDF
+        $pdf = PDF::loadView('admin.laporan.export.laphar', $data)
+                ->setPaper('a4', 'landscape');  // Set orientasi landscape
+
+        // Menyimpan PDF dengan nama yang mencakup tanggal
+        $fileName = 'laporan-' . ($formattedStartDate == $formattedEndDate ? $formattedStartDate : $formattedStartDate . '-to-' . $formattedEndDate) . '.pdf';
+        return $pdf->download($fileName);
+    }
 }
