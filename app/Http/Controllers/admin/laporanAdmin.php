@@ -851,7 +851,8 @@ class laporanAdmin extends Controller
     {
         // Menghandle single date export
         $date = $request->date;
-        return $this->exportReports($date, $date);
+        $source = $request->source;
+        return $this->exportReports($date, $date, $source);
     }
 
     public function exportRange(Request $request)
@@ -859,18 +860,24 @@ class laporanAdmin extends Controller
         // Menghandle range date export
         $fromDate = $request->from_date;
         $toDate = $request->to_date;
-        return $this->exportReports($fromDate, $toDate);
+        $source = $request->source;
+        return $this->exportReports($fromDate, $toDate, $source);
     }
 
-    private function exportReports($startDate, $endDate)
+    private function exportReports($startDate, $endDate, $source)
     {
         $formattedStartDate = Carbon::parse($startDate)->format('d-m-Y');
         $formattedEndDate = Carbon::parse($endDate)->format('d-m-Y');
 
-        // Mengambil data berdasarkan range tanggal
-        $reports = Laporan::whereDate('created_at', '>=', $startDate)
-                        ->whereDate('created_at', '<=', $endDate)
-                        ->get();
+        $query = Laporan::whereDate('created_at', '>=', $startDate)
+                        ->whereDate('created_at', '<=', $endDate);
+
+        // Menambahkan filter berdasarkan sumber pengaduan
+        if ($source !== 'all') {
+            $query->where('sumber_pengaduan', $source);
+        }
+
+        $reports = $query->get();
 
         // Memformat data untuk disertakan dalam PDF
         $data = [
@@ -881,10 +888,10 @@ class laporanAdmin extends Controller
 
         // Membuat PDF
         $pdf = PDF::loadView('admin.laporan.export.laphar', $data)
-                ->setPaper('a4', 'landscape');  // Set orientasi landscape
+                ->setPaper('a4', 'landscape'); // Set orientasi landscape
 
-        // Menyimpan PDF dengan nama yang mencakup tanggal
-        $fileName = 'laporan-' . ($formattedStartDate == $formattedEndDate ? $formattedStartDate : $formattedStartDate . '-to-' . $formattedEndDate) . '.pdf';
+        // Menyimpan PDF dengan nama yang mencakup tanggal dan sumber pengaduan
+        $fileName = 'laporan-' . ($formattedStartDate == $formattedEndDate ? $formattedStartDate : $formattedStartDate . '-to-' . $formattedEndDate) . '-' . $source . '.pdf';
         return $pdf->download($fileName);
     }
 }
