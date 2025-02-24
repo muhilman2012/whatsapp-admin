@@ -740,7 +740,7 @@ class laporanAdmin extends Controller
         $pdf->setPaper('A4', 'portrait');
 
         // Download file PDF
-        return $pdf->download('Tanda_Terima_Pengaduan_untuk_K/L/D_' . $laporan->nomor_tiket . '.pdf');
+        return $pdf->download('Tanda_Terima_Pengaduan_untuk_KLD_' . $laporan->nomor_tiket . '.pdf');
     }
 
     public function tandaterimaPDF($nomor_tiket)
