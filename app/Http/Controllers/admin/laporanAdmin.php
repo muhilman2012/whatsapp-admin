@@ -425,18 +425,18 @@ class laporanAdmin extends Controller
                 // Menyimpan log aktivitas
                 Log::create([
                     'laporan_id' => $laporan->id,
-                    'activity' => 'Pengaduan diteruskan ke instansi tujuan oleh ' . auth('admin')->user()->nama,
+                    'activity' => 'Pengaduan diteruskan ke instansi tujuan',
                     'user_id' => auth('admin')->user()->id_admins,
                 ]);
 
                 // Kirim notifikasi kepada pengguna
-                Notification::create([
-                    'assigner_id' => auth('admin')->user()->id_admins,
-                    'assignee_id' => auth('admin')->user()->id_admins,
-                    'laporan_id' => $laporan->id,
-                    'message' => 'Pengaduan Anda berhasil diteruskan ke instansi tujuan',
-                    'is_read' => false
-                ]);
+                // Notification::create([
+                //     'assigner_id' => auth('admin')->user()->id_admins,
+                //     'assignee_id' => auth('admin')->user()->id_admins,
+                //     'laporan_id' => $laporan->id,
+                //     'message' => 'Pengaduan Anda berhasil diteruskan ke instansi tujuan',
+                //     'is_read' => false
+                // ]);
 
                 return back()->with('success', 'Pengaduan berhasil diteruskan ke instansi tujuan.');
             } else {
@@ -447,133 +447,121 @@ class laporanAdmin extends Controller
         }
     }
 
+    private function uploadDocuments($laporan)
+    {
+        $dokumenIds = [];
+        $dokumens = Dokumen::where('laporan_id', $laporan->id)->get();
+
+        foreach ($dokumens as $dokumen) {
+            $filePath = storage_path('storage/dokumen/' . $dokumen->filename);
+
+            if (file_exists($filePath)) {
+                $fileContent = file_get_contents($filePath);
+
+                $response = Http::withHeaders([
+                    'auth' => 'Bearer $2y$10$hBmSeCgYycf5/ldf3dfrReuImJgooIDTPTOdFzPFSPtl70LT6QPgO',
+                    'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
+                    'Content-Type' => 'application/json'
+                ])->post('https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint/file', [
+                    'attachments' => base64_encode($fileContent)
+                ]);
+
+                if ($response->successful()) {
+                    $responseData = $response->json();
+                    $dokumenIds[] = $responseData['results']['docs'][0]['id'];
+
+                    // Menyimpan log aktivitas untuk setiap dokument yang berhasil diunggah
+                    Log::create([
+                        'laporan_id' => $laporan->id,
+                        'activity' => 'Dokumen berhasil diunggah dengan ID: ' . $responseData['results']['docs'][0]['id'],
+                        'user_id' => auth('admin')->user()->id_admins,
+                    ]);
+                } else {
+                    logger()->error('Gagal mengunggah dokumen: ' . $dokumen->filename, [
+                        'error' => $response->body()
+                    ]);
+                }
+            } else {
+                logger()->error('File tidak ditemukan: ' . $filePath);
+            }
+        }
+        
+        return $dokumenIds;
+    }
+
     private function sendToApi($laporan)
     {
-        // Konfigurasi API eksternal Production
-        // $url = 'https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint';
-        // $authToken = '$2y$10$FAuB2fWJIJD/WcWoNOK5eukwca4TH.VUDUAbiateNlrci2e0QNgKG';
-        // $token = '{9VV7PWYE-G1IA-6UQP-HEMK-ONOCILDSC7WP}';
+        $uploadedDocumentIds = $this->uploadDocuments($laporan);
+        $attachments = implode(',', $uploadedDocumentIds);
 
-        // Konfigurasi API eksternal Development
-        $url = 'https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint';
-        $authToken = '$2y$10$zUVBCgRxSDnAa5uMMdLZ5Ohz0dSreTiDrF.SxG7apFewcVrP/Sfom';
-        $token = '{Z6BTTJ18-OFMK-LZ4U-ZAAG-JAAWOB1DVW8P}';
-    
-        // Siapkan data yang akan dikirim    
-        $data = [    
-            'title' => $laporan->judul,    
-            'content' =>"Nomor Tiket pada Aplikasi LMW: " . $laporan->nomor_tiket .
-                        " , Nama Lengkap: " . $laporan->nama_lengkap .   
+        $data = [
+            'title' => $laporan->judul,
+            'content' => "Nomor Tiket pada Aplikasi LMW: " . $laporan->nomor_tiket .
+                        " , Nama Lengkap: " . $laporan->nama_lengkap .
                         " , NIK: " . $laporan->nik .
-                        " , Alamat Lengkap: " . $laporan->alamat_lengkap .  
-                        " , Detail Laporan: " . $laporan->detail .  
-                        " , Lokasi: " . $laporan->lokasi .
-                        " , Dokumen KTP: " . $laporan->dokumen_ktp .  
-                        " , Dokumen KK: " . $laporan->dokumen_kk .  
-                        " , Dokumen Kuasa: " . $laporan->dokumen_skuasa .  
-                        " , Dokumen Pendukung: " . $laporan->dokumen_pendukung,    
+                        " , Alamat Lengkap: " . $laporan->alamat_lengkap .
+                        " , Detail Laporan: " . $laporan->detail .
+                        " , Lokasi: " . $laporan->lokasi,
             'channel' => 13,
             'is_new_user_slider' => false,
             'user_id' => 5218120,
-            // 'emailUser' => $laporan->email,
-            // 'nameUser' => $laporan->nama_lengkap,
-            // 'phoneUser' => $laporan->nomor_pengadu,
             'is_disposisi_slider' => true,
             'classification_id' => 6,
             'disposition_id' => 151345,
-            'category_id' => 436, //apakah boleh bebas
+            'category_id' => 436,
             'priority_program_id' => null,
-            'location_id' => 34, //apakah boleh bebas (34 Nasional)
-            'community_id' => null, //apakah boleh bebas
+            'location_id' => 34,
+            'community_id' => null,
             'date_of_incident' => $laporan->tanggal_kejadian,
-            'copy_externals' => null, // Apakah ini harus?
-            'info_disposition' => 'Ini keterangan disposisi.', 
+            'copy_externals' => null,
+            'info_disposition' => '-',
             'info_attachments' => '[66]',
-            'tags_raw' => '#pengaduanwhatsapp', //apakah boleh bebas
+            'tags_raw' => '#lapormaswapres',
             'is_approval' => true,
             'is_anonymous' => true,
             'is_secret' => true,
             'is_priority' => true,
-            'attachments' => '[4199656]',
+            'attachments' => "[$attachments]",
         ];
-    
-        try {
-            // Kirim permintaan POST ke API eksternal
-            $response = Http::withHeaders([
-                'auth' => 'Bearer ' . $authToken,
-                'token' => $token,
-                'Content-Type' => 'application/json',
-            ])->post($url, $data);
-    
-            // Periksa apakah respons berhasil
-            if ($response->successful()) {
-                $responseData = $response->json();
 
-                // Tangani jika API mengembalikan error
-                logger()->info('Mengirim Data ke API External Berhasil.', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
+        $response = Http::withHeaders([
+            'auth' => 'Bearer $2y$10$hBmSeCgYycf5/ldf3dfrReuImJgooIDTPTOdFzPFSPtl70LT6QPgO',
+            'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
+            'Content-Type' => 'application/json'
+        ])->post('https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint', $data);
 
-                // Menyimpan log aktivitas
-                Log::create([
-                    'laporan_id' => $laporan->id,
-                    'activity' => 'Pengaduan dikirim ke Lapor oleh ' . auth('admin')->user()->nama,
-                    'user_id' => auth('admin')->user()->id_admins,
-                ]);
+        if ($response->successful()) {
+            $responseData = $response->json();
 
-                return [
-                    'success' => true,
-                    'data' => $responseData,
-                ];
-            } else {
-                // Tangani jika API mengembalikan error
-                logger()->info('API eksternal mengembalikan error.', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
-                ]);
-    
-                return [
-                    'success' => false,
-                    'error' => $response->body(),
-                ];
-            }
-        } catch (\Exception $e) {
-            // Tangani jika ada kesalahan saat mengirim permintaan
-            logger()->info('Terjadi kesalahan saat mengirim data ke API eksternal.', [
-                'exception' => $e->getMessage(),
+            // Log aktivitas jika pengaduan berhasil dikirim
+            Log::create([
+                'laporan_id' => $laporan->id,
+                'activity' => 'Pengaduan berhasil dikirim ke LAPOR! dengan ID: ' . $responseData['data']['complaint_id'],
+                'user_id' => auth('admin')->user()->id_admins,
             ]);
-    
-            return [
-                'success' => false,
-                'error' => $e->getMessage(),
-            ];
+
+            return ['success' => true, 'data' => $responseData];
+        } else {
+            // Log aktivitas jika pengaduan gagal dikirim
+            Log::create([
+                'laporan_id' => $laporan->id,
+                'activity' => 'Gagal mengirim pengaduan ke LAPOR!',
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+
+            return ['success' => false, 'error' => $response->body()];
         }
     }
 
     private function sendRejectRequest($apiTicketNumber, $institution, $reason)
     {
-        // Endpoint API untuk reject Prod
-        // $url = "https://api-splp.layanan.go.id/lapor/3.0.0/complaints/process/{$apiTicketNumber}/reject";
-
-        // Endpoint API untuk reject Dev
-        $url = "https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/process/{$apiTicketNumber}/reject";
-
-        // Header autentikasi Prod
-        // $headers = [
-        //     'auth' => 'Bearer $2y$10$FAuB2fWJIJD/WcWoNOK5eukwca4TH.VUDUAbiateNlrci2e0QNgKG',
-        //     'token' => '{9VV7PWYE-G1IA-6UQP-HEMK-ONOCILDSC7WP}',
-        //     'Content-Type' => 'application/json'
-        // ];
-
-        // Header autentikasi Dev
+        $url = "https://api-splp.layanan.go.id/lapor/3.0.0/complaints/process/{$apiTicketNumber}/reject";
         $headers = [
-            'auth' => 'Bearer $2y$10$zUVBCgRxSDnAa5uMMdLZ5Ohz0dSreTiDrF.SxG7apFewcVrP/Sfom',
-            'token' => '{Z6BTTJ18-OFMK-LZ4U-ZAAG-JAAWOB1DVW8P}',
+            'auth' => 'Bearer $2y$10$hBmSeCgYycf5/ldf3dfrReuImJgooIDTPTOdFzPFSPtl70LT6QPgO',
+            'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
             'Content-Type' => 'application/json'
         ];
 
-        // Body request
         $data = [
             'is_request' => 1,
             'reason' => $institution,
@@ -581,7 +569,6 @@ class laporanAdmin extends Controller
             'not_authority' => 1
         ];
 
-        // Kirim permintaan POST ke API
         $response = Http::withHeaders($headers)->post($url, $data);
 
         if ($response->successful()) {

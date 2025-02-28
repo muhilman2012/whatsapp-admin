@@ -35,11 +35,7 @@
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Nama Lengkap:</p>
-                    <p>{{ $data->nama_lengkap }}
-                        <button type="button" class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#editNamaModal">
-                            Edit
-                        </button>
-                    </p>
+                    <p>{{ $data->nama_lengkap }}</p>
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status:</p>
@@ -53,10 +49,6 @@
                     <p class="text-label fw-bold mb-1">Kategori:</p>
                     <p>{{ $data->kategori ?? 'Belum ada kategori' }}</p>
                 </div>
-                <!-- <div class="col-md-6">
-                    <p class="text-label fw-bold mb-1">Klasifikasi:</p>
-                    <p>{{ $data->klasifikasi ?? 'Belum ada klasifikasi' }}</p>
-                </div> -->
                 <div class="col-md-6">  
                     <p class="text-label fw-bold mb-1">Disposisi:</p>  
                     <p>  
@@ -93,6 +85,11 @@
                             @else
                                 <span class="badge bg-primary">Tidak ada Dokumen Pengaduan</span>
                             @endif
+
+                            <!-- Tampilkan semua dokumen terkait dari tabel dokumens -->
+                            @foreach ($data->dokumens as $dokumen)
+                                <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
+                            @endforeach
                         </div>
                     @elseif($data->sumber_pengaduan === 'tatap muka')
                         <!-- Jika sumber pengaduan adalah Tatap Muka -->
@@ -102,6 +99,10 @@
                             @else
                                 <span class="badge bg-primary">Tidak ada Dokumen Pengaduan</span>
                             @endif
+                            <!-- Tampilkan semua dokumen terkait dari tabel dokumens -->
+                            @foreach ($data->dokumens as $dokumen)
+                                <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
+                            @endforeach
                         </div>
                     @else
                         <!-- Jika sumber pengaduan tidak diketahui -->
@@ -139,63 +140,12 @@
         </form>
     </div>
     @endif
-    <!-- @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
-    <div class="d-block rounded bg-white shadow mb-3 p-5">
-        <form action="{{ route('admin.laporan.teruskanKeInstansi', $data->nomor_tiket) }}" method="post">
-            @csrf
-            <div class="mb-3">
-                <label for="institution" class="form-label fw-bold">Instansi Tujuan</label>
-                <select name="institution" id="institution" class="form-control select2" data-live-search="true">
-                    <option value="" selected>Pilih Institusi Tujuan</option>
-                    @foreach ($institutions->sortBy('name') as $institution)
-                        <option value="{{ $institution->id }}">{{ $institution->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="reason" class="form-label fw-bold">Keterangan untuk Instansi Tujuan</label>
-                <textarea name="reason" id="reason" rows="6" class="form-control">{{ old('reason') }}</textarea>
-            </div>
-            <div class="d-flex justify-content-end">
-                <button type="button" class="btn btn-success" onclick="showConfirmationModal()">Teruskan ke Instansi Tujuan</button>
-            </div>
-        </form>
-    </div>
-    @endif -->
+    
     <!-- Bagian Form Edit -->
     <div class="d-block rounded bg-white shadow p-5">
         <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">
             @csrf
             @method('put')
-            <!-- Dropdown Kategori -->
-            <!-- <div class="mb-3">
-                <label for="kategori" class="form-label fw-bold">Kategori</label>
-                <select name="kategori" id="kategori" class="form-control">
-                    <optgroup label="SP4N Lapor">
-                        @foreach ($kategoriSP4NLapor as $item)
-                            <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
-                        @endforeach
-                    </optgroup>
-                    <optgroup label="Kategori Baru">
-                        @foreach ($kategoriBaru as $item)
-                            <option value="{{ $item }}" {{ $data->kategori == $item ? 'selected' : '' }}>{{ $item }}</option>
-                        @endforeach
-                    </optgroup>
-                </select>
-            </div> -->
-
-            <!-- Dropdown Disposisi -->
-            <!-- <div class="mb-3">
-                <label for="disposisi" class="form-label fw-bold">Disposisi</label>
-                <select name="disposisi" id="disposisi" class="form-control">
-                    @foreach ($semuaDisposisi as $key => $value)
-                        <option value="{{ $key }}" {{ $data->disposisi == $key ? 'selected' : '' }}>
-                            {{ $namaDeputi[$key] ?? $value }}
-                        </option>
-                    @endforeach
-                </select>
-            </div> -->
-
             <!-- Dropdown Status -->
             <div class="mb-3">
                 <label for="status" class="form-label fw-bold">Status</label>
@@ -215,126 +165,78 @@
             </div>
 
             <div class="d-flex justify-content-between align-items-center my-3">
-                <!-- Tombol Kembali ke Detail Pengaduan -->
-                <div>
-                    <button class="btn btn-secondary form-control" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>
-                </div>
-                <!-- Tombol Update -->
-                <div>
-                    <button type="submit" class="btn btn-primary form-control">
-                        Perbarui Pengaduan
-                    </button>
-                </div>
+                <button class="btn btn-secondary" onclick="window.history.back()">Kembali</button>
+                @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instansiTujuanModal">Teruskan ke Instansi</button>
+                @endif
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#perbaruiModal">Perbarui Pengaduan</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal Edit Nama -->
-<div class="modal fade" id="editNamaModal" tabindex="-1" aria-labelledby="editNamaModalLabel" aria-hidden="true">
+<!-- Modal Konfirmasi Perbarui Pengaduan -->
+<div class="modal fade" id="perbaruiModal" tabindex="-1" aria-labelledby="perbaruiModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('admin.laporan.updateNama', $data->nomor_tiket) }}" method="post">
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Perbarui Pengaduan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Apakah Anda yakin ingin memperbarui pengaduan ini?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary" form="formEditLaporan">Ya, Perbarui</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Pilih Instansi -->
+<div class="modal fade" id="instansiTujuanModal" tabindex="-1" aria-labelledby="instansiTujuanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Teruskan ke Instansi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.laporan.teruskanKeInstansi', $data->nomor_tiket) }}" method="post">
                 @csrf
-                @method('put')
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editNamaModalLabel">Edit Nama Lengkap</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control" value="{{ $data->nama_lengkap }}" required>
+                        <label for="institution" class="form-label fw-bold">Pilih Instansi Tujuan</label>
+                        <select name="institution" id="institution" class="form-control select2" style="width: 100%;">
+                            <option value="">Pilih Instansi</option>
+                            @foreach ($institutions as $institution)
+                                <option value="{{ $institution->id }}">{{ $institution->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label fw-bold">Keterangan untuk Instansi Tujuan</label>
+                        <textarea name="reason" id="reason" rows="6" class="form-control">{{ old('reason') }}</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-success">Kirim ke Instansi</button>
                 </div>
             </form>
-        </div>
-    </div>
-</div>
-<!-- Modal Konfirmasi -->
-<div class="modal fade" id="konfirmasiModal" tabindex="-1" aria-labelledby="konfirmasiModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="konfirmasiModalLabel">Konfirmasi Perubahan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Apakah Anda yakin sudah merubah Status Pengaduan?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" id="confirmUpdateButton" class="btn btn-primary">Simpan Perubahan</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal Konfirmasi -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi Pengiriman</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Apakah Anda yakin ingin meneruskan pengaduan ke instansi tujuan?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-success" id="confirmSubmit">Ya, Teruskan</button>
-            </div>
         </div>
     </div>
 </div>
 @endsection
 
 @section('script')
-<script>
-    $(document).ready(function() {
-        $('#institution').select2({
-            placeholder: "Pilih Institusi Tujuan",
-            allowClear: true,
-            width: '100%'
-        });
-    });
-</script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/js/select2.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const formEditLaporan = document.getElementById('formEditLaporan');
-        const modalKonfirmasi = new bootstrap.Modal(document.getElementById('konfirmasiModal'));
-
-        // Tangkap event submit form
-        formEditLaporan.addEventListener('submit', function (e) {
-            e.preventDefault(); // Hentikan proses submit default
-            modalKonfirmasi.show(); // Tampilkan modal konfirmasi
-        });
-
-        // Tombol di modal untuk melanjutkan update
-        document.getElementById('confirmUpdateButton').addEventListener('click', function () {
-            modalKonfirmasi.hide(); // Tutup modal
-            formEditLaporan.submit(); // Submit ulang form
-        });
-    });
-</script>
-<script>
-    function showConfirmationModal() {
-        $('#confirmationModal').modal('show');
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('form');
-        document.getElementById('confirmSubmit').addEventListener('click', function () {
-            form.submit();
+    $(document).ready(function() {
+        $('.select2').select2({
+            width: '100%'
         });
     });
 </script>
