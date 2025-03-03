@@ -14,9 +14,14 @@ class TutupLaporanOtomatis extends Command
 
     public function handle()
     {
+
+        $tanggalMulai = Carbon::create(2025, 2, 17);
+
         $laporans = Laporan::where('status', 'Menunggu kelengkapan data dukung dari Pelapor')
             ->whereNull('dokumen_tambahan')
-            ->where('updated_at', '<', Carbon::now()->subDays(14))
+            ->where('updated_at', '<', Carbon::now()->subDays(10)) // Lebih dari 10 hari
+            ->whereDate('updated_at', '>=', $tanggalMulai) // Hanya yang updated setelah 17 Februari 2025
+            // ->where('updated_at', '<', Carbon::now()->subDays(14))
             ->get();
 
         $jumlahLaporanDitutup = $laporans->count();
