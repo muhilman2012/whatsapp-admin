@@ -90,6 +90,11 @@
                             @foreach ($data->dokumens as $dokumen)
                                 <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
                             @endforeach
+
+                            <!-- Menampilkan dokumen tambahan jika ada -->
+                            @if($data->dokumen_tambahan)
+                                <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
+                            @endif
                         </div>
                     @elseif($data->sumber_pengaduan === 'tatap muka')
                         <!-- Jika sumber pengaduan adalah Tatap Muka -->
@@ -103,6 +108,11 @@
                             @foreach ($data->dokumens as $dokumen)
                                 <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
                             @endforeach
+
+                            <!-- Menampilkan dokumen tambahan jika ada -->
+                            @if($data->dokumen_tambahan)
+                                <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
+                            @endif
                         </div>
                     @else
                         <!-- Jika sumber pengaduan tidak diketahui -->

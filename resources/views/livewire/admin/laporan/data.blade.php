@@ -224,7 +224,7 @@
                                 $assignedTo = $item->assignments->where('laporan_id', $item->id)->first();
                             @endphp
                             @if ($assignedTo)
-                                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin']))
+                                @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                                     <!-- Link untuk membuka modal re-assign -->
                                     <a href="#" class="text-primary" style="text-decoration: none;" data-bs-toggle="modal" data-bs-target="#reassignAnalisModal"
                                     wire:click="openReassignModal({{ $item->id }}, {{ $assignedTo->assignedTo->id_admins }})">
