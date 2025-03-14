@@ -536,7 +536,7 @@ class laporanAdmin extends Controller
             // Log aktivitas jika pengaduan berhasil dikirim
             Log::create([
                 'laporan_id' => $laporan->id,
-                'activity' => 'Pengaduan berhasil dikirim ke LAPOR! dengan ID: ' . $responseData['data']['complaint_id'],
+                'activity' => 'Pengaduan berhasil dikirim ke LAPOR! dengan ID: ',
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
 

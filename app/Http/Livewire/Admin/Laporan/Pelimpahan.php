@@ -40,6 +40,7 @@ class Pelimpahan extends Component
     public $currentPageData = [];
     public $filterStatusAnalisis = ''; // Untuk filter status analisis
     public $sumber_pengaduan = ''; // Untuk filter sumber pengaduan
+    public $filterDirection = ''; // Untuk filter direction
 
     protected $listeners = ["deleteAction" => "delete"];
 
@@ -55,6 +56,13 @@ class Pelimpahan extends Component
         // Dapatkan informasi user yang sedang login
         $user = auth('admin')->user();
 
+        // Set default filterDirection based on user role
+        if (in_array($user->role, ['deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep', 'analis'])) {
+            $this->filterDirection = 'masuk';
+        } else {
+            $this->filterDirection = ''; // Default to 'Semua' for superadmin and admin
+        }
+        
         // Muat data kategori sesuai unit pengguna
         $this->kategoriUnit = Laporan::getKategoriByUnit($user->unit);
 
@@ -170,6 +178,12 @@ class Pelimpahan extends Component
                 $query->where('disposisi', $user->role)
                     ->orWhere('disposisi_terbaru', $user->role);
             });
+        }
+
+        if ($this->filterDirection === 'masuk') {
+            $data->where('disposisi_terbaru', $user->role);
+        } elseif ($this->filterDirection === 'keluar') {
+            $data->where('disposisi', $user->role);
         }
 
         // Filter status analisis

@@ -271,7 +271,7 @@
 
     <div class="d-flex align-items-center mt-3">
         <p class="mb-0 border py-1 px-2 rounded">
-            <span class="fw-bold">{{ $data->count() }}</span> Data
+            <span class="fw-bold">{{ $data->count() }}</span> dari <span class="fw-bold">{{ $data->total() }}</span> Data
         </p>
 
         @if($selected)

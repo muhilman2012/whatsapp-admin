@@ -118,6 +118,13 @@
                     <option value="asc">Terlama</option>
                 </select>
             </div>
+            <div class="ms-2">
+                <select wire:model="filterDirection" class="form-select">
+                    <option value="masuk">Masuk</option>
+                    <option value="keluar">Keluar</option>
+                    <option value="">Semua</option>
+                </select>
+            </div>
         </div>
     </div>
 
@@ -137,7 +144,7 @@
                     <th>Nama Lengkap</th>
                     <th>Judul Pengaduan</th>
                     <th>Kategori</th>
-                    <th>Distribusi asal</th>
+                    <!-- <th>Distribusi asal</th> -->
                     <th>Distribusi tujuan</th>
                     <th>
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
@@ -169,7 +176,7 @@
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
-                    <td>{{ $item->disposisi }}</td>
+                    <!-- <td>{{ $item->disposisi }}</td> -->
                     <td>{{ $item->disposisi_terbaru}}</td>
                     <td>
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
@@ -223,7 +230,7 @@
 
     <div class="d-flex align-items-center mt-3">
         <p class="mb-0 border py-1 px-2 rounded">
-            <span class="fw-bold">{{ $data->count() }}</span> Data
+            <span class="fw-bold">{{ $data->count() }}</span> dari <span class="fw-bold">{{ $data->total() }}</span> Data
         </p>
 
         @if ($selected)
