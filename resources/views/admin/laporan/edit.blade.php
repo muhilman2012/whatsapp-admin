@@ -226,7 +226,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="reason" class="form-label fw-bold">Keterangan untuk Instansi Tujuan</label>
-                        <textarea name="reason" id="reason" rows="6" class="form-control">{{ $reason }}</textarea>
+                        <textarea name="reason" id="reason" rows="6" class="form-control">{{ old('reason', $data->reason) }}</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

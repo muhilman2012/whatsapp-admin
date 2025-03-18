@@ -459,7 +459,7 @@ class laporanAdmin extends Controller
                 $fileContent = file_get_contents($filePath);
 
                 $response = Http::withHeaders([
-                    'auth' => 'Bearer $2y$10$hBmSeCgYycf5/ldf3dfrReuImJgooIDTPTOdFzPFSPtl70LT6QPgO',
+                    'auth' => 'Bearer $2y$10$e/ygLwDf3VPBQJpU86e9JuUalocF/v0oZF1NkivGzVjI8YQtoGQHa',
                     'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
                     'Content-Type' => 'application/json'
                 ])->post('https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint/file', [
@@ -525,7 +525,7 @@ class laporanAdmin extends Controller
         ];
 
         $response = Http::withHeaders([
-            'auth' => 'Bearer $2y$10$hBmSeCgYycf5/ldf3dfrReuImJgooIDTPTOdFzPFSPtl70LT6QPgO',
+            'auth' => 'Bearer $2y$10$e/ygLwDf3VPBQJpU86e9JuUalocF/v0oZF1NkivGzVjI8YQtoGQHa',
             'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
             'Content-Type' => 'application/json'
         ])->post('https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint', $data);
@@ -557,7 +557,7 @@ class laporanAdmin extends Controller
     {
         $url = "https://api-splp.layanan.go.id/lapor/3.0.0/complaints/process/{$apiTicketNumber}/reject";
         $headers = [
-            'auth' => 'Bearer $2y$10$hBmSeCgYycf5/ldf3dfrReuImJgooIDTPTOdFzPFSPtl70LT6QPgO',
+            'auth' => 'Bearer $2y$10$e/ygLwDf3VPBQJpU86e9JuUalocF/v0oZF1NkivGzVjI8YQtoGQHa',
             'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
             'Content-Type' => 'application/json'
         ];
