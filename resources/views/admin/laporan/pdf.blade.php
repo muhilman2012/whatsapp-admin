@@ -12,15 +12,19 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .header img {
             width: 150px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         .header h1 {
             font-size: 16px;
             text-transform: uppercase;
+            margin: 0;
+        }
+        .header h3 {
+            margin: 2px 0;
         }
         .box {
             border: 1px solid #000;
@@ -29,7 +33,7 @@
         }
         .watermark {
             position: fixed;
-            top: 32%;
+            top: 35%;
             left: 13%;
             opacity: 0.1;
             z-index: -1;
@@ -40,6 +44,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo/LaporMasWapres.png') }}" alt="Logo">
         <h1>Tanda Terima Pengaduan</h1>
+        <h3>{{ date('d-m-Y', strtotime($laporan->created_at)) }}</h3>
         <h3>Nomor Tiket: <strong>{{ $laporan->nomor_tiket }}</strong></h3>
     </div>
 

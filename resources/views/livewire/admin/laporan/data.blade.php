@@ -454,6 +454,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" wire:click="deleteAssignment" class="btn btn-danger">Hapus Analis</button>
                     <button type="button" wire:click="reassignToAnalis" class="btn btn-primary">Disposisikan Ulang</button>
                 </div>
             </div>

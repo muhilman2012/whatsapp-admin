@@ -517,6 +517,38 @@ class Pelimpahan extends Component
         $this->dispatchBrowserEvent('close-modal');
     }
 
+    public function deleteAssignment()
+    {
+        // Pastikan laporanId valid
+        if (!$this->laporanId) {
+            $this->emit('alert', ['type' => 'error', 'message' => 'ID Laporan tidak ditemukan.']);
+            return;
+        }
+
+        // Cari tugas berdasarkan laporan_id
+        $existingAssignment = Assignment::where('laporan_id', $this->laporanId)->first();
+
+        if (!$existingAssignment) {
+            $this->emit('alert', ['type' => 'error', 'message' => 'Data assignment tidak ditemukan.']);
+            return;
+        }
+
+        // Hapus tugas
+        $existingAssignment->delete();
+
+        // Log aktivitas
+        Log::create([
+            'laporan_id' => $this->laporanId,
+            'activity' => 'Disposisi Analis dihapus',
+            'user_id' => auth('admin')->user()->id_admins,
+        ]);
+
+        session()->flash('success', 'Analis berhasil dihapus dari disposisi.');
+
+        // Tutup modal
+        $this->dispatchBrowserEvent('close-modal');
+    }
+
     public function pelimpahan(Request $request)
     {
         // Cek jika selected atau selectedDisposisi kosong
