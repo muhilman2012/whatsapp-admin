@@ -144,8 +144,12 @@
                     <th>Nama Lengkap</th>
                     <th>Judul Pengaduan</th>
                     <th>Kategori</th>
-                    <th>Distribusi asal</th>
-                    <th>Distribusi tujuan</th>
+                    @if ($filterDirection === 'masuk' || $filterDirection === '')
+                        <th>Distribusi Tujuan</th>
+                    @endif
+                    @if ($filterDirection === 'keluar' || $filterDirection === '')
+                        <th>Distribusi Asal</th>
+                    @endif
                     <th>
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                             Disposisi ke
@@ -176,8 +180,12 @@
                     <td>{{ \Illuminate\Support\Str::limit($item->nama_lengkap, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->judul, 20) }}</td>
                     <td>{{ \Illuminate\Support\Str::words($item->kategori, 4) }}</td>
-                    <td>{{ $item->disposisi }}</td>
-                    <td>{{ $item->disposisi_terbaru}}</td>
+                    @if ($filterDirection === 'masuk' || $filterDirection === '')
+                        <td>{{ $item->disposisi_terbaru }}</td>
+                    @endif
+                    @if ($filterDirection === 'keluar' || $filterDirection === '')
+                        <td>{{ $item->disposisi }}</td>
+                    @endif
                     <td>
                         @if (in_array(auth('admin')->user()->role, ['superadmin', 'admin', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4', 'asdep']))
                             @php

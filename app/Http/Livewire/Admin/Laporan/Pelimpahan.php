@@ -181,9 +181,25 @@ class Pelimpahan extends Component
         }
 
         if ($this->filterDirection === 'masuk') {
-            $data->where('disposisi_terbaru', $user->role);
+            if (in_array($user->role, ['asdep', 'analis'])) {
+                // Ambil deputi dari mapping
+                $deputiRole = array_search($user->deputi, self::$deputiMapping);
+                if ($deputiRole) {
+                    $data->where('disposisi_terbaru', $deputiRole);
+                }
+            } else {
+                $data->where('disposisi_terbaru', $user->role);
+            }
         } elseif ($this->filterDirection === 'keluar') {
-            $data->where('disposisi', $user->role);
+            if (in_array($user->role, ['asdep', 'analis'])) {
+                // Ambil deputi dari mapping
+                $deputiRole = array_search($user->deputi, self::$deputiMapping);
+                if ($deputiRole) {
+                    $data->where('disposisi', $deputiRole);
+                }
+            } else {
+                $data->where('disposisi', $user->role);
+            }
         }
 
         // Filter status analisis
