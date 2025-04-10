@@ -55,17 +55,29 @@
                 
                 <!-- Nama dan NIK -->
                 <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
                         <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap') }}">
                         @error('nama_lengkap')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="nik" class="form-label fw-bold">NIK <span class="text-danger">*</span></label>
                         <input type="text" name="nik" id="nik" class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik') }}">
                         @error('nik')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-4">
+                        <label for="sumber_pengaduan" class="form-label fw-bold">Sumber Pengaduan <span class="text-danger">*</span></label>
+                        <select name="sumber_pengaduan" id="sumber_pengaduan" class="form-select @error('sumber_pengaduan') is-invalid @enderror">
+                            <option value="tatap muka" {{ old('sumber_pengaduan') == 'tatap muka' ? 'selected' : '' }}>Tatap Muka</option>
+                            <option value="whatsapp" {{ old('sumber_pengaduan') == 'whatsapp' ? 'selected' : '' }}>WhatsApp</option>
+                            <option value="surat fisik" {{ old('sumber_pengaduan') == 'surat fisik' ? 'selected' : '' }}>Surat Fisik</option>
+                            <option value="email" {{ old('sumber_pengaduan') == 'email' ? 'selected' : '' }}>Email</option>
+                        </select>
+                        @error('sumber_pengaduan')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>

@@ -135,7 +135,8 @@ class laporanAdmin extends Controller
             'dokumen_pendukung.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
             'kategori' => 'required',
             'lokasi' => 'nullable',
-            'tanggal_kejadian' => 'nullable|date'
+            'tanggal_kejadian' => 'nullable|date',
+            'sumber_pengaduan' => 'required'
         ]);
 
         // Generate Nomor Tiket
@@ -156,7 +157,7 @@ class laporanAdmin extends Controller
                 'kategori' => $validated['kategori'],
                 'lokasi' => $validated['lokasi'],
                 'tanggal_kejadian' => $validated['tanggal_kejadian'],
-                'sumber_pengaduan' => 'tatap muka',
+                'sumber_pengaduan' => $validated['sumber_pengaduan'],
                 'petugas' => auth('admin')->user()->nama,
             ]);
 
