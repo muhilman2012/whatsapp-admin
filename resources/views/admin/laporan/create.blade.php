@@ -215,14 +215,14 @@
 
     document.getElementById('dokumen_pendukung').addEventListener('change', function(event) {
         const files = event.target.files;
-        const maxFileSize = 4 * 1024 * 1024; // 4 MB
+        const maxFileSize = 10 * 1024 * 1024; // 4 MB
 
         for (let i = 0; i < files.length; i++) {
             if (files[i].size > maxFileSize) {
                 Swal.fire({
                     icon: 'error',
                     title: 'File Terlalu Besar',
-                    text: 'File ' + files[i].name + ' melebihi batas ukuran 4 MB.',
+                    text: 'File ' + files[i].name + ' melebihi batas ukuran 10 MB.',
                 });
                 // Kosongkan input file
                 event.target.value = '';
