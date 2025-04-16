@@ -52,6 +52,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::get('/dashboard/laporan/edit/{nomor_tiket}', [laporanAdmin::class, 'edit'])->name('admin.laporan.edit');
         Route::put('/dashboard/laporan/update/{nomor_tiket}', [laporanAdmin::class, 'update'])->name('admin.laporan.update');
         Route::post('/dashboard/laporan/{nomor_tiket}/teruskan-ke-instansi', [laporanAdmin::class, 'teruskanKeInstansi'])->name('admin.laporan.teruskanKeInstansi');
+        Route::post('/dashboard/laporan/{nomor_tiket}/kirim-ke-lapor', [laporanAdmin::class, 'kirimKeLapor'])->name('admin.laporan.kirimKeLapor');
         Route::post('/dashboard/laporan/update/{nomor_tiket}/analis', [laporanAdmin::class, 'storeAnalis'])->name('admin.laporan.analis.store');
         Route::post('/dashboard/laporan/upload/editor', [laporanAdmin::class, 'editor'])->name('admin.laporan.upload.editor');
         Route::put('/dashboard/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');

@@ -132,7 +132,7 @@ class laporanAdmin extends Controller
             'alamat_lengkap' => 'required',
             'judul' => 'required|max:255',
             'detail' => 'required',
-            'dokumen_pendukung.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:4096',
+            'dokumen_pendukung.*' => 'file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
             'kategori' => 'required',
             'lokasi' => 'nullable',
             'tanggal_kejadian' => 'nullable|date',
@@ -448,13 +448,37 @@ class laporanAdmin extends Controller
         }
     }
 
+    public function kirimKeLapor($nomor_tiket)
+    {
+        $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+
+        // Kirim ke API LAPOR!
+        $apiResponse = $this->sendToApi($laporan);
+
+        if ($apiResponse['success']) {
+            $complaintId = $apiResponse['data']['results']['complaint']['id'] ?? null;
+            $laporan->complaint_id = $complaintId;
+            $laporan->save();
+
+            Log::create([
+                'laporan_id' => $laporan->id,
+                'activity' => 'Pengaduan berhasil dikirim ke LAPOR!',
+                'user_id' => auth('admin')->user()->id_admins,
+            ]);
+
+            return back()->with('success', 'Pengaduan berhasil dikirim ke LAPOR!');
+        } else {
+            return back()->with('error', 'Gagal mengirim ke LAPOR: ' . $apiResponse['error']);
+        }
+    }
+
     private function uploadDocuments($laporan)
     {
         $dokumenIds = [];
         $dokumens = Dokumen::where('laporan_id', $laporan->id)->get();
 
         foreach ($dokumens as $dokumen) {
-            $filePath = storage_path('storage/dokumen/' . $dokumen->filename);
+            $filePath = storage_path('app/public/dokumen/' . $dokumen->filename);
 
             if (file_exists($filePath)) {
                 $fileContent = file_get_contents($filePath);

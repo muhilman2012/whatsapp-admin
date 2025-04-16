@@ -177,7 +177,16 @@
             <div class="d-flex justify-content-between align-items-center my-3">
                 <button class="btn btn-secondary" onclick="window.history.back()">Kembali</button>
                 @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instansiTujuanModal">Teruskan ke Instansi</button>
+                    <form action="{{ route('admin.laporan.kirimKeLapor', $data->nomor_tiket) }}" method="post" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-warning" onclick="return confirm('Apakah Anda yakin ingin mengirim ke LAPOR?')">
+                            Kirim ke LAPOR
+                        </button>
+                    </form>
+
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instansiTujuanModal">
+                        Teruskan ke Instansi
+                    </button>
                 @endif
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#perbaruiModal">Perbarui Pengaduan</button>
             </div>

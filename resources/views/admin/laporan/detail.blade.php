@@ -79,7 +79,7 @@
                                 <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
                             @endforeach
                         </div>  
-                        @elseif($data->sumber_pengaduan === 'tatap muka')
+                        @elseif(in_array($data->sumber_pengaduan, ['tatap muka', 'surat fisik', 'email']))
                             <!-- Jika sumber pengaduan adalah Tatap Muka -->
                             <div>
                                 <!-- Selalu tampilkan dokumen_pendukung jika ada, baik itu URL maupun file lokal -->

@@ -195,7 +195,7 @@
                 <div class="mb-3 d-block rounded bg-secondary shadow">
                     <p class="text-white p-3">
                         1. Perhatikan Kolom yang wajib diisi. <br>
-                        2. Dokumen Pendukung berupa file PDF/Document/JPG/PNG. Maximal 4mb<br>
+                        2. Dokumen Pendukung berupa file PDF/Document/JPG/PNG. Maximal 10mb<br>
                         3. Disposisi Otomatis ketika Kategori sudah dipilih. <br>
                         4. Harap Unduh Tanda Terima Pengaduan di Halaman Detail Pengaduan (otomatis ke halaman Detail Pengaduan setelah Buat Pengaduan).
                     </p>
