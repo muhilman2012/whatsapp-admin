@@ -141,13 +141,20 @@
             </div>
         </div>
     </div>
-    <div class="mb-3 mt-3 text-end">
-        <a href="{{ route('admin.laporan.tandaterima', $data->nomor_tiket) }}" class="btn btn-primary">
-            Unduh Tanda Terima Pengaduan (untuk Pengadu)
-        </a>
-        <a href="{{ route('admin.laporan.download', $data->nomor_tiket) }}" class="btn btn-success">
-            Unduh Tanda Terima (untuk TL K/L/D)
-        </a>
+    <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">
+        <div class="text-end">
+            @if($duplicateReports->count())
+                <button class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#laporanGandaModal">
+                    Info Laporan Ganda ({{ $duplicateReports->count() }})
+                </button>
+            @endif
+            <a href="{{ route('admin.laporan.tandaterima', $data->nomor_tiket) }}" class="btn btn-primary mb-3">
+                Unduh Tanda Terima Pengaduan (untuk Pengadu)
+            </a>
+            <a href="{{ route('admin.laporan.download', $data->nomor_tiket) }}" class="btn btn-success mb-3">
+                Unduh Tanda Terima (untuk TL K/L/D)
+            </a>
+        </div>
     </div>
     <div class="d-block rounded bg-white shadow">
         <div class="p-3 border-bottom">
@@ -249,6 +256,52 @@
                 <p>Anda dapat mengklik tombol di bawah ini untuk membuka dokumen di tab baru, atau copy link berikut untuk membuka secara manual jika ada kendala.</p>
                 <textarea readonly class="form-control mb-2">{{ $data->dokumen_pendukung }}</textarea>
                 <a href="{{ $data->dokumen_pendukung }}" target="_blank" class="btn btn-primary">Buka Dokumen</a>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Info Laporan Ganda -->
+<div class="modal fade" id="laporanGandaModal" tabindex="-1" aria-labelledby="laporanGandaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="laporanGandaModalLabel">Daftar Laporan Ganda pada Identitas Pelapor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                <thead>
+                    <tr>
+                    <th>Nomor Tiket</th>
+                    <th>Tanggal</th>
+                    <th>Kategori</th>
+                    <th>Disposisi</th>
+                    <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($duplicateReports as $laporan)
+                    <tr>
+                        <td>{{ $laporan->nomor_tiket }}</td>
+                        <td>{{ \Carbon\Carbon::parse($laporan->created_at)->format('d-m-Y H:i') }}</td>
+                        <td>{{ $laporan->kategori ?? '-' }}</td>
+                        <td>
+                            @if(!empty($laporan->disposisi_terbaru))
+                                {{ $laporan->disposisi_terbaru }}
+                            @else
+                                {{ $laporan->disposisi }}
+                            @endif
+                        </td>
+                        <td>
+                        <a href="{{ route('admin.laporan.detail', $laporan->nomor_tiket) }}" class="btn btn-sm btn-primary">Lihat</a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+                </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

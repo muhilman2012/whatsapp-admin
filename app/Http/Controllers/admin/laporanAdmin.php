@@ -10,9 +10,11 @@ use App\Models\Assignment;
 use App\Models\Notification;
 use App\Models\Institution;
 use App\Models\Dokumen;
+use App\Models\Identitas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LaporanExport;
@@ -103,10 +105,9 @@ class laporanAdmin extends Controller
         return view('admin.laporan.data', compact('data', 'kategori', 'type', 'pageTitle'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $kategoriDeputi = Laporan::getKategoriDeputi2();
-
         $namaDeputi = [
             'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
             'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
@@ -114,10 +115,12 @@ class laporanAdmin extends Controller
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        // Debug data
-        // dd($kategoriDeputi, $namaDeputi);
+        $identitas = null;
+        if ($request->has('identitas_id')) {
+            $identitas = \App\Models\Identitas::find($request->identitas_id);
+        }
 
-        return view('admin.laporan.create', compact('namaDeputi', 'kategoriDeputi'));
+        return view('admin.laporan.create', compact('namaDeputi', 'kategoriDeputi', 'identitas'));
     }
 
     public function store(Request $request)
@@ -179,6 +182,13 @@ class laporanAdmin extends Controller
                 }
             }
 
+            $identitas = \App\Models\Identitas::where('nik', $validated['nik'])->first();
+
+            if ($identitas) {
+                $identitas->is_filled = 1;
+                $identitas->save();
+            }
+
             // Menyimpan log aktivitas
             Log::create([
                 'laporan_id' => $laporan->id,
@@ -216,20 +226,28 @@ class laporanAdmin extends Controller
             ->where('nomor_tiket', $nomor_tiket)
             ->firstOrFail();
 
+        // Ambil laporan lain berdasarkan nama, NIK, atau nomor pengadu, kecuali yang sedang dilihat
+        $duplicateReports = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
+            ->where('id', '!=', $data->id)
+            ->where(function($query) use ($data) {
+                $query->where('nik', $data->nik)
+                    ->orWhere('nomor_pengadu', $data->nomor_pengadu);
+            })
+            ->get();
+
         // Mendapatkan penugasan terakhir untuk laporan ini
-        $latestAssignment = $data->assignments->last(); // Diasumsikan Anda ingin penugasan terakhir
+        $latestAssignment = $data->assignments->last();
 
         $dokumen = $data->dokumen;
 
         // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
         $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
 
-        return view('admin.laporan.detail', compact('data', 'dokumen', 'latestAssignment', 'logs'));
+        return view('admin.laporan.detail', compact('data', 'dokumen', 'latestAssignment', 'logs', 'duplicateReports'));
     }
 
     public function detail($nomor_tiket)
     {
-        // Mengambil data Laporan bersama dengan 'assignments' dan relasi terkait
         $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
             ->where('nomor_tiket', $nomor_tiket)
             ->firstOrFail();
@@ -241,15 +259,20 @@ class laporanAdmin extends Controller
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        // Mendapatkan penugasan terakhir untuk laporan ini
-        $latestAssignment = $data->assignments->last(); // Diasumsikan Anda ingin penugasan terakhir
+        // Ambil laporan lain berdasarkan nama, NIK, atau nomor pengadu, kecuali yang sedang dilihat
+        $duplicateReports = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
+            ->where('id', '!=', $data->id)
+            ->where(function($query) use ($data) {
+                $query->where('nik', $data->nik)
+                    ->orWhere('nomor_pengadu', $data->nomor_pengadu);
+            })
+            ->get();
 
+        $latestAssignment = $data->assignments->last();
         $dokumen = $data->dokumen;
-
-        // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
         $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
 
-        return view('admin.laporan.detail2', compact('data', 'namaDeputi', 'dokumen', 'latestAssignment', 'logs'));
+        return view('admin.laporan.detail2', compact('data', 'namaDeputi', 'dokumen', 'latestAssignment', 'logs', 'duplicateReports'));
     }
 
     public function ubah(Request $request, $nomor_tiket)
@@ -905,5 +928,10 @@ class laporanAdmin extends Controller
         // Menyimpan PDF dengan nama yang mencakup tanggal dan sumber pengaduan
         $fileName = 'laporan-' . ($formattedStartDate == $formattedEndDate ? $formattedStartDate : $formattedStartDate . '-to-' . $formattedEndDate) . '-' . $source . '.pdf';
         return $pdf->download($fileName);
+    }
+
+    public function list()
+    {
+        return view('admin.laporan.list');
     }
 }
