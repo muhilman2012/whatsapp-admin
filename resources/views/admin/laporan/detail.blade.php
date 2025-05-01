@@ -262,7 +262,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="laporanGandaModalLabel">Daftar Laporan Ganda pada Identitas Pelapor</h5>
+                <h5 class="modal-title" id="laporanGandaModalLabel">Daftar Laporan Ganda berdasarkan NIK atau Nomor HP pengadu</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body">
