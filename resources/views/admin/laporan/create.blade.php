@@ -57,14 +57,14 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="nama_lengkap" class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
-                        <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap') }}">
+                        <input type="text" name="nama_lengkap" id="nama_lengkap" class="form-control @error('nama_lengkap') is-invalid @enderror" value="{{ old('nama_lengkap', $identitas->nama_lengkap ?? '') }}">
                         @error('nama_lengkap')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-4">
                         <label for="nik" class="form-label fw-bold">NIK <span class="text-danger">*</span></label>
-                        <input type="text" name="nik" id="nik" class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik') }}">
+                        <input type="text" name="nik" id="nik" class="form-control @error('nik') is-invalid @enderror" value="{{ old('nik', $identitas->nik ?? '') }}">
                         @error('nik')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -88,9 +88,9 @@
                     <div class="col-md-4">
                         <label for="jenis_kelamin" class="form-label fw-bold">Jenis Kelamin <span class="text-danger">*</span></label>
                         <select name="jenis_kelamin" id="jenis_kelamin" class="form-select @error('jenis_kelamin') is-invalid @enderror">
-                            <option disabled selected>Pilih Jenis Kelamin</option>
-                            <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-Laki</option>
-                            <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                            <option disabled {{ old('jenis_kelamin', $identitas->jenis_kelamin ?? '') == null ? 'selected' : '' }}>Pilih Jenis Kelamin</option>
+                            <option value="L" {{ old('jenis_kelamin', $identitas->jenis_kelamin ?? '') == 'L' ? 'selected' : '' }}>Laki-Laki</option>
+                            <option value="P" {{ old('jenis_kelamin', $identitas->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
                         </select>
                         @error('jenis_kelamin')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -98,14 +98,14 @@
                     </div>
                     <div class="col-md-4">
                         <label for="email" class="form-label fw-bold">Email Pengadu</label>
-                        <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}">
+                        <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $identitas->email ?? '') }}">
                         @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     <div class="col-md-4">
                         <label for="nomor_pengadu" class="form-label fw-bold">Nomor Handphone Pengadu</label>
-                        <input type="text" name="nomor_pengadu" id="nomor_pengadu" class="form-control @error('nomor_pengadu') is-invalid @enderror" value="{{ old('nomor_pengadu') }}">
+                        <input type="text" name="nomor_pengadu" id="nomor_pengadu" class="form-control @error('nomor_pengadu') is-invalid @enderror" value="{{ old('nomor_pengadu', $identitas->nomor_pengadu ?? '') }}">
                         @error('nomor_pengadu')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -115,7 +115,7 @@
                 <!-- Alamat -->
                 <div class="mb-3">
                     <label for="alamat_lengkap" class="form-label fw-bold">Alamat Lengkap <span class="text-danger">*</span></label>
-                    <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control @error('alamat_lengkap') is-invalid @enderror">{{ old('alamat_lengkap') }}</textarea>
+                    <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control @error('alamat_lengkap') is-invalid @enderror">{{ old('alamat_lengkap', $identitas->alamat_lengkap ?? '') }}</textarea>
                     @error('alamat_lengkap')
                     <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

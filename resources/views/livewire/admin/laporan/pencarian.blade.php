@@ -20,6 +20,8 @@
                             <th>Nomor Tiket</th>
                             <th>Nama Lengkap</th>
                             <th>Judul Pengaduan</th>
+                            <th>Kategori</th>
+                            <th>Distribusi</th>
                             <th>Sumber</th>
                             <th>Status</th>
                             <th>Dikirim</th>
@@ -39,6 +41,8 @@
                             </td>
                             <td>{{ \Illuminate\Support\Str::limit($result->nama_lengkap, 20) }}</td>
                             <td>{{ \Illuminate\Support\Str::words($result->judul, 20) }}</td>
+                            <td>{{ $result->kategori }}</td>
+                            <td>{{ $result->disposisi }}</td>
                             <td>
                                 @if($result->sumber_pengaduan === 'tatap muka')
                                     <span class="badge bg-primary">TM</span>
