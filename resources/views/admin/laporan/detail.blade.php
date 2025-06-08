@@ -50,65 +50,119 @@
                     <p>{{ $data->alamat_lengkap }}</p>
                 </div>
                 <div class="col-md-6">  
-                    <p class="text-label fw-bold mb-1">Dokumen Pendukung:</p>   
+                    <p class="text-label fw-bold mb-1">Dokumen Pendukung:</p>
                     @if($data->sumber_pengaduan === 'whatsapp')  
-                        <!-- Jika sumber pengaduan adalah WhatsApp -->  
                         <div>  
-                            @if($data->dokumen_ktp)  
-                                <a href="{{ $data->dokumen_ktp }}" target="_blank"><span class="badge bg-primary">Lihat Identitas</span></a>  
-                            @endif  
-                
-                            @if($data->dokumen_kk)  
-                                <a href="{{ $data->dokumen_kk }}" target="_blank"><span class="badge bg-primary">Lihat KK</span></a>  
-                            @endif  
-                
-                            @if($data->dokumen_skuasa)  
-                                <a href="{{ $data->dokumen_skuasa }}" target="_blank"><span class="badge bg-primary">Lihat Surat Kuasa</span></a>  
-                            @endif  
-                
-                            @if($data->dokumen_pendukung)  
-                                <a href="{{ $data->dokumen_pendukung }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
+                            {{-- Dokumen KTP --}}
+                            @if($data->dokumen_ktp)
+                                <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('dokumen/' . basename($data->dokumen_ktp)) }}"
+                                target="_blank">
+                                    <span class="badge bg-primary">Lihat Identitas</span>
+                                </a>  
                             @endif
 
-                            @if($data->dokumen_tambahan)
-                                <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
-                            @endif  
+                            {{-- Dokumen KK --}}
+                            @if($data->dokumen_kk)
+                                <a href="{{ filter_var($data->dokumen_kk, FILTER_VALIDATE_URL) ? $data->dokumen_kk : asset('dokumen/' . basename($data->dokumen_kk)) }}"
+                                target="_blank">
+                                    <span class="badge bg-primary">Lihat KK</span>
+                                </a>  
+                            @endif
 
-                            <!-- Tampilkan semua dokumen terkait dari tabel dokumens -->
-                            @foreach ($data->dokumens as $dokumen)
-                                <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
+                            {{-- Dokumen Surat Kuasa --}}
+                            @if($data->dokumen_skuasa)
+                                <a href="{{ filter_var($data->dokumen_skuasa, FILTER_VALIDATE_URL) ? $data->dokumen_skuasa : asset('dokumen/' . basename($data->dokumen_skuasa)) }}"
+                                target="_blank">
+                                    <span class="badge bg-primary">Lihat Surat Kuasa</span>
+                                </a>  
+                            @endif
+
+                            {{-- Dokumen Pendukung --}}
+                            @if($data->dokumen_pendukung)
+                                <a href="{{ filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL) ? $data->dokumen_pendukung : asset('dokumen/' . basename($data->dokumen_pendukung)) }}"
+                                target="_blank">
+                                    <span class="badge bg-primary">Lihat Dokumen Pengaduan</span>
+                                </a>
+                            @endif
+
+                            {{-- Dokumen Tambahan: Jika URL disimpan di field, tampilkan --}}
+                            @if($data->dokumen_tambahan && filter_var($data->dokumen_tambahan, FILTER_VALIDATE_URL))
+                                <a href="{{ $data->dokumen_tambahan }}" target="_blank">
+                                    <span class="badge bg-warning">Lihat Kekurangan Dokumen</span>
+                                </a>
+                            @endif
+
+                            {{-- Tambahan: Tampilkan semua dokumen tambahan dari folder public/dokumen --}}
+                            @php
+                                $dokumenTambahanFiles = [];
+                                $folderPath = public_path('dokumen');
+
+                                if (\Illuminate\Support\Facades\File::exists($folderPath)) {
+                                    $allFiles = \Illuminate\Support\Facades\File::files($folderPath);
+                                    $dokumenTambahanFiles = collect($allFiles)->filter(function ($file) use ($data) {
+                                        return \Illuminate\Support\Str::startsWith($file->getFilename(), $data->nomor_tiket . '_tambahan_');
+                                    });
+                                }
+                            @endphp
+
+                            @foreach ($dokumenTambahanFiles as $file)
+                                <a href="{{ asset('dokumen/' . $file->getFilename()) }}" target="_blank">
+                                    <span class="badge bg-warning">Lihat Kekurangan Dokumen</span>
+                                </a>
                             @endforeach
                         </div>  
-                        @elseif(in_array($data->sumber_pengaduan, ['tatap muka', 'surat fisik', 'email']))
-                            <!-- Jika sumber pengaduan adalah Tatap Muka -->
-                            <div>
-                                <!-- Selalu tampilkan dokumen_pendukung jika ada, baik itu URL maupun file lokal -->
-                                @if (!empty($data->dokumen_pendukung))
-                                    <!-- Jika dokumen_pendukung adalah URL, tampilkan sebagai link yang memicu modal -->
-                                    @if(filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
-                                        <a href="#" data-bs-toggle="modal" data-bs-target="#viewDocumentModal">
-                                            <span class="badge bg-primary">Lihat Dokumen Pengaduan di Scloud</span>
-                                        </a>
-                                    @else
-                                        <!-- Jika dokumen_pendukung adalah file lokal, tampilkan menggunakan asset -->
-                                        <a href="{{ asset('storage/dokumen/' . $data->dokumen_pendukung) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen Pengaduan</span></a>
-                                    @endif
-                                @endif
 
-                                <!-- Tampilkan semua dokumen terkait dari tabel dokumens -->
-                                @foreach ($data->dokumens as $dokumen)
-                                    <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank"><span class="badge bg-primary">Lihat Dokumen</span></a>
-                                @endforeach
+                    @elseif(in_array($data->sumber_pengaduan, ['tatap muka', 'surat fisik', 'email']))
+                    <div>
+                        {{-- Tampilkan dokumen_pendukung --}}
+                        @if (!empty($data->dokumen_pendukung))
+                            @if(filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#viewDocumentModal">
+                                    <span class="badge bg-primary">Lihat Dokumen Pengaduan di Scloud</span>
+                                </a>
+                            @else
+                                <a href="{{ asset('dokumen/' . basename($data->dokumen_pendukung)) }}" target="_blank">
+                                    <span class="badge bg-primary">Lihat Dokumen Pengaduan</span>
+                                </a>
+                            @endif
+                        @endif
 
-                                <!-- Menampilkan dokumen tambahan jika ada -->
-                                @if($data->dokumen_tambahan)
-                                    <a href="{{ $data->dokumen_tambahan }}" target="_blank"><span class="badge bg-warning">Lihat Kekurangan Dokumen</span></a>
-                                @endif
-                            </div>
-                        @else
-                            <!-- Jika sumber pengaduan tidak diketahui -->
-                            <p>Sumber pengaduan tidak valid</p>
-                    @endif  
+                        {{-- Tampilkan dokumen dari tabel dokumens --}}
+                        @foreach ($data->dokumens as $dokumen)
+                            <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank">
+                                <span class="badge bg-primary">Lihat Dokumen</span>
+                            </a>
+                        @endforeach
+
+                        {{-- Dokumen Tambahan: Jika URL disimpan di field, tampilkan --}}
+                        @if($data->dokumen_tambahan && filter_var($data->dokumen_tambahan, FILTER_VALIDATE_URL))
+                            <a href="{{ $data->dokumen_tambahan }}" target="_blank">
+                                <span class="badge bg-warning">Lihat Kekurangan Dokumen</span>
+                            </a>
+                        @endif
+
+                        {{-- Tambahan: Semua Dokumen Tambahan dari folder public/dokumen --}}
+                        @php
+                            $folderPath = public_path('dokumen');
+                            $dokumenTambahanFiles = [];
+
+                            if (\Illuminate\Support\Facades\File::exists($folderPath)) {
+                                $allFiles = \Illuminate\Support\Facades\File::files($folderPath);
+                                $dokumenTambahanFiles = collect($allFiles)->filter(function ($file) use ($data) {
+                                    return \Illuminate\Support\Str::startsWith($file->getFilename(), $data->nomor_tiket . '_tambahan_');
+                                });
+                            }
+                        @endphp
+
+                        @foreach ($dokumenTambahanFiles as $file)
+                            <a href="{{ asset('dokumen/' . $file->getFilename()) }}" target="_blank">
+                                <span class="badge bg-warning">Lihat Kekurangan Dokumen</span>
+                            </a>
+                        @endforeach
+                    </div>
+                    @else
+                        <p>Sumber pengaduan tidak valid</p>
+                    @endif
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Laporan:</p>
@@ -164,6 +218,7 @@
             @if (auth()->user()->hasRole(['superadmin','admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                 <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
             @endif
+                <!-- <a href="{{ route('admin.laporan.followup', $data->nomor_tiket) }}" target="_blank" class="btn btn-warning mt-3"><i class="fas fa-history"></i> Lihat Tindak Lanjut K/L/D</a> -->
         </div>
     </div>
     <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">
