@@ -218,7 +218,7 @@
             @if (auth()->user()->hasRole(['superadmin','admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                 <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
             @endif
-                <!-- <a href="{{ route('admin.laporan.followup', $data->nomor_tiket) }}" target="_blank" class="btn btn-warning mt-3"><i class="fas fa-history"></i> Lihat Tindak Lanjut K/L/D</a> -->
+
         </div>
     </div>
     <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">

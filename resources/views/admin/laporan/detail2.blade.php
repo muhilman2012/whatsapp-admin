@@ -197,7 +197,7 @@
     </div>
     <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">
         <div class="text-end">
-            <!-- <a href="{{ route('admin.laporan.followup', $data->nomor_tiket) }}" target="_blank" class="btn btn-warning mb-3"><i class="fas fa-history"></i> Lihat Tindak Lanjut K/L/D</a> -->
+            
             @if($duplicateReports->count())
                 <button class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#laporanGandaModal">
                     Info Laporan Ganda ({{ $duplicateReports->count() }})
