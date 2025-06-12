@@ -218,7 +218,7 @@
             @if (auth()->user()->hasRole(['superadmin','admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                 <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
             @endif
-
+                
         </div>
     </div>
     <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">
@@ -314,43 +314,53 @@
 </div>
 <!-- Modal Info Laporan Ganda -->
 <div class="modal fade" id="laporanGandaModal" tabindex="-1" aria-labelledby="laporanGandaModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="laporanGandaModalLabel">Daftar Laporan Ganda berdasarkan NIK atau Nomor HP pengadu</h5>
+                <h5 class="modal-title" id="laporanGandaModalLabel">
+                    Daftar Laporan Ganda berdasarkan NIK/Nomor HP/Email pengadu
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body">
-                <table class="table table-bordered">
-                <thead>
-                    <tr>
-                    <th>Nomor Tiket</th>
-                    <th>Tanggal</th>
-                    <th>Kategori</th>
-                    <th>Disposisi</th>
-                    <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($duplicateReports as $laporan)
-                    <tr>
-                        <td>{{ $laporan->nomor_tiket }}</td>
-                        <td>{{ \Carbon\Carbon::parse($laporan->created_at)->format('d-m-Y H:i') }}</td>
-                        <td>{{ $laporan->kategori ?? '-' }}</td>
-                        <td>
-                            @if(!empty($laporan->disposisi_terbaru))
-                                {{ $laporan->disposisi_terbaru }}
-                            @else
-                                {{ $laporan->disposisi }}
-                            @endif
-                        </td>
-                        <td>
-                        <a href="{{ route('admin.laporan.detail', $laporan->nomor_tiket) }}" class="btn btn-sm btn-primary">Lihat</a>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-                </table>
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nomor Tiket</th>
+                                <th>Nama</th>
+                                <th>Nomor Pengadu</th>
+                                <th>Email</th>
+                                <th>Tanggal</th>
+                                <th>Kategori</th>
+                                <th>Disposisi</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($duplicateReports as $laporan)
+                            <tr>
+                                <td>{{ $laporan->nomor_tiket }}</td>
+                                <td>{{ $laporan->nama_lengkap }}</td>
+                                <td>{{ $laporan->nomor_pengadu }}</td>
+                                <td>{{ $laporan->email }}</td>
+                                <td>{{ \Carbon\Carbon::parse($laporan->created_at)->format('d-m-Y') }}</td>
+                                <td>{{ $laporan->kategori ?? '-' }}</td>
+                                <td>
+                                    @if(!empty($laporan->disposisi_terbaru))
+                                        {{ $laporan->disposisi_terbaru }}
+                                    @else
+                                        {{ $laporan->disposisi }}
+                                    @endif
+                                </td>
+                                <td>
+                                    <a href="{{ route('admin.laporan.detail', $laporan->nomor_tiket) }}" class="btn btn-sm btn-primary">Lihat</a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

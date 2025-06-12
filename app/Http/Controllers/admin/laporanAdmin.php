@@ -9,6 +9,7 @@ use App\Models\Log;
 use App\Models\Assignment;
 use App\Models\Notification;
 use App\Models\Institution;
+use App\Models\LaporanForwarding;
 use App\Models\Dokumen;
 use App\Models\Identitas;
 use Illuminate\Http\Request;
@@ -221,37 +222,55 @@ class laporanAdmin extends Controller
 
     public function show($nomor_tiket)
     {
-        // Mengambil data Laporan bersama dengan 'assignments' dan relasi terkait
+        // Ambil data utama laporan berdasarkan nomor_tiket beserta relasi terkait
         $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
             ->where('nomor_tiket', $nomor_tiket)
             ->firstOrFail();
 
-        // Ambil laporan lain berdasarkan nama, NIK, atau nomor pengadu, kecuali yang sedang dilihat
+        // Ambil laporan duplikat berdasarkan NIK, nomor_pengadu, atau email
         $duplicateReports = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
             ->where('id', '!=', $data->id)
-            ->where(function($query) use ($data) {
-                $query->where('nik', $data->nik)
-                    ->orWhere('nomor_pengadu', $data->nomor_pengadu);
+            ->where(function ($query) use ($data) {
+                $query->where(function ($subQuery) use ($data) {
+                    $subQuery->whereNotNull('nik')
+                            ->where('nik', $data->nik);
+                })
+                ->orWhere(function ($subQuery) use ($data) {
+                    $subQuery->whereNotNull('nomor_pengadu')
+                            ->where('nomor_pengadu', '!=', '')
+                            ->where('nomor_pengadu', $data->nomor_pengadu);
+                })
+                ->orWhere(function ($subQuery) use ($data) {
+                    $subQuery->whereNotNull('email')
+                            ->where('email', '!=', '')
+                            ->where('email', $data->email);
+                });
             })
             ->get();
 
-        // Mendapatkan penugasan terakhir untuk laporan ini
+        // Penugasan terakhir
         $latestAssignment = $data->assignments->last();
 
+        // Dokumen terkait
         $dokumen = $data->dokumen;
 
-        // Mendapatkan logs berdasarkan 'id' dari laporan yang di-fetch
-        $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
+        // Log aktivitas terkait laporan
+        $logs = Log::where('laporan_id', $data->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
+        // Kirim ke view
         return view('admin.laporan.detail', compact('data', 'dokumen', 'latestAssignment', 'logs', 'duplicateReports'));
     }
 
     public function detail($nomor_tiket)
     {
+        // Ambil data laporan utama beserta relasi assignments
         $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
             ->where('nomor_tiket', $nomor_tiket)
             ->firstOrFail();
 
+        // Daftar nama Deputi
         $namaDeputi = [
             'deputi_1' => 'Deputi Bidang Dukungan Kebijakan Perekonomian, Pariwisata dan Transformasi Digital',
             'deputi_2' => 'Deputi Bidang Dukungan Kebijakan Peningkatan Kesejahteraan dan Pembangunan Sumber Daya Manusia',
@@ -259,19 +278,39 @@ class laporanAdmin extends Controller
             'deputi_4' => 'Deputi Bidang Administrasi',
         ];
 
-        // Ambil laporan lain berdasarkan nama, NIK, atau nomor pengadu, kecuali yang sedang dilihat
+        // Ambil laporan lain yang memiliki NIK sama ATAU nomor_pengadu/email sama (yang tidak kosong)
         $duplicateReports = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy'])
             ->where('id', '!=', $data->id)
-            ->where(function($query) use ($data) {
-                $query->where('nik', $data->nik)
-                    ->orWhere('nomor_pengadu', $data->nomor_pengadu);
+            ->where(function ($query) use ($data) {
+                $query->where(function ($subQuery) use ($data) {
+                    $subQuery->whereNotNull('nik')
+                            ->where('nik', $data->nik);
+                })
+                ->orWhere(function ($subQuery) use ($data) {
+                    $subQuery->whereNotNull('nomor_pengadu')
+                            ->where('nomor_pengadu', '!=', '')
+                            ->where('nomor_pengadu', $data->nomor_pengadu);
+                })
+                ->orWhere(function ($subQuery) use ($data) {
+                    $subQuery->whereNotNull('email')
+                            ->where('email', '!=', '')
+                            ->where('email', $data->email);
+                });
             })
             ->get();
 
+        // Ambil penugasan terakhir
         $latestAssignment = $data->assignments->last();
-        $dokumen = $data->dokumen;
-        $logs = Log::where('laporan_id', $data->id)->orderBy('created_at', 'desc')->get();
 
+        // Dokumen yang diunggah
+        $dokumen = $data->dokumen;
+
+        // Riwayat log laporan
+        $logs = Log::where('laporan_id', $data->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Kirim ke view
         return view('admin.laporan.detail2', compact('data', 'namaDeputi', 'dokumen', 'latestAssignment', 'logs', 'duplicateReports'));
     }
 
@@ -428,46 +467,62 @@ class laporanAdmin extends Controller
 
     public function teruskanKeInstansi(Request $request, $nomor_tiket)
     {
+        $request->validate([
+            'institution' => 'required|exists:institutions,id',
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
         $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
+        $isAnonymous = $request->has('is_anonymous');
 
-        // Kirim ke API pertama
-        $apiFirstResponse = $this->sendToApi($laporan);
-        if ($apiFirstResponse['success']) {
-            $complaintId = $apiFirstResponse['data']['complaint_id'];
-            $laporan->complaint_id = $complaintId;
-            $laporan->save();
+        try {
+            $apiFirstResponse = $this->sendToApi($laporan, $isAnonymous);
 
-            // Kirim ke API kedua
-            $apiSecondResponse = $this->sendRejectRequest($complaintId, $request->institution, $request->reason);
-            if ($apiSecondResponse['success']) {
-                // Log pembaruan data
-                logger('Pengaduan #' . $laporan->nomor_tiket . ' diteruskan ke instansi tujuan.', [
-                    'complaint_id' => $complaintId,
-                    'updated_by' => auth('admin')->user()->username
-                ]);
+            if ($apiFirstResponse['success']) {
+                $complaintId = $apiFirstResponse['data']['complaint_id'] ?? null;
+                $laporan->complaint_id = $complaintId;
+                $laporan->save();
 
-                // Menyimpan log aktivitas
-                Log::create([
-                    'laporan_id' => $laporan->id,
-                    'activity' => 'Pengaduan diteruskan ke instansi tujuan',
-                    'user_id' => auth('admin')->user()->id_admins,
-                ]);
+                // Kirim ke API kedua
+                $apiSecondResponse = $this->sendRejectRequest($complaintId, $request->institution, $request->reason);
 
-                // Kirim notifikasi kepada pengguna
-                // Notification::create([
-                //     'assigner_id' => auth('admin')->user()->id_admins,
-                //     'assignee_id' => auth('admin')->user()->id_admins,
-                //     'laporan_id' => $laporan->id,
-                //     'message' => 'Pengaduan Anda berhasil diteruskan ke instansi tujuan',
-                //     'is_read' => false
-                // ]);
+                if ($apiSecondResponse['success']) {
+                    Log::create([
+                        'laporan_id' => $laporan->id,
+                        'activity' => 'Pengaduan diteruskan ke instansi tujuan',
+                        'user_id' => auth('admin')->user()->id_admins,
+                    ]);
 
-                return back()->with('success', 'Pengaduan berhasil diteruskan ke instansi tujuan.');
+                    LaporanForwarding::create([
+                        'laporan_id' => $laporan->id,
+                        'institution_id' => $request->institution,
+                        'reason' => $request->reason,
+                        'status' => 'terkirim',
+                        'complaint_id' => $complaintId,
+                        'is_anonymous' => $isAnonymous,
+                        'sent_at' => now(),
+                    ]);
+
+                    return back()->with('success', 'Pengaduan berhasil diteruskan ke instansi tujuan.');
+                } else {
+                    LaporanForwarding::create([
+                        'laporan_id' => $laporan->id,
+                        'institution_id' => $request->institution,
+                        'reason' => $request->reason,
+                        'status' => 'gagal',
+                        'error_message' => $apiSecondResponse['error'],
+                        'is_anonymous' => $isAnonymous,
+                        'scheduled_at' => now()->addHour(),
+                    ]);
+
+                    return back()->with('error', 'Gagal meneruskan ke instansi tujuan: ' . $apiSecondResponse['error']);
+                }
             } else {
-                return back()->with('error', 'Gagal saat meneruskan ke instansi tujuan: ' . $apiSecondResponse['error']);
+                return back()->with('error', 'Gagal mengirim ke LAPOR!: ' . $apiFirstResponse['error']);
             }
-        } else {
-            return back()->with('error', 'Gagal saat pengiriman ke LAPOR!: ' . $apiFirstResponse['error']);
+        } catch (\Exception $e) {
+            \Log::error('Terjadi kesalahan saat teruskan ke instansi: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan sistem.');
         }
     }
 
@@ -501,59 +556,67 @@ class laporanAdmin extends Controller
         $dokumens = Dokumen::where('laporan_id', $laporan->id)->get();
 
         foreach ($dokumens as $dokumen) {
-            $filePath = storage_path('app/public/dokumen/' . $dokumen->filename);
+            $filePath = storage_path('app/public/dokumen/' . $dokumen->file_name);
 
             if (file_exists($filePath)) {
-                $fileContent = file_get_contents($filePath);
+                try {
+                    $response = Http::withHeaders([
+                        'auth' => 'Bearer $2y$10$xhRva4LVGpBYnZU221zSh.MwTPfNpcKpDb4urzbUw.l4tFZcpD6eW',
+                        'token' => '{YKICFSY6-C3PT-SJTU-OI4Z-ITUTOC2DLAQP}',
+                    ])->attach(
+                        'attachments[]', // sesuai spesifikasi API
+                        file_get_contents($filePath),
+                        basename($filePath)
+                    )->post('https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint/file');
 
-                $response = Http::withHeaders([
-                    'auth' => 'Bearer $2y$10$e/ygLwDf3VPBQJpU86e9JuUalocF/v0oZF1NkivGzVjI8YQtoGQHa',
-                    'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
-                    'Content-Type' => 'application/json'
-                ])->post('https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint/file', [
-                    'attachments' => base64_encode($fileContent)
-                ]);
+                    if ($response->successful()) {
+                        $responseData = $response->json();
+                        $dokumenId = $responseData['results']['docs'][0]['id'] ?? null;
 
-                if ($response->successful()) {
-                    $responseData = $response->json();
-                    $dokumenIds[] = $responseData['results']['docs'][0]['id'];
+                        if ($dokumenId) {
+                            $dokumenIds[] = $dokumenId;
 
-                    // Menyimpan log aktivitas untuk setiap dokument yang berhasil diunggah
-                    Log::create([
-                        'laporan_id' => $laporan->id,
-                        'activity' => 'Dokumen berhasil diunggah dengan ID: ' . $responseData['results']['docs'][0]['id'],
-                        'user_id' => auth('admin')->user()->id_admins,
-                    ]);
-                } else {
-                    logger()->error('Gagal mengunggah dokumen: ' . $dokumen->filename, [
-                        'error' => $response->body()
+                            Log::create([
+                                'laporan_id' => $laporan->id,
+                                'activity' => 'Dokumen berhasil diunggah dengan ID: ' . $dokumenId,
+                                'user_id' => auth('admin')->user()->id_admins,
+                            ]);
+                        }
+                    } else {
+                        logger()->error('Gagal mengunggah dokumen: ' . $dokumen->file_name, [
+                            'error' => $response->body()
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    logger()->error('Exception saat upload dokumen: ' . $dokumen->file_name, [
+                        'message' => $e->getMessage()
                     ]);
                 }
             } else {
                 logger()->error('File tidak ditemukan: ' . $filePath);
             }
         }
-        
+
         return $dokumenIds;
     }
 
-    private function sendToApi($laporan)
+    private function sendToApi($laporan, $isAnonymous = true)
     {
         $uploadedDocumentIds = $this->uploadDocuments($laporan);
         $attachments = implode(',', $uploadedDocumentIds);
 
+        // Buat content tergantung status anonim
+        $content = $isAnonymous
+            ? "Nomor Tiket pada Aplikasi LMW: {$laporan->nomor_tiket}\nDetail Laporan: {$laporan->detail}\nLokasi: {$laporan->lokasi}"
+            : "Nomor Tiket pada Aplikasi LMW: {$laporan->nomor_tiket} , Nama Lengkap: {$laporan->nama_lengkap} , NIK: {$laporan->nik} , Alamat Lengkap: {$laporan->alamat_lengkap} , Detail Laporan: {$laporan->detail} , Lokasi: {$laporan->lokasi}";
+
         $data = [
             'title' => $laporan->judul,
-            'content' => "Nomor Tiket pada Aplikasi LMW: " . $laporan->nomor_tiket .
-                        " , Nama Lengkap: " . $laporan->nama_lengkap .
-                        " , NIK: " . $laporan->nik .
-                        " , Alamat Lengkap: " . $laporan->alamat_lengkap .
-                        " , Detail Laporan: " . $laporan->detail .
-                        " , Lokasi: " . $laporan->lokasi,
+            'content' => $content,
             'channel' => 13,
             'is_new_user_slider' => false,
             'user_id' => 5218120,
-            'is_disposisi_slider' => true,
+            'is_disposisi_slider' => false,
             'classification_id' => 6,
             'disposition_id' => 151345,
             'category_id' => 436,
@@ -561,36 +624,29 @@ class laporanAdmin extends Controller
             'location_id' => 34,
             'community_id' => null,
             'date_of_incident' => $laporan->tanggal_kejadian,
-            'copy_externals' => null,
-            'info_disposition' => '-',
-            'info_attachments' => '[66]',
             'tags_raw' => '#lapormaswapres',
-            'is_approval' => true,
-            'is_anonymous' => true,
+            'is_approval' => false,
+            'is_anonymous' => $isAnonymous,
             'is_secret' => true,
             'is_priority' => true,
             'attachments' => "[$attachments]",
         ];
 
         $response = Http::withHeaders([
-            'auth' => 'Bearer $2y$10$e/ygLwDf3VPBQJpU86e9JuUalocF/v0oZF1NkivGzVjI8YQtoGQHa',
-            'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
+            'auth' => 'Bearer $2y$10$xhRva4LVGpBYnZU221zSh.MwTPfNpcKpDb4urzbUw.l4tFZcpD6eW',
+            'token' => '{YKICFSY6-C3PT-SJTU-OI4Z-ITUTOC2DLAQP}',
             'Content-Type' => 'application/json'
-        ])->post('https://api-splp.layanan.go.id/lapor/3.0.0/complaints/complaint', $data);
+        ])->post('https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint', $data);
 
         if ($response->successful()) {
-            $responseData = $response->json();
-
-            // Log aktivitas jika pengaduan berhasil dikirim
             Log::create([
                 'laporan_id' => $laporan->id,
-                'activity' => 'Pengaduan berhasil dikirim ke LAPOR! dengan ID: ',
+                'activity' => 'Pengaduan berhasil dikirim ke LAPOR!',
                 'user_id' => auth('admin')->user()->id_admins,
             ]);
 
-            return ['success' => true, 'data' => $responseData];
+            return ['success' => true, 'data' => $response->json()];
         } else {
-            // Log aktivitas jika pengaduan gagal dikirim
             Log::create([
                 'laporan_id' => $laporan->id,
                 'activity' => 'Gagal mengirim pengaduan ke LAPOR!',
@@ -603,11 +659,12 @@ class laporanAdmin extends Controller
 
     private function sendRejectRequest($apiTicketNumber, $institution, $reason)
     {
-        $url = "https://api-splp.layanan.go.id/lapor/3.0.0/complaints/process/{$apiTicketNumber}/reject";
+        $url = "https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/process/{$apiTicketNumber}/reject";
         $headers = [
-            'auth' => 'Bearer $2y$10$e/ygLwDf3VPBQJpU86e9JuUalocF/v0oZF1NkivGzVjI8YQtoGQHa',
-            'token' => '{1LSAU1XA-Y5HR-SXQR-GUSD-ZBWZBUCPY0X9}',
-            'Content-Type' => 'application/json'
+            'auth' => 'Bearer $2y$10$xhRva4LVGpBYnZU221zSh.MwTPfNpcKpDb4urzbUw.l4tFZcpD6eW',
+            'token' => '{YKICFSY6-C3PT-SJTU-OI4Z-ITUTOC2DLAQP}',
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
         ];
 
         $data = [
@@ -633,11 +690,13 @@ class laporanAdmin extends Controller
 
         // Validasi input
         $request->validate([
+            // 'klasifikasi' => 'required|string',  Validasi klasifikasi
             'lembar_kerja_analis' => 'required|string', // Validasi lembar kerja analis
         ]);
 
         // Simpan lembar kerja analis dan set status analisis menjadi Pending
         $laporan->update([
+            // 'klasifikasi' => $request->klasifikasi,
             'lembar_kerja_analis' => $request->lembar_kerja_analis,
             'status_analisis' => 'Menunggu Persetujuan', // Status analisis menjadi 'Menunggu Persetujuan'
         ]);
@@ -933,5 +992,10 @@ class laporanAdmin extends Controller
     public function list()
     {
         return view('admin.laporan.list');
+    }
+
+    public function laporanforwarding()
+    {
+        return view('admin.laporan.forwarding');
     }
 }
