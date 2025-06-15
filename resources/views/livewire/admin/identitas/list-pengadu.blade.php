@@ -33,7 +33,7 @@
                         <td>{{ \Illuminate\Support\Str::limit($item->alamat_lengkap, 50) }}</td>
                         <td>
                             @if($item->foto_ktp)
-                                <a href="{{ asset($item->dokumen_ktp) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <a href="{{ asset($item->foto_ktp) }}" target="_blank" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-id-card fa-sm"></i> Lihat
                                 </a>
                             @else
