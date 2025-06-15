@@ -9,6 +9,7 @@ use App\Http\Controllers\admin\ExportController;
 use App\Http\Controllers\admin\ImportController;
 use App\Http\Controllers\admin\UserManagementController;
 use App\Http\Controllers\admin\NotificationController;
+use App\Http\Controllers\admin\LaporanFollowupController;
 
 // auth controllers
 use App\Http\Controllers\auth\authAdmin;
@@ -45,6 +46,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
     Route::group(['middleware' => 'role.access:superadmin|admin|deputi_1|deputi_2|deputi_3|deputi_4|asdep|analis'], function () {
         Route::get('/dashboard/laporan/create', [laporanAdmin::class, 'create'])->name('admin.laporan.create');
         Route::post('/dashboard/laporan/store', [laporanAdmin::class, 'store'])->name('admin.laporan.store');
+        Route::get('/dashboard/laporan/diteruskan', [laporanAdmin::class, 'laporanforwarding'])->name('admin.laporan.forwarding');
         Route::get('/dashboard/laporan', [laporanAdmin::class, 'index'])->name('admin.laporan');
         Route::get('/dashboard/laporan/{nomor_tiket}', [laporanAdmin::class, 'show'])->name('admin.laporan.detail');
         Route::get('/dashboard/pengaduan/{nomor_tiket}', [laporanAdmin::class, 'detail'])->name('admin.laporan.detail2');
@@ -58,6 +60,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::put('/dashboard/laporan/update-nama/{nomor_tiket}', [laporanAdmin::class, 'updateNama'])->name('admin.laporan.updateNama');
         Route::get('/dashboard/laporan/{nomor_tiket}/download', [laporanAdmin::class, 'downloadPDF'])->name('admin.laporan.download');
         Route::get('/dashboard/laporan/{nomor_tiket}/downloadtandaterima', [laporanAdmin::class, 'tandaterimaPDF'])->name('admin.laporan.tandaterima');
+        Route::get('/dashboard/laporan/{nomor_tiket}/followup', [LaporanFollowupController::class, 'show'])->name('admin.laporan.followup');
         Route::put('/laporan/{nomorTiket}/approval', [laporanAdmin::class, 'approval'])->name('admin.laporan.approval');
         Route::get('/laporan/laporan-harian', [laporanAdmin::class, 'laphar'])->name('admin.laporan.laphar');
         Route::post('/laporan/laporan-harian/export-single', [laporanAdmin::class, 'exportSingle'])->name('admin.laporan.laphar.exportSingle');

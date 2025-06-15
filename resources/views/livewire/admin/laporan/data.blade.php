@@ -508,10 +508,27 @@
                         <strong>Judul Pengaduan :</strong> {{ $item->judul }}
                     </div>
                     <div class="mb-3">
-                        <strong>Status Tindak Lanjut K/L/D :</strong>
+                        <strong>Status Tindak Lanjut K/L/D :</strong><br>
+                        @if($item->forwardings && $item->forwardings->count())
+                            @foreach ($item->forwardings as $fwd)
+                                <span class="badge bg-success">
+                                    Telah diteruskan ke {{ $fwd->institution->name ?? 'Instansi tidak ditemukan' }} pada {{ \Carbon\Carbon::parse($fwd->created_at)->format('d-m-Y H:i') }}
+                                </span>
+                            @endforeach
+                        @else
+                            <span class="text-muted">Belum diteruskan ke instansi manapun</span>
+                        @endif
                     </div>
+
                     <div class="mb-3">
-                        <strong>Tanggapan K/L/D :</strong> 
+                        <strong>Tanggapan K/L/D :</strong><br>
+                        @if($item->forwardings && $item->forwardings->count())
+                            <a href="{{ route('admin.laporan.followup', ['nomor_tiket' => $item->nomor_tiket]) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-comments"></i> Lihat Tindak Lanjut
+                            </a>
+                        @else
+                            <span class="text-muted">Belum ada tindak lanjut</span>
+                        @endif
                     </div>
                     <!-- <div class="mb-3">
                         <strong>Detail Pengaduan :</strong>
