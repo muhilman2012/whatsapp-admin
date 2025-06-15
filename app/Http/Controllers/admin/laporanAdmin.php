@@ -150,7 +150,7 @@ class laporanAdmin extends Controller
             $identitas = \App\Models\Identitas::where('nik', $validated['nik'])->first();
 
             // Ambil URL KTP jika ada
-            $urlKtp = $identitas && $identitas->foto_ktp_url ? $identitas->foto_ktp_url : null;
+            $pathKtp = $identitas && $identitas->foto_ktp ? $identitas->foto_ktp : null;
 
             // Simpan laporan
             $laporan = Laporan::create([
@@ -168,7 +168,7 @@ class laporanAdmin extends Controller
                 'tanggal_kejadian' => $validated['tanggal_kejadian'],
                 'sumber_pengaduan' => $validated['sumber_pengaduan'],
                 'petugas' => auth('admin')->user()->nama,
-                'dokumen_ktp' => $urlKtp,
+                'dokumen_ktp' => $pathKtp,
             ]);
 
             // Simpan dokumen pendukung (jika ada)

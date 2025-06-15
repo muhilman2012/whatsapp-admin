@@ -115,7 +115,7 @@
                     @elseif(in_array($data->sumber_pengaduan, ['tatap muka', 'surat fisik', 'email']))
                     <div>
                         @if($data->dokumen_ktp)
-                            <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('dokumen/' . basename($data->dokumen_ktp)) }}"
+                            <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('identitas/' . basename($data->dokumen_ktp)) }}"
                             target="_blank">
                                 <span class="badge bg-primary">Lihat KTP</span>
                             </a>  
