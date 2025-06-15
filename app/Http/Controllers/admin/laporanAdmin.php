@@ -12,6 +12,7 @@ use App\Models\Institution;
 use App\Models\LaporanForwarding;
 use App\Models\Dokumen;
 use App\Models\Identitas;
+use App\Models\ApiSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -126,7 +127,6 @@ class laporanAdmin extends Controller
 
     public function store(Request $request)
     {
-        // Validasi input termasuk file multiple
         $validated = $request->validate([
             'nomor_pengadu' => 'nullable|string|max:15',
             'email' => 'nullable|email|max:255',
@@ -143,11 +143,16 @@ class laporanAdmin extends Controller
             'sumber_pengaduan' => 'required'
         ]);
 
-        // Generate Nomor Tiket
         $nomorTiket = $this->generateNomorTiket();
 
         try {
-            // Menyimpan laporan baru
+            // Ambil data identitas jika ada
+            $identitas = \App\Models\Identitas::where('nik', $validated['nik'])->first();
+
+            // Ambil URL KTP jika ada
+            $urlKtp = $identitas && $identitas->foto_ktp_url ? $identitas->foto_ktp_url : null;
+
+            // Simpan laporan
             $laporan = Laporan::create([
                 'nomor_tiket' => $nomorTiket,
                 'nomor_pengadu' => $validated['nomor_pengadu'],
@@ -163,34 +168,32 @@ class laporanAdmin extends Controller
                 'tanggal_kejadian' => $validated['tanggal_kejadian'],
                 'sumber_pengaduan' => $validated['sumber_pengaduan'],
                 'petugas' => auth('admin')->user()->nama,
+                'dokumen_ktp' => $urlKtp,
             ]);
 
-            // Proses penyimpanan file
+            // Simpan dokumen pendukung (jika ada)
             if ($request->hasFile('dokumen_pendukung')) {
                 foreach ($request->file('dokumen_pendukung') as $index => $file) {
                     $fileName = $nomorTiket . ($index > 0 ? "_{$index}" : '') . '.' . $file->getClientOriginalExtension();
                     $filePath = $file->storeAs('public/dokumen', $fileName);
 
-                    // Log file yang diterima
                     logger()->info('File diterima: ' . $fileName);
 
-                    // Simpan referensi file ke database Dokumen
                     Dokumen::create([
                         'laporan_id' => $laporan->id,
                         'file_name' => $fileName,
-                        'file_path' => $filePath
+                        'file_path' => $filePath,
                     ]);
                 }
             }
 
-            $identitas = \App\Models\Identitas::where('nik', $validated['nik'])->first();
-
+            // Update status identitas jika ditemukan
             if ($identitas) {
                 $identitas->is_filled = 1;
                 $identitas->save();
             }
 
-            // Menyimpan log aktivitas
+            // Log aktivitas
             Log::create([
                 'laporan_id' => $laporan->id,
                 'activity' => 'Laporan baru berhasil dibuat',
@@ -413,20 +416,6 @@ class laporanAdmin extends Controller
 
         // Mengambil ID analis yang ditugaskan pada laporan ini
         $assignments = Assignment::where('laporan_id', $laporan->id)->get();
-        
-        // // Kirimkan notifikasi kepada analis yang terlibat
-        // foreach ($assignments as $assignment) {
-        //     $analis = $assignment->assignedTo;
-
-        //     // Kirim notifikasi kepada analis
-        //     Notification::create([
-        //         'assigner_id' => auth('admin')->user()->id_admins,  // ID pengirim
-        //         'assignee_id' => $analis->id_admins,  // ID penerima (analis)
-        //         'laporan_id' => $laporan->id,  // ID laporan
-        //         'message' => 'Anda telah memperbarui status/tanggapan',
-        //         'is_read' => false,  // Notifikasi belum dibaca
-        //     ]);
-        // }
 
         // Tentukan nama deputi berdasarkan disposisi atau disposisi_terbaru
         $deputiName = $laporan->disposisi_terbaru ?: $laporan->disposisi; // Pilih disposisi_terbaru jika ada, jika tidak pilih disposisi
@@ -521,7 +510,7 @@ class laporanAdmin extends Controller
                 return back()->with('error', 'Gagal mengirim ke LAPOR!: ' . $apiFirstResponse['error']);
             }
         } catch (\Exception $e) {
-            \Log::error('Terjadi kesalahan saat teruskan ke instansi: ' . $e->getMessage());
+            logger()->error('Terjadi kesalahan saat teruskan ke instansi: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan sistem.');
         }
     }
@@ -530,7 +519,6 @@ class laporanAdmin extends Controller
     {
         $laporan = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        // Kirim ke API LAPOR!
         $apiResponse = $this->sendToApi($laporan);
 
         if ($apiResponse['success']) {
@@ -561,13 +549,13 @@ class laporanAdmin extends Controller
             if (file_exists($filePath)) {
                 try {
                     $response = Http::withHeaders([
-                        'auth' => 'Bearer $2y$10$xhRva4LVGpBYnZU221zSh.MwTPfNpcKpDb4urzbUw.l4tFZcpD6eW',
-                        'token' => '{YKICFSY6-C3PT-SJTU-OI4Z-ITUTOC2DLAQP}',
+                        'auth' => $this->getApiSetting('auth'),
+                        'token' => $this->getApiSetting('token'),
                     ])->attach(
-                        'attachments[]', // sesuai spesifikasi API
+                        'attachments[]',
                         file_get_contents($filePath),
                         basename($filePath)
-                    )->post('https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint/file');
+                    )->post($this->getApiSetting('base_url') . '/complaints/complaint/file');
 
                     if ($response->successful()) {
                         $responseData = $response->json();
@@ -605,10 +593,9 @@ class laporanAdmin extends Controller
         $uploadedDocumentIds = $this->uploadDocuments($laporan);
         $attachments = implode(',', $uploadedDocumentIds);
 
-        // Buat content tergantung status anonim
         $content = $isAnonymous
             ? "Nomor Tiket pada Aplikasi LMW: {$laporan->nomor_tiket}\nDetail Laporan: {$laporan->detail}\nLokasi: {$laporan->lokasi}"
-            : "Nomor Tiket pada Aplikasi LMW: {$laporan->nomor_tiket} , Nama Lengkap: {$laporan->nama_lengkap} , NIK: {$laporan->nik} , Alamat Lengkap: {$laporan->alamat_lengkap} , Detail Laporan: {$laporan->detail} , Lokasi: {$laporan->lokasi}";
+            : "Nomor Tiket pada Aplikasi LMW: {$laporan->nomor_tiket}, Nama Lengkap: {$laporan->nama_lengkap}, NIK: {$laporan->nik}, Alamat Lengkap: {$laporan->alamat_lengkap}, Detail Laporan: {$laporan->detail}, Lokasi: {$laporan->lokasi}";
 
         $data = [
             'title' => $laporan->judul,
@@ -616,7 +603,7 @@ class laporanAdmin extends Controller
             'channel' => 13,
             'is_new_user_slider' => false,
             'user_id' => 5218120,
-            'is_disposisi_slider' => false,
+            'is_disposisi_slider' => true,
             'classification_id' => 6,
             'disposition_id' => 151345,
             'category_id' => 436,
@@ -624,6 +611,9 @@ class laporanAdmin extends Controller
             'location_id' => 34,
             'community_id' => null,
             'date_of_incident' => $laporan->tanggal_kejadian,
+            "copy_externals"=> null,
+            'info_disposition' => '-',
+            'info_attachments' => '[66]',
             'tags_raw' => '#lapormaswapres',
             'is_approval' => false,
             'is_anonymous' => $isAnonymous,
@@ -633,10 +623,10 @@ class laporanAdmin extends Controller
         ];
 
         $response = Http::withHeaders([
-            'auth' => 'Bearer $2y$10$xhRva4LVGpBYnZU221zSh.MwTPfNpcKpDb4urzbUw.l4tFZcpD6eW',
-            'token' => '{YKICFSY6-C3PT-SJTU-OI4Z-ITUTOC2DLAQP}',
+            'auth' => $this->getApiSetting('auth'),
+            'token' => $this->getApiSetting('token'),
             'Content-Type' => 'application/json'
-        ])->post('https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/complaint', $data);
+        ])->post($this->getApiSetting('base_url') . '/complaints/complaint', $data);
 
         if ($response->successful()) {
             Log::create([
@@ -659,10 +649,11 @@ class laporanAdmin extends Controller
 
     private function sendRejectRequest($apiTicketNumber, $institution, $reason)
     {
-        $url = "https://api-splp.layanan.go.id/sandbox-konsolidasi/1.0/complaints/process/{$apiTicketNumber}/reject";
+        $url = $this->getApiSetting('base_url') . "/complaints/process/{$apiTicketNumber}/reject";
+
         $headers = [
-            'auth' => 'Bearer $2y$10$xhRva4LVGpBYnZU221zSh.MwTPfNpcKpDb4urzbUw.l4tFZcpD6eW',
-            'token' => '{YKICFSY6-C3PT-SJTU-OI4Z-ITUTOC2DLAQP}',
+            'auth' => $this->getApiSetting('auth'),
+            'token' => $this->getApiSetting('token'),
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
         ];
@@ -690,13 +681,13 @@ class laporanAdmin extends Controller
 
         // Validasi input
         $request->validate([
-            // 'klasifikasi' => 'required|string',  Validasi klasifikasi
+            
             'lembar_kerja_analis' => 'required|string', // Validasi lembar kerja analis
         ]);
 
         // Simpan lembar kerja analis dan set status analisis menjadi Pending
         $laporan->update([
-            // 'klasifikasi' => $request->klasifikasi,
+            
             'lembar_kerja_analis' => $request->lembar_kerja_analis,
             'status_analisis' => 'Menunggu Persetujuan', // Status analisis menjadi 'Menunggu Persetujuan'
         ]);
@@ -997,5 +988,10 @@ class laporanAdmin extends Controller
     public function laporanforwarding()
     {
         return view('admin.laporan.forwarding');
+    }
+
+    public function getApiSetting($key)
+    {
+        return ApiSetting::where('key', $key)->value('value') ?? '';
     }
 }

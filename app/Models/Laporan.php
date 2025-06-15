@@ -24,6 +24,7 @@ class Laporan extends Model
         'detail',
         'lokasi',
         'dokumen_pendukung',
+        'dokumen_ktp',
         'dokumen_tambahan',
         'tanggal_kejadian',
         'status',
@@ -401,5 +402,10 @@ class Laporan extends Model
             });
         }
         return $query;
+    }
+
+    public function forwardings()
+    {
+        return $this->hasMany(LaporanForwarding::class, 'laporan_id');
     }
 }

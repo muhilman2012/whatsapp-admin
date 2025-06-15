@@ -24,15 +24,16 @@ class ListPengadu extends Component
     public function render()
     {
         $results = Identitas::query()
-            ->where('is_filled', 0) // hanya tampil identitas yang belum isi laporan
+            ->where('is_filled', 0)
             ->when($this->searchTerm, function ($query) {
                 $query->where(function ($subQuery) {
                     $subQuery->where('nama_lengkap', 'like', '%' . $this->searchTerm . '%')
-                             ->orWhere('nik', 'like', '%' . $this->searchTerm . '%');
+                            ->orWhere('nik', 'like', '%' . $this->searchTerm . '%')
+                            ->orWhere('nomor_pengadu', 'like', '%' . $this->searchTerm . '%');
                 });
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(25);
 
         return view('livewire.admin.identitas.list-pengadu', [
             'results' => $results,

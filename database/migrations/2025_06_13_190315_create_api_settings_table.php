@@ -13,8 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('identitas', function (Blueprint $table) {
-            $table->boolean('is_filled')->default(0);
+        Schema::create('api_settings', function (Blueprint $table) {
+            $table->id();
+            $table->string('key')->unique();
+            $table->text('value');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('identitas', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('api_settings');
     }
 };

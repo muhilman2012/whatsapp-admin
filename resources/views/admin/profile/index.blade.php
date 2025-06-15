@@ -9,6 +9,11 @@
 <div class="mb-3">
     @livewire('admin.profile.data')
 </div>
+@if (auth('admin')->user()->role === 'superadmin')
+<div class="mb-3">
+    @livewire('admin.profile.api-settings')
+</div>
+@endif
 <div class="mb-3">
     @livewire('admin.profile.password')
 </div>

@@ -1,8 +1,13 @@
-<div wire:poll.10s>
+<div wire:poll.30s>
     <!-- <div wire:loading>
         <div class="alert alert-info">Memuat data...</div>
     </div> -->
-
+    <div class="mb-3">
+        <input type="text" wire:model.debounce.500ms="searchTerm" class="form-control" placeholder="Cari berdasarkan Nama, NIK, atau Nomor HP...">
+    </div>
+    <div wire:loading.delay wire:target="searchTerm" class="text-muted mb-2">
+        <i class="fas fa-spinner fa-spin"></i> Mencari data...
+    </div>
     <div class="table-responsive" wire:loading.remove>
         <table class="table table-borderless table-striped table-hover mt-3">
             <thead class="alert-secondary">

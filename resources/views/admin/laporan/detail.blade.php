@@ -57,7 +57,7 @@
                             @if($data->dokumen_ktp)
                                 <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('dokumen/' . basename($data->dokumen_ktp)) }}"
                                 target="_blank">
-                                    <span class="badge bg-primary">Lihat Identitas</span>
+                                    <span class="badge bg-primary">Lihat KTP</span>
                                 </a>  
                             @endif
 
@@ -114,6 +114,12 @@
 
                     @elseif(in_array($data->sumber_pengaduan, ['tatap muka', 'surat fisik', 'email']))
                     <div>
+                        @if($data->dokumen_ktp)
+                            <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('dokumen/' . basename($data->dokumen_ktp)) }}"
+                            target="_blank">
+                                <span class="badge bg-primary">Lihat KTP</span>
+                            </a>  
+                        @endif
                         {{-- Tampilkan dokumen_pendukung --}}
                         @if (!empty($data->dokumen_pendukung))
                             @if(filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
@@ -218,7 +224,7 @@
             @if (auth()->user()->hasRole(['superadmin','admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
                 <a href="{{ route('admin.laporan.edit', $data->nomor_tiket) }}" class="btn btn-primary mt-3">Perbarui Pengaduan</a>
             @endif
-                
+
         </div>
     </div>
     <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">

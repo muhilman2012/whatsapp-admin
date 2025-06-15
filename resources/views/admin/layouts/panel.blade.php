@@ -123,17 +123,20 @@
                         <i class="fas fa-user box-icon" aria-hidden="true"></i>Profile
                     </a>
                     <hr class="soft my-1 text-white">
-                    @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
                     <a class="nav-link px-3" href="{{ route('admin.laporan.list') }}">
                         <i class="fas fa-list-ul box-icon" aria-hidden="true"></i>Daftar Pengadu
                     </a>
-                    @endif
                     <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'all']) }}">
                         <i class="fas fa-newspaper box-icon text-center"></i>Kelola Pengaduan
                     </a>
                     <a class="nav-link px-3" href="{{ route('admin.laporan', ['type' => 'pelimpahan']) }}">
                         <i class="fas fa-bookmark box-icon text-center fa-fw "></i>Pelimpahan
                     </a>
+                    @if (in_array(auth('admin')->user()->role, ['superadmin']))
+                    <a class="nav-link px-3" href="{{ route('admin.laporan.forwarding') }}">
+                        <i class="fas fa-forward box-icon" aria-hidden="true"></i>Laporan Diteruskan
+                    </a>
+                    @endif
                     <a class="nav-link px-3" href="{{ route('admin.laporan.create') }}">
                         <i class="fas fa-newspaper box-icon" aria-hidden="true"></i>Tambah Pengaduan
                     </a>

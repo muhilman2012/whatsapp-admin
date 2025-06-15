@@ -57,7 +57,7 @@
                             @if($data->dokumen_ktp)
                                 <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('dokumen/' . basename($data->dokumen_ktp)) }}"
                                 target="_blank">
-                                    <span class="badge bg-primary">Lihat Identitas</span>
+                                    <span class="badge bg-primary">Lihat KTP</span>
                                 </a>  
                             @endif
 
@@ -114,6 +114,12 @@
 
                     @elseif(in_array($data->sumber_pengaduan, ['tatap muka', 'surat fisik', 'email']))
                     <div>
+                        @if($data->dokumen_ktp)
+                            <a href="{{ filter_var($data->dokumen_ktp, FILTER_VALIDATE_URL) ? $data->dokumen_ktp : asset('dokumen/' . basename($data->dokumen_ktp)) }}"
+                            target="_blank">
+                                <span class="badge bg-primary">Lihat KTP</span>
+                            </a>  
+                        @endif
                         {{-- Tampilkan dokumen_pendukung --}}
                         @if (!empty($data->dokumen_pendukung))
                             @if(filter_var($data->dokumen_pendukung, FILTER_VALIDATE_URL))
@@ -197,7 +203,7 @@
     </div>
     <div class="mb-3 mt-3 d-flex justify-content-end align-items-center">
         <div class="text-end">
-            
+
             @if($duplicateReports->count())
                 <button class="btn btn-warning mb-3" data-bs-toggle="modal" data-bs-target="#laporanGandaModal">
                     Info Laporan Ganda ({{ $duplicateReports->count() }})
