@@ -3,6 +3,7 @@
 namespace App\Http\Livewire\Admin\Laporan;
 
 use App\Models\Laporan;
+use App\Models\LaporanForwarding;
 use App\Models\admins;
 use App\Models\Assignment;
 use App\Models\Notification;
@@ -148,7 +149,7 @@ class Data extends Component
     {  
         $user = auth()->guard('admin')->user(); // Ambil data pengguna saat ini  
     
-        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy']);  
+        $data = Laporan::with(['assignments.assignedTo', 'assignments.assignedBy', 'forwardings.institution']);  
     
         // Filter berdasarkan role pengguna  
         if ($user->role === 'asdep') {  
