@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Identitas;
 use App\Models\Laporan;
+use Carbon\Carbon;
 
 class ListPengadu extends Component
 {
@@ -25,11 +26,12 @@ class ListPengadu extends Component
     {
         $results = Identitas::query()
             ->where('is_filled', 0)
+            ->whereDate('created_at', Carbon::now()->toDateString()) // Filter hanya hari ini
             ->when($this->searchTerm, function ($query) {
                 $query->where(function ($subQuery) {
                     $subQuery->where('nama_lengkap', 'like', '%' . $this->searchTerm . '%')
-                            ->orWhere('nik', 'like', '%' . $this->searchTerm . '%')
-                            ->orWhere('nomor_pengadu', 'like', '%' . $this->searchTerm . '%');
+                             ->orWhere('nik', 'like', '%' . $this->searchTerm . '%')
+                             ->orWhere('nomor_pengadu', 'like', '%' . $this->searchTerm . '%');
                 });
             })
             ->orderBy('created_at', 'desc')
