@@ -321,24 +321,44 @@ class laporanAdmin extends Controller
     {
         $data = Laporan::where('nomor_tiket', $nomor_tiket)->firstOrFail();
 
-        // Perbarui data pengaduan dengan mengabaikan 'dokumen_pendukung' dari request
+        // Validasi tambahan untuk dokumen pendukung
+        $request->validate([
+            'dokumen_pendukung.*' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:10240',
+        ]);
+
+        // Perbarui data pengaduan tanpa menyentuh dokumen_pendukung
         $data->update($request->except(['dokumen_pendukung']));
 
-        // Handle file uploads
+        // Handle file uploads jika ada
         if ($request->hasFile('dokumen_pendukung')) {
-            foreach ($request->file('dokumen_pendukung') as $index => $file) {
-                $fileName = $data->nomor_tiket . ($index > 0 ? "_{$index}" : '') . '.' . $file->getClientOriginalExtension();
-                $filePath = $file->storeAs('public/dokumen', $fileName);
+            $files = $request->file('dokumen_pendukung');
 
-                // Simpan referensi file ke database Dokumen
-                Dokumen::create([
-                    'laporan_id' => $data->id,
-                    'file_name' => $fileName,
-                    'file_path' => $filePath,
-                ]);
+            // Konversi ke array jika bukan array
+            if (!is_array($files)) {
+                $files = [$files];
+            }
 
-                // Log file yang diterima
-                logger()->info('File diterima: ' . $fileName);
+            foreach ($files as $index => $file) {
+                try {
+                    $fileName = $data->nomor_tiket . ($index > 0 ? "_{$index}" : '') . '.' . $file->getClientOriginalExtension();
+                    $filePath = $file->storeAs('public/dokumen', $fileName);
+
+                    logger()->info('File diterima: ' . $fileName);
+
+                    Dokumen::create([
+                        'laporan_id' => $data->id,
+                        'file_name' => $fileName,
+                        'file_path' => $filePath,
+                    ]);
+
+                    logger()->info('Dokumen berhasil disimpan: ' . $fileName);
+                } catch (\Throwable $e) {
+                    logger()->error('Gagal menyimpan dokumen pendukung: ' . $e->getMessage(), [
+                        'nomor_tiket' => $data->nomor_tiket,
+                        'index' => $index,
+                        'file_name' => isset($fileName) ? $fileName : 'N/A',
+                    ]);
+                }
             }
         }
 
