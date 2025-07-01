@@ -102,7 +102,7 @@ class Laporan extends Model
         'Politisasi ASN' => ['asn','politisasi asn','netralitas asn','kampanye','pegawai negeri','pns','kode etik asn','manajemen asn','pengangkatan p3k','gaji asn','honorer','mutasi','penyalahgunaan wewenang','tes cpns'],
         'Sosial dan Kesejahteraan' => ['sosial','kesejahteraan','bansos','kesejahteraan sosial','penanggulangan kemiskinan','keluarga miskin','lansia','difabel','kartu lansia','disabilitas','tunggakan spp','tebus ijazah','baznas','miskin','bantuan sosial','pkh','dtks','blt','bpjs', 'makan gratis', 'makan', 'jkn', 'subsidi', 'bpnt', 'kjp', 'kis'],
         'SP4N Lapor' => ['lapor', 'pengaduan', 'sp4n', 'tindak lanjut', 'sistem pengaduan'],
-        'Energi dan Sumber Daya Alam' => ['energi','minyak','gas','pertambangan','sumber daya alam','sda','listrik','pembangkit','bbm','pln','ebt','smelter','hilirisasi', 'tambang', 'pasir'],
+        'Energi dan Sumber Daya Alam' => ['limbah', 'sampah', 'perikanan', 'perkebunan', 'pertanian', 'bbm', 'ebt', 'gas', 'banjir', 'air', 'udara', 'listrik', 'kehutanan'],
         'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)' => ['kekerasan','bullying','pelecehan','lembaga diklat','kampus','sekolah','pendidikan','bully','dosen','mahasiswa','siswa'],
         'Kependudukan' => ['penduduk', 'kependudukan', 'ktp', 'nik', 'domisili', 'dukcapil', 'kartu keluarga', 'pernikahan', 'akta kelahiran', 'kia'],
         'Ketenagakerjaan' => ['pekerja','migran','tenaga kerja','buruh','karyawan','phk','upah','gaji','tunjangan','pensiun','jaminan kerja','outsourcing','hubungan industrial','kesempatan kerja','cuti','bpjs ketenagakerjaan','serikat pekerja','lowongan','pengangguran','pecat', 'kerja', 'rekrutmen', 'recruitment', 'pkwt', 'putus kontrak', 'loker', 'umk', 'thr', 'pesangon', 'pekerja migran', 'ump', 'umr'],
@@ -132,6 +132,8 @@ class Laporan extends Model
         'TNI' => ['tni'],
         'Polri' => ['polri'],
         'Perpajakan' => ['pajak', 'tax'],
+        'Infrastruktur' => ['infrastruktur', 'jalan', 'jembatan', 'transportasi', 'bendungan', 'pelabuhan', 'bandara', 'stasiun'],
+        'Pembangunan Kewilayahan' => ['transmigrasi', 'pemukiman'],
         'Lainnya' => [],
     ];
 
@@ -185,6 +187,8 @@ class Laporan extends Model
         'TNI' => ['tni'],
         'Polri' => ['polri'],
         'Perpajakan' => ['pajak', 'tax'],
+        'Infrastruktur' => ['infrastruktur', 'jalan', 'jembatan', 'transportasi', 'bendungan', 'pelabuhan', 'bandara', 'stasiun'],
+        'Pembangunan Kewilayahan' => ['transmigrasi', 'pemukiman'],
         'Lainnya' => [],
     ];
 
@@ -219,7 +223,9 @@ class Laporan extends Model
             'Pariwisata dan Ekonomi Kreatif',
             'Industri dan Perdagangan',
             'Perumahan',
-            'Perpajakan'
+            'Perpajakan',
+            'Infrastruktur',
+            'Pembangunan Kewilayahan'
         ];
 
         // Deputi 2
@@ -269,7 +275,7 @@ class Laporan extends Model
     }
 
     private static $kategoriDeputi = [
-        'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan', 'Perpajakan'],
+        'deputi_1' => ['Ekonomi dan Keuangan', 'Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Pemulihan Ekonomi Nasional', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Teknologi Informasi dan Komunikasi', 'Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan', 'Perumahan', 'Perpajakan', 'Infrastruktur', 'Pembangunan Kewilayahan'],
         'deputi_2' => ['Agama', 'Corona Virus', 'Kesehatan', 'Kesetaraan Gender dan Sosial Inklusif', 'Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Pendidikan dan Kebudayaan', 'Sosial dan Kesejahteraan', 'Kekerasan di Satuan Pendidikan (Sekolah, Kampus, Lembaga Khusus)', 'Ketenagakerjaan', 'Kependudukan', 'Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Kepemudaan dan Olahraga', 'Keluarga Berencana', 'Penanggulangan Bencana', 'Pembangunan Keluarga'],
         'deputi_3' => ['Ketentraman, Ketertiban Umum, dan Perlindungan Masyarakat','Politik dan Hukum', 'Politisasi ASN', 'SP4N Lapor', 'Netralitas ASN', 'Pencegahan dan Pemberantasan Penyalahgunaan dan Peredaran Gelap Narkotika dan Prekursor Narkotika (P4GN)', 'Manajemen ASN', 'Luar Negeri', 'Pertanahan', 'Daerah Perbatasan', 'Pelayanan Publik', 'TNI', 'Polri', 'Kependudukan'],
         'deputi_4' => ['Topik Khusus', 'Topik Lainnya', 'Bantuan Masyarakat'],
@@ -278,7 +284,7 @@ class Laporan extends Model
     private static $kategoriUnit = [
         'Asisten Deputi Ekonomi, Keuangan, dan Transformasi Digital' => ['Ekonomi dan Keuangan', 'Pemulihan Ekonomi Nasional', 'Teknologi Informasi dan Komunikasi', 'Perpajakan'],
         'Asisten Deputi Industri, Perdagangan, Pariwisata, dan Ekonomi Kreatif' => ['Perlindungan Konsumen', 'Pariwisata dan Ekonomi Kreatif', 'Industri dan Perdagangan'],
-        'Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan' => ['Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Perumahan'],
+        'Asisten Deputi Infrastruktur, Sumber Daya Alam, dan Pembangunan Kewilayahan' => ['Lingkungan Hidup dan Kehutanan', 'Pekerjaan Umum dan Penataan Ruang', 'Pertanian dan Peternakan', 'Energi dan Sumber Daya Alam', 'Mudik', 'Perairan', 'Perhubungan', 'Perumahan', 'Infrastruktur', 'Pembangunan Kewilayahan'],
         'Asisten Deputi Pengentasan Kemiskinan dan Pembangunan Desa' => ['Pembangunan Desa, Daerah Tertinggal, dan Transmigrasi', 'Sosial dan Kesejahteraan'],
         'Asisten Deputi Kesehatan, Gizi, dan Pembangunan Keluarga' => ['Corona Virus', 'Kesehatan', 'Keluarga Berencana', 'Pembangunan Keluarga', 'Kesetaraan Gender dan Sosial Inklusif'],
         'Asisten Deputi Pemberdayaan Masyarakat dan Penanggulangan Bencana' => ['Pemberdayaan Masyarakat, Koperasi, dan UMKM', 'Penanggulangan Bencana', 'Ketenagakerjaan'],
