@@ -201,14 +201,13 @@
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Status Analisis:</p>
                     <p><span class="badge bg-primary">{{ $data->status_analisis }}</span> {{ $data->catatan_analisis ?? '' }}</p>
-
-                    @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
-                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Perbaiki Analisis</button>
-                    @endif
                 </div>
                 <div class="col-md-6">
                     <p class="text-label fw-bold mb-1">Analisis dari JF:</p>
                     <p>{{ $data->lembar_kerja_analis ?? 'Belum ada analisis' }}</p>
+                    @if (auth()->user()->hasRole(['admin', 'asdep', 'deputi_1', 'deputi_2', 'deputi_3', 'deputi_4']))
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalModal">Setujui/Perbaiki Analisis</button>
+                    @endif
                 </div>
             </div>
             <button class="btn btn-secondary mt-3" onclick="window.history.back()">Kembali ke Halaman Sebelumnya</button>

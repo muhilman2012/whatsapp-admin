@@ -75,6 +75,9 @@ class indexAdmin extends Controller
         $tatapMukaQuery = clone $totalLaporanQuery;
         $tatapMuka = $tatapMukaQuery->where('sumber_pengaduan', 'tatap muka')->count();
 
+        $suratFisikQuery = clone $totalLaporanQuery;
+        $suratFisik = $suratFisikQuery->where('sumber_pengaduan', 'surat fisik')->count();
+
         // Query untuk laporan laki-laki dan perempuan
         $lakiLakiQuery = clone $totalLaporanQuery;
         $lakiLaki = $lakiLakiQuery->where('jenis_kelamin', 'L')->count();
@@ -281,6 +284,7 @@ class indexAdmin extends Controller
             'totalLaporan' => $totalLaporan,
             'whatsapp' => $whatsapp,
             'tatapMuka' => $tatapMuka,
+            'suratFisik' => $suratFisik,
             'lakiLaki' => $lakiLaki,
             'perempuan' => $perempuan,
             'totalTerdisposisi' => $totalTerdisposisi,

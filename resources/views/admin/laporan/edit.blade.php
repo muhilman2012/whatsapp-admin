@@ -203,7 +203,15 @@
                     <p>{{ $data->catatan_analisis }}</p>
                 </div>
             </div>
-            
+            <div class="mb-3">
+                <label for="klasifikasi" class="form-label fw-bold">Klasifikasi</label>
+                <select name="klasifikasi" id="klasifikasi" class="form-control select2">
+                    <option value="" selected>Pilih Klasifikasi</option>
+                    <option value="Aspirasi" {{ $data->klasifikasi === 'Aspirasi' ? 'selected' : '' }}>Aspirasi</option>
+                    <option value="Pengaduan Berkadar Pengawasan" {{ $data->klasifikasi === 'Pengaduan Berkadar Pengawasan' ? 'selected' : '' }}>Pengaduan Berkadar Pengawasan</option>
+                    <option value="Pengaduan Tidak Berkadar Pengawasan" {{ $data->klasifikasi === 'Pengaduan Tidak Berkadar Pengawasan' ? 'selected' : '' }}>Pengaduan Tidak Berkadar Pengawasan</option>
+                </select>
+            </div>
             <!-- Input Lembar Kerja Analis -->
             <div class="mb-3">
                 <label for="lembar_kerja_analis" class="form-label fw-bold">Lembar Kerja Analis</label>
@@ -217,42 +225,46 @@
     </div>
     @endif
     
-    
-    <!-- Bagian Form Edit -->
-    <div class="d-block rounded bg-white shadow p-5">
-        <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">
-            @csrf
-            @method('put')
-            <!-- Dropdown Status -->
-            <div class="mb-3">
-                <label for="status" class="form-label fw-bold">Status</label>
-                <select name="status" id="status" class="form-control select2">
-                    <option value="" selected>Pilih Status</option>
-                    <option value="Penanganan Selesai" {{ $data->status === 'Penanganan Selesai' ? 'selected' : 'Penanganan Selesai' }}>Penanganan Selesai</option>
-                    <option value="Menunggu kelengkapan data dukung dari Pelapor" {{ $data->status === 'Menunggu kelengkapan data dukung dari Pelapor' ? 'selected' : '' }}>Menunggu kelengkapan data dukung dari Pelapor</option>
-                    <option value="Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut" {{ $data->status === 'Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut' ? 'selected' : '' }}>Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut</option>
-                    <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
-                </select>
-            </div>
+    @php
+        $userRole = auth()->user()->role;
+    @endphp
 
-            <!-- Input Tanggapan -->
-            <div class="mb-3">
-                <label for="tanggapan" class="form-label fw-bold">Tanggapan <small>(Tanggapan ini dapat dilihat oleh Pengadu)</small></label>
-                <textarea name="tanggapan" id="tanggapan" rows="6" class="form-control">{{ old('tanggapan', $data->tanggapan) }}</textarea>
-            </div>
+    @if($userRole !== 'analis' || ($userRole === 'analis' && $data->status_analisis === 'Disetujui'))
+        <!-- Bagian Form Edit -->
+        <div class="d-block rounded bg-white shadow p-5">
+            <form action="{{ route('admin.laporan.update', $data->nomor_tiket) }}" method="post" id="formEditLaporan">
+                @csrf
+                @method('put')
+                <!-- Dropdown Status -->
+                <div class="mb-3">
+                    <label for="status" class="form-label fw-bold">Status</label>
+                    <select name="status" id="status" class="form-control select2">
+                        <option value="" selected>Pilih Status</option>
+                        <option value="Penanganan Selesai" {{ $data->status === 'Penanganan Selesai' ? 'selected' : '' }}>Penanganan Selesai</option>
+                        <option value="Menunggu kelengkapan data dukung dari Pelapor" {{ $data->status === 'Menunggu kelengkapan data dukung dari Pelapor' ? 'selected' : '' }}>Menunggu kelengkapan data dukung dari Pelapor</option>
+                        <option value="Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut" {{ $data->status === 'Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut' ? 'selected' : '' }}>Diteruskan kepada instansi yang berwenang untuk penanganan lebih lanjut</option>
+                        <option value="Proses verifikasi dan telaah" {{ $data->status === 'Proses verifikasi dan telaah' ? 'selected' : '' }}>Proses verifikasi dan telaah</option>
+                    </select>
+                </div>
 
-            <div class="d-flex justify-content-between align-items-center my-3">
-                <button class="btn btn-secondary" onclick="window.history.back()">Kembali</button>
-                @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instansiTujuanModal">
-                        Teruskan ke Instansi
-                    </button>
-                @endif
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#perbaruiModal">Perbarui Pengaduan</button>
-            </div>
-        </form>
-    </div>
-    
+                <!-- Input Tanggapan -->
+                <div class="mb-3">
+                    <label for="tanggapan" class="form-label fw-bold">Tanggapan <small>(Tanggapan ini dapat dilihat oleh Pengadu)</small></label>
+                    <textarea name="tanggapan" id="tanggapan" rows="6" class="form-control">{{ old('tanggapan', $data->tanggapan) }}</textarea>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center my-3">
+                    <button class="btn btn-secondary" onclick="window.history.back()">Kembali</button>
+                    @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#instansiTujuanModal">
+                            Teruskan ke Instansi
+                        </button>
+                    @endif
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#perbaruiModal">Perbarui Pengaduan</button>
+                </div>
+            </form>
+        </div>
+    @endif
 </div>
 
 <!-- Modal Konfirmasi Perbarui Pengaduan -->

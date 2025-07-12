@@ -20,9 +20,9 @@
                     <td>{{ $item->laporan->nomor_tiket }}</td>
                     <td>{{ $item->laporan->nama_lengkap }}</td>
                     <td>{{ $item->institution->name ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($item->forwarded_at)->format('d/m/Y H:i') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($item->sent_at)->format('d/m/Y H:i') }}</td>
                     <td>
-                        <a href="{{ route('admin.laporan.detail', ['nomor_tiket' => $item->laporan->nomor_tiket]) }}" class="btn btn-sm btn-primary">
+                        <a href="{{ route('admin.laporan.followup', ['nomor_tiket' => $item->laporan->nomor_tiket]) }}" target="_blank" class="btn btn-sm btn-primary">
                             Detail
                         </a>
                     </td>

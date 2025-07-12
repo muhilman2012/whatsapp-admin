@@ -5,6 +5,11 @@
 @endsection
 
 @section('pages')
+@php
+    use Illuminate\Support\Str;
+    // Ambil instansi tujuan terakhir dari followups
+    $terdisposisiKe = collect($followups)->reverse()->first(fn($item) => !empty($item['institution_to_name']));
+@endphp
 <div class="container fluid">
     <div class="d-block rounded bg-white shadow">
         <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
@@ -15,8 +20,11 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-1">
                     <div>
-                        <strong>{{ $laporan->nama_lengkap ?? 'Anonim' }}</strong>
+                        <h3>{{ $laporan->nama_lengkap ?? 'Anonim' }}</h3>
                         <span class="badge bg-secondary">{{ ucfirst($laporan->sumber_pengaduan) }}</span>
+                        @if($terdisposisiKe)
+                            <span class="badge bg-primary">Terdisposisi ke {{ $terdisposisiKe['institution_to_name'] }}</span>
+                        @endif
                         @if($laporan->status === 'Belum Diverifikasi')
                             <span class="badge bg-danger">Belum Diverifikasi</span>
                         @elseif($laporan->status === 'Terverifikasi')

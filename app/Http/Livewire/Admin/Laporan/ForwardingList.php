@@ -28,7 +28,7 @@ class ForwardingList extends Component
                 $query->where('nomor_tiket', 'like', "%{$this->search}%")
                       ->orWhere('nama_lengkap', 'like', "%{$this->search}%");
             })
-            ->orderBy('forwarded_at', 'desc')
+            ->orderBy('sent_at', 'desc')
             ->paginate(10);
 
         return view('livewire.admin.laporan.forwarding-list', [

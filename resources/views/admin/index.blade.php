@@ -52,10 +52,11 @@
                 <div class="col-12 col-sm-6 col-md-6 col-lg-3">
                     <div class="card border-0 p-2 shadow-sm">
                         <div class="d-flex align-items-center px-2">
-                            <i class="fas fa-newspaper fa-3x"></i>
-                            <div class="card-body text-end">
-                                <p class="card-title mb-0">WA: {{ $whatsapp }}</p>
-                                <p class="card-title mb-0">TM: {{ $tatapMuka }}</p>
+                            <i class="fas fa-newspaper fa-3x me-2"></i>
+                            <div class="card-body p-0 text-end">
+                                <p class="mb-0" style="font-size: 1.1rem;">WA: {{ $whatsapp }}</p>
+                                <p class="mb-0" style="font-size: 1.1rem;">TM: {{ $tatapMuka }}</p>
+                                <p class="mb-0" style="font-size: 1.1rem;">Surat: {{ $suratFisik }}</p>
                             </div>
                         </div>
                         <div class="card-footer bg-white px-1">
@@ -303,11 +304,61 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Pengumuman -->   
+    <div class="modal fade" id="pengumumanModal" tabindex="-1" aria-labelledby="pengumumanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="pengumumanModalLabel">📢 Pengumuman Penting</h5>
+                </div>
+                <div class="modal-body" style="font-size: 0.9rem;">
+                    <p>Dalam rangka peningkatan tata kelola penanganan pengaduan yang lebih tertib dan akuntabel, disampaikan hal-hal berikut:</p>
+                    
+                    <p><strong>Bagi Analis / JF:</strong></p>
+                    <ul>
+                        <li>Dimohon untuk menyelesaikan tahapan analisis secara menyeluruh terhadap setiap pengaduan yang diterima.</li>
+                        <li>Hasil analisis perlu dilengkapi hingga tahap <em>Lembar Kerja Analis</em>.</li>
+                        <li>Pengaduan baru dapat dilanjutkan setelah ada persetujuan dari Asdep/Karo terkait.</li>
+                    </ul>
+
+                    <p><strong>Bagi Asdep / Karo:</strong></p>
+                    <ul>
+                        <li>Dimohon untuk memeriksa dan memberikan persetujuan dari setiap hasil analisis yang diajukan oleh Analis.</li>
+                        <li>Status dan tanggapan pengaduan baru dapat diperbarui setelah hasil analisis disetujui.</li>
+                    </ul>
+
+                    <hr>
+                    <p><strong>📘 Keterangan Status Analisis:</strong></p>
+                    <ul>
+                        <li><strong>Pending:</strong> Status awal ketika pengaduan baru diteruskan ke Analis/JF.</li>
+                        <li><strong>Menunggu Persetujuan:</strong> Analis telah memilih klasifikasi dan mengirimkan hasil analisis.</li>
+                        <li><strong>Disetujui:</strong> Asdep/Karo telah menyetujui hasil analisis.</li>
+                        <li><strong>Perbaikan:</strong> Asdep/Karo meminta perbaikan atas hasil analisis. Catatan koreksi tersedia dalam form analisis.</li>
+                    </ul>
+
+                    <p>🔔 Informasi dan pembaruan terkait proses analisis kini tersedia secara langsung melalui fitur <strong>Notifikasi</strong> pada sistem.</p>
+
+                    <p>Atas perhatian dan kerja sama Bapak/Ibu dalam menjaga kelancaran serta akuntabilitas penanganan pengaduan, kami sampaikan terima kasih.</p>
+                </div>
+                <div class="modal-footer justify-content-end">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Saya Mengerti</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<!-- Script untuk menampilkan modal setiap kali halaman dimuat -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const pengumumanModal = new bootstrap.Modal(document.getElementById('pengumumanModal'));
+        pengumumanModal.show();
+    });
+</script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('laporanHarianChart').getContext('2d');

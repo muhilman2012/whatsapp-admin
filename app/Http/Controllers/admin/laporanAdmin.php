@@ -701,13 +701,13 @@ class laporanAdmin extends Controller
 
         // Validasi input
         $request->validate([
-            
+            'klasifikasi' => 'required|string', // Validasi klasifikasi
             'lembar_kerja_analis' => 'required|string', // Validasi lembar kerja analis
         ]);
 
         // Simpan lembar kerja analis dan set status analisis menjadi Pending
         $laporan->update([
-            
+            'klasifikasi' => $request->klasifikasi,
             'lembar_kerja_analis' => $request->lembar_kerja_analis,
             'status_analisis' => 'Menunggu Persetujuan', // Status analisis menjadi 'Menunggu Persetujuan'
         ]);
@@ -717,6 +717,7 @@ class laporanAdmin extends Controller
             'laporan_nomor_tiket' => $laporan->nomor_tiket,
             'lembar_kerja_analis' => $request->lembar_kerja_analis,
             'status_analisis' => $laporan->status_analisis,
+            'klasifikasi' => $laporan->klasifikasi,
             'updated_by' => auth('admin')->user()->username
         ]);
 
