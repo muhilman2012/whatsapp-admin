@@ -286,9 +286,9 @@
             <button type="button" class="btn btn-info ms-2" data-bs-toggle="modal" data-bs-target="#assignModal">
                 Disposisi ke Analis
             </button>
-            <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#pelimpahanModal">
+            <!-- <button type="button" class="btn btn-warning ms-2" data-bs-toggle="modal" data-bs-target="#pelimpahanModal">
                 Limpahkan
-            </button>
+            </button> -->
             @endif
         @endif
 
