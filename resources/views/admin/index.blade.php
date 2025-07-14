@@ -352,11 +352,17 @@
 @section('script')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-<!-- Script untuk menampilkan modal setiap kali halaman dimuat -->
+<!-- Script untuk menampilkan modal 1x per login -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const pengumumanModal = new bootstrap.Modal(document.getElementById('pengumumanModal'));
-        pengumumanModal.show();
+        // Cek apakah modal sudah pernah ditampilkan di sesi ini
+        if (!sessionStorage.getItem('pengumumanShown')) {
+            const pengumumanModal = new bootstrap.Modal(document.getElementById('pengumumanModal'));
+            pengumumanModal.show();
+
+            // Simpan flag ke sessionStorage
+            sessionStorage.setItem('pengumumanShown', 'true');
+        }
     });
 </script>
 <script>
