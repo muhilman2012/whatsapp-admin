@@ -35,15 +35,17 @@ class indexAdmin extends Controller
         $kategoriByUnit = Laporan::getKategoriByUnit($admin->unit);
 
         // Ambil daftar kategori sesuai Deputi menggunakan getter
-        $kategoriDeputi = Laporan::getKategoriDeputi();
+        $kategoriDeputi = Laporan::getKategoriDeputi2();
 
         // Tentukan kategori yang bisa diakses menggunakan getter
         $kategoriKataKunci = Laporan::getKategoriKataKunci();
         
         // Modifikasi logika untuk menentukan kategori berdasarkan role
         $kategori = in_array($admin->role, ['superadmin', 'admin'])
-            ? array_keys($kategoriKataKunci) // Semua kategori untuk superadmin dan admin
-            : ($admin->role === 'asdep' ? Laporan::getKategoriByUnit($admin->unit) : ($kategoriDeputi[$admin->role] ?? [])); // Kategori sesuai role Deputi atau asdep
+        ? array_keys($kategoriKataKunci)
+        : ($admin->role === 'asdep' 
+            ? Laporan::getKategoriByUnit($admin->unit) 
+            : ($kategoriDeputi[$admin->role] ?? [])); // Kategori sesuai role Deputi atau asdep
 
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
