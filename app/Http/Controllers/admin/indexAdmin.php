@@ -42,10 +42,8 @@ class indexAdmin extends Controller
         
         // Modifikasi logika untuk menentukan kategori berdasarkan role
         $kategori = in_array($admin->role, ['superadmin', 'admin'])
-        ? array_keys($kategoriKataKunci)
-        : ($admin->role === 'asdep' 
-            ? Laporan::getKategoriByUnit($admin->unit) 
-            : ($kategoriDeputi[$admin->role] ?? [])); // Kategori sesuai role Deputi atau asdep
+            ? array_keys($kategoriKataKunci) // Semua kategori untuk superadmin dan admin
+            : ($admin->role === 'asdep' ? Laporan::getKategoriByUnit($admin->unit) : ($kategoriDeputi[$admin->role] ?? [])); // Kategori sesuai role Deputi atau asdep
 
         // Hitung total laporan
         $totalLaporanQuery = Laporan::query();
