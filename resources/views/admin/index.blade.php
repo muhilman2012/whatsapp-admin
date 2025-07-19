@@ -353,7 +353,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <!-- Script untuk menampilkan modal 1x per login -->
-<script>
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Cek apakah modal sudah pernah ditampilkan di sesi ini
         if (!sessionStorage.getItem('pengumumanShown')) {
@@ -364,7 +364,7 @@
             sessionStorage.setItem('pengumumanShown', 'true');
         }
     });
-</script>
+</script> -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('laporanHarianChart').getContext('2d');
