@@ -14,40 +14,35 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 
-class LaporanExport implements FromView, WithStyles, WithColumnWidths
+class LaporanExport implements
+    FromQuery,
+    WithMapping,
+    WithHeadings,
+    WithStyles,
+    WithColumnWidths,
+    WithChunkReading,
+    ShouldAutoSize
 {
     protected $startDate;
     protected $endDate;
-    protected $data;
+    protected $query;
 
-    public function view(): View
+    public function __construct($query)
     {
-        return view('admin.laporan.export.laporan', [
-            'laporans' => $this->data
-        ]);
-    }
-
-    public function __construct($data)
-    {
-        $this->data = $data->map(function ($item) {
-            $item->created_at = $item->created_at->format('d-m-Y');
-            $item->nik = "'" . $item->nik; // Tambahkan kutipan tunggal di depan NIK
-            $item->nomor_pengadu = "'" . $item->nomor_pengadu; // Tambahkan kutipan tunggal di depan Nomor Pengadu
-            return $item;
-        });
+        $this->query = $query;
     }
 
     public function query()
     {
-        return Laporan::query()
-            ->whereBetween('created_at', [$this->startDate, $this->endDate]);
+        return $this->query;
     }
 
     public function headings(): array
     {
         return [
-            'Tgl Pengaduan',
+            'Tanggal Pengaduan',
             'Nomor Tiket',
             'Nama Lengkap',
             'NIK',
@@ -70,70 +65,79 @@ class LaporanExport implements FromView, WithStyles, WithColumnWidths
         ];
     }
 
+    public function map($row): array
+    {
+        return [
+            optional($row->created_at)->format('d-m-Y'),
+            $row->nomor_tiket,
+            $row->nama_lengkap,
+            "'" . $row->nik,
+            "'" . $row->nomor_pengadu,
+            $row->email,
+            $row->jenis_kelamin,
+            $row->alamat_lengkap,
+            $row->tanggal_kejadian,
+            $row->lokasi,
+            $row->judul,
+            $row->detail_pengaduan,
+            $row->kategori,
+            $row->status,
+            $row->tanggapan,
+            $row->dokumen_ktp,
+            $row->dokumen_kk,
+            $row->dokumen_surat_kuasa,
+            $row->dokumen_pendukung,
+            $row->sumber_pengaduan,
+        ];
+    }
+
     public function styles(Worksheet $sheet)
     {
-        // Style untuk header tabel
-        $sheet->getStyle('A1:O1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'color' => ['argb' => 'FFFFFF'], // Warna teks putih
-            ],
+        $sheet->getStyle('A1:T1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFF']],
             'fill' => [
                 'fillType' => 'solid',
-                'startColor' => ['argb' => '538DD5'], // Latar belakang biru
+                'startColor' => ['argb' => '538DD5'],
             ],
-            'alignment' => [
-                'horizontal' => 'center', // Pusatkan teks header
-                'vertical' => 'center',
-            ],
+            'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
         ]);
 
-        // Style border untuk semua tabel
-        $highestRow = $sheet->getHighestRow();
-        $sheet->getStyle('A1:O' . $highestRow)->applyFromArray([
+        // Border seluruh data
+        $sheet->getStyle('A1:T' . $sheet->getHighestRow())->applyFromArray([
             'borders' => [
-                'allBorders' => [
-                    'borderStyle' => 'thin',
-                    'color' => ['argb' => '000000'], // Warna border hitam
-                ],
+                'allBorders' => ['borderStyle' => 'thin', 'color' => ['argb' => '000000']],
             ],
         ]);
-
-        // Tinggi baris default
-        $sheet->getDefaultRowDimension()->setRowHeight(20);
-
-        return $sheet;
     }
 
     public function columnWidths(): array
     {
         return [
-            'A' => 15, // Nomor Tiket
-            'B' => 20, // Tanggal Pengaduan
-            'C' => 25, // Nama Lengkap
-            'D' => 18, // NIK
-            'E' => 18, // Nomor Pengadu
-            'F' => 30, // Email
-            'G' => 10, // Jenis Kelamin
-            'H' => 40, // Alamat Lengkap
-            'I' => 20, // Tanggal Kejadian
-            'J' => 30, // Lokasi
-            'K' => 35, // Judul
-            'L' => 50, // Detail
-            'M' => 20, // Kategori
-            'N' => 15, // Status
-            'O' => 50, // Tanggapan
-            'P' => 15, // Dokumen KTP
-            'Q' => 15, // Dokumen KK
-            'R' => 15, // Dokumen Pendukung
-            'S' => 15, // Dokumen Surat Kuasa
-            'T' => 10, // Sumber Pengaduan
+            'A' => 15,
+            'B' => 20,
+            'C' => 25,
+            'D' => 18,
+            'E' => 18,
+            'F' => 30,
+            'G' => 10,
+            'H' => 40,
+            'I' => 20,
+            'J' => 30,
+            'K' => 35,
+            'L' => 50,
+            'M' => 20,
+            'N' => 15,
+            'O' => 50,
+            'P' => 15,
+            'Q' => 15,
+            'R' => 15,
+            'S' => 15,
+            'T' => 10,
         ];
     }
 
-    public static function afterSheet(AfterSheet $event)
+    public function chunkSize(): int
     {
-        $event->sheet->getStyle('D')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
-        $event->sheet->getStyle('E')->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+        return 1000;
     }
 }

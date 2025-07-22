@@ -7,8 +7,16 @@
     @endif
 
     @if (session('success'))
-        <div class="alert alert-success">
-            {!! session('success') !!}
+        <div class="alert alert-success d-flex justify-content-between align-items-center">
+            <div>
+                {{ session('success') }}
+                @if (session('download_url'))
+                    <br>
+                    <a href="{{ session('download_url') }}" target="_blank" class="btn btn-sm btn-success mt-2">
+                        Download File
+                    </a>
+                @endif
+            </div>
         </div>
     @endif
 

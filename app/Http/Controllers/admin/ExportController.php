@@ -13,6 +13,7 @@ use App\Exports\LaporanExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Jobs\ExportPdfJob;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ExportController extends Controller
 {
@@ -61,27 +62,27 @@ class ExportController extends Controller
         $user = auth()->guard('admin')->user();
         $kategori = $this->getKategoriByRole($user->role, $user->unit);
 
-        $data = Laporan::query();
+        $query = Laporan::query();
 
         if ($user->role === 'analis') {
-            $data->whereHas('assignments', function ($query) use ($user) {
-                $query->where('analis_id', $user->id_admins);  // Pastikan hanya mengambil laporan yang ditugaskan kepada analis yang login
+            $query->whereHas('assignments', function ($q) use ($user) {
+                $q->where('analis_id', $user->id_admins);
             });
-        } else if ($user->role !== 'admin' && $user->role !== 'superadmin') {
-            $data->whereIn('kategori', $kategori);
+        } elseif (!in_array($user->role, ['admin', 'superadmin'])) {
+            $query->whereIn('kategori', $kategori);
         }
 
-        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
-            $data->where('kategori', $request->filterKategori);
+        if ($request->filled('filterKategori')) {
+            $query->where('kategori', $request->filterKategori);
         }
 
-        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
-            $data->where('status', $request->filterStatus);
+        if ($request->filled('filterStatus')) {
+            $query->where('status', $request->filterStatus);
         }
 
-        if ($request->has('search') && !empty($request->search)) {
-            $data->where(function ($query) use ($request) {
-                $query->where('nomor_tiket', 'like', '%' . $request->search . '%')
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nomor_tiket', 'like', '%' . $request->search . '%')
                     ->orWhere('nama_lengkap', 'like', '%' . $request->search . '%')
                     ->orWhere('nik', 'like', '%' . $request->search . '%')
                     ->orWhere('status', 'like', '%' . $request->search . '%')
@@ -89,37 +90,46 @@ class ExportController extends Controller
             });
         }
 
-        if ($request->has('tanggal') && !empty($request->tanggal)) {
-            $data->whereDate('created_at', $request->tanggal);
+        if ($request->filled('tanggal')) {
+            $query->whereDate('created_at', $request->tanggal);
         }
 
-        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)) {
-            $data->where('sumber_pengaduan', $request->sumber_pengaduan);
+        if ($request->filled('sumber_pengaduan')) {
+            $query->where('sumber_pengaduan', $request->sumber_pengaduan);
         }
 
-        $data = $data->get();
-        // dd($data);
-
-        if ($data->isEmpty()) {
+        if (!$query->exists()) {
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
         }
 
-        $fileName = 'laporan_all';
-        if ($request->has('filterKategori') && !empty($request->filterKategori)) {
-            $fileName .= '_by_kategori_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterKategori));
+        // Buat nama file
+        $fileName = 'laporan_' . now()->format('Ymd_His');
+        if ($request->filled('filterKategori')) {
+            $fileName .= '_kategori_' . Str::slug($request->filterKategori, '_');
         }
-        if ($request->has('filterStatus') && !empty($request->filterStatus)) {
-            $fileName .= '_by_status_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterStatus));
+        if ($request->filled('filterStatus')) {
+            $fileName .= '_status_' . Str::slug($request->filterStatus, '_');
         }
-        if ($request->has('tanggal') && !empty($request->tanggal)) {
-            $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
+        if ($request->filled('tanggal')) {
+            $fileName .= '_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d_m_Y');
         }
-        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)){
-            $fileName .= '_by_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->sumber_pengaduan));
+        if ($request->filled('sumber_pengaduan')) {
+            $fileName .= '_sumber_' . Str::slug($request->sumber_pengaduan, '_');
         }
-        $fileName .= '.xlsx';
 
-        return Excel::download(new LaporanExport($data), $fileName);
+        $fileName .= '.xlsx';
+        $filePath = 'public/exports/' . $fileName;
+
+        // Simpan file Excel ke storage
+        Excel::store(new LaporanExport($query), $filePath);
+
+        $downloadLink = Storage::url('exports/' . $fileName);
+
+        // Kirim flash message dengan link
+        return redirect()->back()->with([
+            'success' => 'Export berhasil.',
+            'download_url' => Storage::url('exports/' . $fileName)
+        ]);
     }
 
     public function exportPelimpahan(Request $request)
