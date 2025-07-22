@@ -57,10 +57,6 @@ class LaporanExport implements
             'Kategori',
             'Status',
             'Tanggapan',
-            'Dokumen KTP',
-            'Dokumen KK',
-            'Dokumen Surat Kuasa',
-            'Dokumen Pendukung',
             'Sumber Pengaduan'
         ];
     }
@@ -79,21 +75,17 @@ class LaporanExport implements
             $row->tanggal_kejadian,
             $row->lokasi,
             $row->judul,
-            $row->detail_pengaduan,
+            $row->detail,
             $row->kategori,
             $row->status,
             $row->tanggapan,
-            $row->dokumen_ktp,
-            $row->dokumen_kk,
-            $row->dokumen_surat_kuasa,
-            $row->dokumen_pendukung,
             $row->sumber_pengaduan,
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:T1')->applyFromArray([
+        $sheet->getStyle('A1:P1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['argb' => 'FFFFFF']],
             'fill' => [
                 'fillType' => 'solid',
@@ -103,7 +95,7 @@ class LaporanExport implements
         ]);
 
         // Border seluruh data
-        $sheet->getStyle('A1:T' . $sheet->getHighestRow())->applyFromArray([
+        $sheet->getStyle('A1:P' . $sheet->getHighestRow())->applyFromArray([
             'borders' => [
                 'allBorders' => ['borderStyle' => 'thin', 'color' => ['argb' => '000000']],
             ],
@@ -128,11 +120,7 @@ class LaporanExport implements
             'M' => 20,
             'N' => 15,
             'O' => 50,
-            'P' => 15,
-            'Q' => 15,
-            'R' => 15,
-            'S' => 15,
-            'T' => 10,
+            'P' => 10,
         ];
     }
 
