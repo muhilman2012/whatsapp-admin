@@ -103,7 +103,7 @@ class ExportController extends Controller
         }
 
         // Buat nama file
-        $fileName = 'laporan_' . now()->format('Ymd_His');
+        $fileName = 'laporan_' . now()->format('Ymd') . '_all_data';
         if ($request->filled('filterKategori')) {
             $fileName .= '_kategori_' . Str::slug($request->filterKategori, '_');
         }

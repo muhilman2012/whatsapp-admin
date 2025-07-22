@@ -72,7 +72,7 @@ class LaporanExport implements
             $row->email,
             $row->jenis_kelamin,
             $row->alamat_lengkap,
-            $row->tanggal_kejadian,
+            optional($row->tanggal_kejadian)->format('d-m-Y'),
             $row->lokasi,
             $row->judul,
             $row->detail,
