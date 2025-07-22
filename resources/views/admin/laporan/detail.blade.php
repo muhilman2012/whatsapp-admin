@@ -85,6 +85,13 @@
                                 </a>
                             @endif
 
+                            {{-- Tampilkan dokumen dari tabel dokumens --}}
+                            @foreach ($data->dokumens as $dokumen)
+                                <a href="{{ asset('storage/dokumen/' . $dokumen->file_name) }}" target="_blank">
+                                    <span class="badge bg-primary">Lihat Dokumen</span>
+                                </a>
+                            @endforeach
+
                             {{-- Dokumen Tambahan: Jika URL disimpan di field, tampilkan --}}
                             @if($data->dokumen_tambahan && filter_var($data->dokumen_tambahan, FILTER_VALIDATE_URL))
                                 <a href="{{ $data->dokumen_tambahan }}" target="_blank">
