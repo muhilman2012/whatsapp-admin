@@ -235,7 +235,12 @@
                                     <span>{{ $assignedTo->assignedTo->nama }}</span>
                                 @endif
                             @else
-                                <span class="text-danger">Belum terdisposisi</span>
+                                <a href="#" class="text-danger" style="text-decoration: none;" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#assignModal"
+                                    wire:click="openReassignModal({{ $item->id }}, null)">
+                                    Belum terdisposisi
+                                </a>
                             @endif
                         @endif
                     </td>
