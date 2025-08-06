@@ -80,6 +80,15 @@ class ExportController extends Controller
             $query->where('status', $request->filterStatus);
         }
 
+        // Logika untuk filter rentang tanggal
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('nomor_tiket', 'like', '%' . $request->search . '%')
@@ -103,15 +112,18 @@ class ExportController extends Controller
         }
 
         // Buat nama file
-        $fileName = 'laporan_' . now()->format('Ymd') . '_all_data';
+        $fileName = 'laporan_' . now()->format('Ymd');
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $fileName .= '_from_' . \Carbon\Carbon::parse($request->from_date)->format('d_m_Y') . '_to_' . \Carbon\Carbon::parse($request->to_date)->format('d_m_Y');
+        } elseif ($request->filled('tanggal')) {
+            $fileName .= '_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d_m_Y');
+        }
+
         if ($request->filled('filterKategori')) {
             $fileName .= '_kategori_' . Str::slug($request->filterKategori, '_');
         }
         if ($request->filled('filterStatus')) {
             $fileName .= '_status_' . Str::slug($request->filterStatus, '_');
-        }
-        if ($request->filled('tanggal')) {
-            $fileName .= '_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d_m_Y');
         }
         if ($request->filled('sumber_pengaduan')) {
             $fileName .= '_sumber_' . Str::slug($request->sumber_pengaduan, '_');

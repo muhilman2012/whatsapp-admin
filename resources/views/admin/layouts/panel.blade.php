@@ -145,7 +145,7 @@
                     </a>
                     @if (in_array(auth('admin')->user()->role, ['superadmin' ,'admin']))
                     <a class="nav-link px-3" href="{{ route('admin.laporan.laphar') }}">
-                        <i class="fas fa-file-export box-icon" aria-hidden="true"></i>Ekspor Laporan Harian
+                        <i class="fas fa-file-export box-icon" aria-hidden="true"></i>Ekspor LMW
                     </a>
                     @endif
                     @if (auth('admin')->user()->role === 'superadmin')
