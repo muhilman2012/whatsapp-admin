@@ -569,7 +569,7 @@ class laporanAdmin extends Controller
             if (file_exists($filePath)) {
                 try {
                     $response = Http::withHeaders([
-                        'auth' => $this->getApiSetting('auth'),
+                        'Authorization' => $this->getApiSetting('auth'),
                         'token' => $this->getApiSetting('token'),
                     ])->attach(
                         'attachments[]',
@@ -643,10 +643,10 @@ class laporanAdmin extends Controller
         ];
 
         $response = Http::withHeaders([
-            'auth' => $this->getApiSetting('auth'),
+            'Authorization' => $this->getApiSetting('auth'),
             'token' => $this->getApiSetting('token'),
             'Content-Type' => 'application/json'
-        ])->post($this->getApiSetting('base_url') . '/complaints/complaint', $data);
+        ])->post($this->getApiSetting('base_url') . '/complaints/complaint-lmw', $data);
 
         if ($response->successful()) {
             Log::create([
@@ -672,7 +672,7 @@ class laporanAdmin extends Controller
         $url = $this->getApiSetting('base_url') . "/complaints/process/{$apiTicketNumber}/reject";
 
         $headers = [
-            'auth' => $this->getApiSetting('auth'),
+            'Authorization' => $this->getApiSetting('auth'),
             'token' => $this->getApiSetting('token'),
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'

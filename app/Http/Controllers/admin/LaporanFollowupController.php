@@ -30,7 +30,7 @@ class LaporanFollowupController extends Controller
             // Ambil konfigurasi dari tabel api_settings
             $baseUrl = $this->getApiSetting('base_url');
             $headers = [
-                'auth' => $this->getApiSetting('auth'),
+                'Authorization' => $this->getApiSetting('auth'),
                 'token' => $this->getApiSetting('token'),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
