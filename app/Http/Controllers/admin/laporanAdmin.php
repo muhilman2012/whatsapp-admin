@@ -623,6 +623,7 @@ class laporanAdmin extends Controller
             'channel' => 13,
             'is_new_user_slider' => false,
             'user_id' => 5218120,
+            'is_inbox' => true,
             'is_disposisi_slider' => true,
             'classification_id' => 6,
             'disposition_id' => 151345,
