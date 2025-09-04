@@ -146,30 +146,30 @@ class ExportController extends Controller
 
     public function exportPelimpahan(Request $request)
     {
+        // PENTING: Periksa apakah ada laporan yang dipilih melalui checkbox.
+        // Jika ada, abaikan semua filter lainnya dan ekspor data berdasarkan ID.
+        if ($request->has('selectedLaporans') && is_array($request->selectedLaporans) && !empty($request->selectedLaporans)) {
+            $selectedLaporanIds = $request->selectedLaporans;
+            $data = Laporan::whereIn('id', $selectedLaporanIds)->get();
+
+            if ($data->isEmpty()) {
+                return redirect()->back()->with('error', 'Tidak ada data yang sesuai dengan ID yang dipilih.');
+            }
+            
+            $fileName = 'laporan_terpilih_' . date('Y-m-d') . '.xlsx';
+            return Excel::download(new LaporanExport($data), $fileName);
+        }
+
+        // Jika tidak ada laporan yang dipilih, lanjutkan dengan logika filter normal.
         $user = auth()->guard('admin')->user();
         $kategori = $this->getKategoriByRole($user->role, $user->unit);
 
-        $data = Laporan::query();
+        // Filter utama yang harus selalu ada untuk data lama.
+        $data = Laporan::query()
+            ->whereNotNull('disposisi')
+            ->whereNotNull('disposisi_terbaru');
 
-        // Logika utama untuk filter disposisi, yang memprioritaskan 'unassigned_disposition'
-        if ($request->has('filterAssignment') && $request->filterAssignment === 'unassigned_disposition') {
-            $data->whereNull('disposisi')->whereNull('disposisi_terbaru');
-        } else {
-            // Jika bukan unassigned_disposition, terapkan filter dasar whereNotNull
-            $data->whereNotNull('disposisi')
-                ->whereNotNull('disposisi_terbaru');
-
-            // Dan jika ada filter assigned/unassigned, tambahkan filter relasi
-            if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
-                if ($request->filterAssignment === 'assigned') {
-                    $data->has('assignments');
-                } elseif ($request->filterAssignment === 'unassigned') {
-                    $data->doesntHave('assignments');
-                }
-            }
-        }
-
-        // ... (Logika filter lainnya tetap sama di bawah ini) ...
+        // Filter berdasarkan role pengguna (seperti yang ada di Livewire).
         if ($user->role === 'analis') {
             $data->whereHas('assignments', function ($query) use ($user) {
                 $query->where('analis_id', $user->id_admins);
@@ -178,13 +178,28 @@ class ExportController extends Controller
             $data->whereIn('kategori', $kategori);
         }
         
-        // ... (sisa filter lainnya seperti filterKategori, filterStatus, dll.) ...
+        // Filter berdasarkan status assignment (assigned/unassigned).
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            if ($request->filterAssignment === 'assigned') {
+                $data->has('assignments');
+            } elseif ($request->filterAssignment === 'unassigned') {
+                $data->doesntHave('assignments');
+            } elseif ($request->filterAssignment === 'unassigned_disposition') {
+                return redirect()->back()->with('error', 'Filter "Belum Terdistribusi" tidak dapat digunakan bersama filter data lama.');
+            }
+        }
+
+        // Filter berdasarkan kategori.
         if ($request->has('filterKategori') && !empty($request->filterKategori)) {
             $data->where('kategori', $request->filterKategori);
         }
+
+        // Filter berdasarkan status.
         if ($request->has('filterStatus') && !empty($request->filterStatus)) {
             $data->where('status', $request->filterStatus);
         }
+
+        // Filter berdasarkan pencarian.
         if ($request->has('search') && !empty($request->search)) {
             $data->where(function ($query) use ($request) {
                 $query->where('nomor_tiket', 'like', '%' . $request->search . '%')
@@ -194,9 +209,13 @@ class ExportController extends Controller
                     ->orWhere('judul', 'like', '%' . $request->search . '%');
             });
         }
+
+        // Filter berdasarkan tanggal.
         if ($request->has('tanggal') && !empty($request->tanggal)) {
             $data->whereDate('created_at', $request->tanggal);
         }
+
+        // Filter berdasarkan sumber pengaduan.
         if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)) {
             $data->where('sumber_pengaduan', $request->sumber_pengaduan);
         }
@@ -207,6 +226,7 @@ class ExportController extends Controller
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
         }
 
+        // Penamaan file ekspor.
         $fileName = 'laporan_all';
         if ($request->has('filterKategori') && !empty($request->filterKategori)) {
             $fileName .= '_by_kategori_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->filterKategori));

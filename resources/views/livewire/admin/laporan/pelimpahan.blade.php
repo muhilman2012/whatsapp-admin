@@ -96,6 +96,9 @@
                                 <input type="hidden" name="search" value="{{ $search }}">
                                 <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
                                 <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                                @foreach($selected as $id)
+                                    <input type="hidden" name="selectedLaporans[]" value="{{ $id }}">
+                                @endforeach
                                 <button type="submit" class="dropdown-item">Export to PDF</button>
                             </form>
                         </li> -->
