@@ -150,12 +150,12 @@ class ExportController extends Controller
         $kategori = $this->getKategoriByRole($user->role, $user->unit);
 
         $data = Laporan::query()
-            ->whereNotNull('disposisi')  // Memastikan kolom disposisi diisi
-            ->whereNotNull('disposisi_terbaru');  // Memastikan kolom disposisi terbaru diisi
+            ->whereNotNull('disposisi')
+            ->whereNotNull('disposisi_terbaru');
 
         if ($user->role === 'analis') {
             $data->whereHas('assignments', function ($query) use ($user) {
-                $query->where('analis_id', $user->id_admins);  // Pastikan hanya mengambil laporan yang ditugaskan kepada analis yang login
+                $query->where('analis_id', $user->id_admins);
             });
         } else if ($user->role !== 'admin' && $user->role !== 'superadmin') {
             $data->whereIn('kategori', $kategori);
@@ -187,8 +187,16 @@ class ExportController extends Controller
             $data->where('sumber_pengaduan', $request->sumber_pengaduan);
         }
 
+        // Filter berdasarkan status assignment (assigned/unassigned)
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            if ($request->filterAssignment === 'assigned') {
+                $data->has('assignments');
+            } elseif ($request->filterAssignment === 'unassigned') {
+                $data->doesntHave('assignments');
+            }
+        }
+
         $data = $data->get();
-        // dd($data);
 
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
@@ -204,8 +212,11 @@ class ExportController extends Controller
         if ($request->has('tanggal') && !empty($request->tanggal)) {
             $fileName .= '_by_tanggal_' . \Carbon\Carbon::parse($request->tanggal)->format('d-m-Y');
         }
-        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)){
+        if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)) {
             $fileName .= '_by_' . str_replace(['/', '\\'], '_', str_replace(' ', '_', $request->sumber_pengaduan));
+        }
+        if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+            $fileName .= '_by_assignment_' . $request->filterAssignment;
         }
         $fileName .= '.xlsx';
 
