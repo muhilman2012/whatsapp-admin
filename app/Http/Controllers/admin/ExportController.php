@@ -151,26 +151,25 @@ class ExportController extends Controller
 
         $data = Laporan::query();
 
-        // Mengelompokkan semua filter utama dalam satu kondisi OR
-        $data->where(function ($query) use ($request) {
-            
-            // Kondisi 1: Filter untuk data yang sudah terdisposisi (data lama)
-            $query->whereNotNull('disposisi')
+        // Logika utama untuk filter disposisi, yang memprioritaskan 'unassigned_disposition'
+        if ($request->has('filterAssignment') && $request->filterAssignment === 'unassigned_disposition') {
+            $data->whereNull('disposisi')->whereNull('disposisi_terbaru');
+        } else {
+            // Jika bukan unassigned_disposition, terapkan filter dasar whereNotNull
+            $data->whereNotNull('disposisi')
                 ->whereNotNull('disposisi_terbaru');
 
-            // Kondisi 2: Filter untuk data yang sudah di-assign (data baru)
-            if ($request->has('filterAssignment') && $request->filterAssignment === 'assigned') {
-                $query->orWhere(function ($subquery) {
-                    $subquery->has('assignments');
-                });
+            // Dan jika ada filter assigned/unassigned, tambahkan filter relasi
+            if ($request->has('filterAssignment') && !empty($request->filterAssignment)) {
+                if ($request->filterAssignment === 'assigned') {
+                    $data->has('assignments');
+                } elseif ($request->filterAssignment === 'unassigned') {
+                    $data->doesntHave('assignments');
+                }
             }
-        });
-
-        // Menangani filter unassigned secara terpisah
-        if ($request->has('filterAssignment') && $request->filterAssignment === 'unassigned') {
-            $data->doesntHave('assignments');
         }
 
+        // ... (Logika filter lainnya tetap sama di bawah ini) ...
         if ($user->role === 'analis') {
             $data->whereHas('assignments', function ($query) use ($user) {
                 $query->where('analis_id', $user->id_admins);
@@ -179,15 +178,13 @@ class ExportController extends Controller
             $data->whereIn('kategori', $kategori);
         }
         
-        // ... (Filter lainnya di bawah ini) ...
+        // ... (sisa filter lainnya seperti filterKategori, filterStatus, dll.) ...
         if ($request->has('filterKategori') && !empty($request->filterKategori)) {
             $data->where('kategori', $request->filterKategori);
         }
-
         if ($request->has('filterStatus') && !empty($request->filterStatus)) {
             $data->where('status', $request->filterStatus);
         }
-
         if ($request->has('search') && !empty($request->search)) {
             $data->where(function ($query) use ($request) {
                 $query->where('nomor_tiket', 'like', '%' . $request->search . '%')
@@ -197,18 +194,15 @@ class ExportController extends Controller
                     ->orWhere('judul', 'like', '%' . $request->search . '%');
             });
         }
-
         if ($request->has('tanggal') && !empty($request->tanggal)) {
             $data->whereDate('created_at', $request->tanggal);
         }
-
         if ($request->has('sumber_pengaduan') && !empty($request->sumber_pengaduan)) {
             $data->where('sumber_pengaduan', $request->sumber_pengaduan);
         }
 
         $data = $data->get();
 
-        // ... (Logika ekspor tetap sama) ...
         if ($data->isEmpty()) {
             return redirect()->back()->with('error', 'Tidak ada data yang sesuai untuk diekspor.');
         }
