@@ -80,15 +80,18 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="exportFilteredDropdown">
                         <li>
-                            <form action="{{ route('admin.laporan.export.pelimpahan') }}" method="GET">
+                            <form action="{{ route('admin.laporan.export.pelimpahan') }}" method="POST">
+                                @csrf
                                 <input type="hidden" name="filterKategori" value="{{ $filterKategori }}">
                                 <input type="hidden" name="filterStatus" value="{{ $filterStatus }}">
                                 <input type="hidden" name="search" value="{{ $search }}">
-                                <input type="hidden" name="filterAssignment" value="{{ $filterAssignment }}">
                                 <input type="hidden" name="tanggal" value="{{ $tanggal }}">
+                                
+                                {{-- Loop untuk mengirim semua ID yang dipilih --}}
                                 @foreach($selected as $id)
                                     <input type="hidden" name="selectedLaporans[]" value="{{ $id }}">
                                 @endforeach
+                                
                                 <button type="submit" class="dropdown-item">Export to Excel</button>
                             </form>
                         </li>

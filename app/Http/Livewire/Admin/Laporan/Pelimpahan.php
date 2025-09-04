@@ -708,4 +708,10 @@ class Pelimpahan extends Component
         'deputi_3' => 'Deputi Bidang Dukungan Kebijakan Pemerintahan dan Pemerataan Pembangunan',
         'deputi_4' => 'Deputi Bidang Administrasi',
     ];
+
+    public function exportSelected()
+    {
+        // Redirect ke route export dengan ID yang dipilih
+        return redirect()->route('admin.laporan.export.pelimpahan', ['selectedLaporans' => $this->selected]);
+    }
 }

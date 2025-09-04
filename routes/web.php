@@ -90,7 +90,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth:admin'], function () {
         Route::post('admin/laporan/checkExportStatus', [ExportController::class, 'checkExportStatus'])->name('admin.laporan.checkExportStatus');
         Route::get('admin/laporan/export/filtered/excel', [ExportController::class, 'exportFilteredData'])->name('admin.laporan.export.filtered.excel');
         Route::get('admin/laporan/export/filtered/pdf', [ExportController::class, 'exportFilteredPdf'])->name('admin.laporan.export.filtered.pdf');
-        Route::get('admin/laporan/export/pelimpahan', [ExportController::class, 'exportPelimpahan'])->name('admin.laporan.export.pelimpahan');
+        Route::post('admin/laporan/export/pelimpahan', [ExportController::class, 'exportPelimpahan'])->name('admin.laporan.export.pelimpahan');
     });
 
     Route::get('/dashboard/user-management', [UserManagementController::class, 'index'])->name('admin.user_management.index');
